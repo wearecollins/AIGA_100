@@ -96,7 +96,6 @@ var App = function(){
 
 	this.onTouchUp = function( e ){
 	    e.preventDefault();
-		this.onMousePressed(e.layerX, e.layerY);
 
 		sb.send("red", "range", this.r);
 		sb.send("green", "range", this.g);
