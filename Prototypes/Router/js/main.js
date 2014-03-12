@@ -105,9 +105,9 @@ GridRouter.prototype.setupGridRoutes = function() {
 		if ( y - (w * div) >= div ){
 			w++;
 			who = clientMinus[w];
-			this.sb.addRoute( who.name, who.remoteAddress, "randomR", grid.name, grid.remoteAddress, "randomR");
-			this.sb.addRoute( who.name, who.remoteAddress, "randomG", grid.name, grid.remoteAddress, "randomG" );
-			this.sb.addRoute( who.name, who.remoteAddress, "randomB", grid.name, grid.remoteAddress, "randomB" );
+			this.sb.addRoute( grid.name, grid.remoteAddress, "randomR", who.name, who.remoteAddress, "randomR");
+			this.sb.addRoute( grid.name, grid.remoteAddress, "randomG", who.name, who.remoteAddress, "randomG" );
+			this.sb.addRoute( grid.name, grid.remoteAddress, "randomB" , who.name, who.remoteAddress, "randomB");
 		}
 		for ( var x =0; x<10; x ++){
 			var ind = x + y * 10;
