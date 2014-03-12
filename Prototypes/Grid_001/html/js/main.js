@@ -94,7 +94,7 @@ var App = function(){
 		this.onMousePressed(e.layerX, e.layerY);
 	}
 
-	this.onTouchUp = function( x,y ){
+	this.onTouchUp = function( e ){
 	    e.preventDefault();
 		this.onMousePressed(e.layerX, e.layerY);
 
