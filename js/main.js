@@ -113,6 +113,10 @@ var App = function(){
 		this.r = Math.round(rgb.r);
 		this.g = Math.round(rgb.g);
 		this.b = Math.round(rgb.b);
+		
+		sb.send("red", "range", this.r);
+		sb.send("green", "range", this.g);
+		sb.send("blue", "range", this.b);
 	};
 
 	//-------------------------------------------------------
