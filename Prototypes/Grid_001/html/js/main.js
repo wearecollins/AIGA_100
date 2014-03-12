@@ -43,6 +43,10 @@ var App = function(){
 	this.g = 0;
 	this.b = 0;
 
+	this.rE = 0;
+	this.gE = 0;
+	this.bE = 0;
+
 	//-------------------------------------------------------
 	this.setup = function() {
 		var random_id = "0000" + Math.floor(Math.random() * 10000);
@@ -61,10 +65,15 @@ var App = function(){
 		sb.addPublish( "red", "range", "0" );
 		sb.addPublish( "green", "range", "0" );
 		sb.addPublish( "blue", "range", "0" );
+		
 		sb.addSubscribe( "mode", "range" );
+		sb.addSubscribe( "randomR", "range" );
+		sb.addSubscribe( "randomG", "range" );
+		sb.addSubscribe( "randomB", "range" );
 
 		// override Spacebrew events - this is how you catch events coming from Spacebrew
 		sb.onCustomMessage = onCustomMessage;
+		sb.onRangeMessage  = this.onRangeMessage.bind(this);
 		sb.onOpen = onOpen;
 
 		// connect to spacbrew
@@ -81,7 +90,10 @@ var App = function(){
 
 	//-------------------------------------------------------
 	this.draw 	= function(){
-		$("body").css("background-color", "rgb(" + this.r +","+ this.g +"," + this.b + ")");
+		this.rE = this.rE * .75 + this.r * .25;
+		this.gE = this.gE * .75 + this.g * .25;
+		this.bE = this.bE * .75 + this.b * .25;
+		$("body").css("background-color", "rgb(" + Math.round(this.rE) +","+ Math.round(this.gE) +"," + Math.round(this.bE) + ")");
 	}
 
 	//-------------------------------------------------------
@@ -104,7 +116,6 @@ var App = function(){
 
 	//-------------------------------------------------------
 	this.onMousePressed = function( x,y ){
-		console.log("hey");
 		var hue = SUD.clamp(SUD.map(x,0,window.innerWidth, 0, 1.0), 0,1.0);
 		var sat = SUD.clamp(SUD.map(y,0,window.innerHeight, 0, 1.0),0.,1.0);
 
@@ -113,11 +124,14 @@ var App = function(){
 		this.r = Math.round(rgb.r);
 		this.g = Math.round(rgb.g);
 		this.b = Math.round(rgb.b);
+
+		sb.send("red", "range", this.r);
+		sb.send("green", "range", this.g);
+		sb.send("blue", "range", this.b);
 	};
 
 	//-------------------------------------------------------
 	this.onMouseDragged = function( x,y ){
-		console.log("yo");
 		this.onMousePressed(x,y);
 	};
 
@@ -125,6 +139,18 @@ var App = function(){
 	this.onMouseReleased = function( x,y ){
 		
 	};
+
+	this.onRangeMessage = function( name, value ){
+		if ( name == "mode" ){
+
+		} else if ( name == "randomR" ){
+			this.r = Math.round(value);
+		} else if ( name == "randomG" ){
+			this.g = Math.round(value);
+		} else if ( name == "randomB" ){
+			this.b = Math.round(value);
+		}
+	}
 }
 
 /**
@@ -143,11 +169,7 @@ function onOpen() {
  * @param  {[type]} value [description]
  * @return {[type]}       [description]
  */
-function onRangeMessage( name, value ){
-	if ( name == "mode" ){
 
-	}
-}
 
 /**
  * onCustomMessage Function that is called whenever new spacebrew custom messages are received.
