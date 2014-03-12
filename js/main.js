@@ -72,6 +72,7 @@ var App = function(){
 
 		document.getElementById("can").addEventListener("touchstart", this.onTouch.bind(this), false);
 		document.getElementById("can").addEventListener("touchmove", this.onTouch.bind(this), false);
+		document.getElementById("can").addEventListener("touchend", this.onTouchUp.bind(this), false);
 	}
 
 	//-------------------------------------------------------
@@ -93,6 +94,15 @@ var App = function(){
 		this.onMousePressed(e.layerX, e.layerY);
 	}
 
+	this.onTouchUp = function( x,y ){
+	    e.preventDefault();
+		this.onMousePressed(e.layerX, e.layerY);
+
+		sb.send("red", "range", this.r);
+		sb.send("green", "range", this.g);
+		sb.send("blue", "range", this.b);
+	};
+
 	//-------------------------------------------------------
 	this.onMousePressed = function( x,y ){
 		console.log("hey");
@@ -101,14 +111,9 @@ var App = function(){
 
 		var rgb = HSVtoRGB(hue, sat, sat)
 
-
 		this.r = Math.round(rgb.r);
 		this.g = Math.round(rgb.g);
-		this.b = Math.round(rgb.b);	
-
-		sb.send("red", "range", this.r);
-		sb.send("green", "range", this.g);
-		sb.send("blue", "range", this.b);
+		this.b = Math.round(rgb.b);
 	};
 
 	//-------------------------------------------------------
