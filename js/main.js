@@ -73,6 +73,7 @@ var App = function(){
 
 		// override Spacebrew events - this is how you catch events coming from Spacebrew
 		sb.onCustomMessage = onCustomMessage;
+		sb.onRangeMessage  = this.onRangeMessage.bind(this);
 		sb.onOpen = onOpen;
 
 		// connect to spacbrew
@@ -138,6 +139,18 @@ var App = function(){
 	this.onMouseReleased = function( x,y ){
 		
 	};
+
+	this.onRangeMessage = function( name, value ){
+		if ( name == "mode" ){
+
+		} else if ( name == "randomR" ){
+			this.r = Math.round(value);
+		} else if ( name == "randomG" ){
+			this.g = Math.round(value);
+		} else if ( name == "randomB" ){
+			this.b = Math.round(value);
+		}
+	}
 }
 
 /**
@@ -156,17 +169,7 @@ function onOpen() {
  * @param  {[type]} value [description]
  * @return {[type]}       [description]
  */
-function onRangeMessage( name, value ){
-	if ( name == "mode" ){
 
-	} else if ( name == "randomR" ){
-		this.r = Math.round(value);
-	} else if ( name == "randomG" ){
-		this.g = Math.round(value);
-	} else if ( name == "randomB" ){
-		this.b = Math.round(value);
-	}
-}
 
 /**
  * onCustomMessage Function that is called whenever new spacebrew custom messages are received.
