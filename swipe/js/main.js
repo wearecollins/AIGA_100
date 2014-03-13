@@ -94,10 +94,12 @@ $(document).ready( function() {
 				var cdNorm = [];
 				for ( var i=0; i<this.currentDrawing.length; i++){
 					cdNorm.push( { 
-									x:this.currentDrawing.x/this.canvas.width, 
+									x: this.currentDrawing.x/ this.canvas.width, 
 									y: this.currentDrawing.y / this.canvas.height
 								});
 				}
+
+				console.log( cdNorm );
 
 				sb.send("drawing","drawing", cdNorm);
 				this.currentDrawing = [];
