@@ -48,6 +48,7 @@ $(document).ready( function() {
 			this.canvas = document.getElementById("canvas");
 			// todo: set w/h
 			this.ctx 	= this.canvas.getContext('2d');
+			window.scrollTo(0,1);
 		}
 
 		//-------------------------------------------------------
@@ -58,6 +59,7 @@ $(document).ready( function() {
 		//-------------------------------------------------------
 		this.draw = function (){
 			this.canvas.width = this.canvas.width;
+			this.ctx.clearRect(0,0,1280,2272);
 			if ( this.currentDrawing.length > 0 ){
 				this.ctx.beginPath();
 				this.ctx.moveTo(this.currentDrawing[0].x, this.currentDrawing[0].y);
