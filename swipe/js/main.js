@@ -59,7 +59,7 @@ $(document).ready( function() {
 		//-------------------------------------------------------
 		this.draw = function (){
 			this.canvas.width = this.canvas.width;
-			this.ctx.clearRect(0,0,1280,2272);
+			this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
 			if ( this.currentDrawing.length > 0 ){
 				this.ctx.beginPath();
 				this.ctx.moveTo(this.currentDrawing[0].x, this.currentDrawing[0].y);
@@ -89,7 +89,17 @@ $(document).ready( function() {
 		this.onTouchEnd = function( id, x,y ){
 			if ( id == this.touchId ){
 				this.touchId = -1;
-				sb.send("drawing","drawing", this.currentDrawing);
+
+				// normalize current drawing
+				var cdNorm = [];
+				for ( var i=0; i<this.currentDrawing.length; i++){
+					cdNorm.push( { 
+									x:this.currentDrawing.x/this.canvas.width, 
+									y: this.currentDrawing.y / this.canvas.height
+								});
+				}
+
+				sb.send("drawing","drawing", cdNorm);
 				this.currentDrawing = [];
 			}
 		};
