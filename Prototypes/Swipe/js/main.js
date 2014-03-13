@@ -48,6 +48,7 @@ $(document).ready( function() {
 			this.canvas = document.getElementById("canvas");
 			// todo: set w/h
 			this.ctx 	= this.canvas.getContext('2d');
+			window.scrollTo(0,1);
 		}
 
 		//-------------------------------------------------------
@@ -57,7 +58,8 @@ $(document).ready( function() {
 
 		//-------------------------------------------------------
 		this.draw = function (){
-			this.ctx.width = this.ctx.width;
+			this.canvas.width = this.canvas.width;
+			this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
 			if ( this.currentDrawing.length > 0 ){
 				this.ctx.beginPath();
 				this.ctx.moveTo(this.currentDrawing[0].x, this.currentDrawing[0].y);
@@ -87,6 +89,20 @@ $(document).ready( function() {
 		this.onTouchEnd = function( id, x,y ){
 			if ( id == this.touchId ){
 				this.touchId = -1;
+
+				// normalize current drawing
+				var cdNorm = [];
+				for ( var i=0; i<this.currentDrawing.length; i++){
+					cdNorm.push( { 
+									x: this.currentDrawing[i].x / parseInt(window.innerWidth), 
+									y: this.currentDrawing[i].y / parseInt(window.innerHeight)
+								});
+				}
+
+				console.log( cdNorm );
+
+				sb.send("drawing","drawing", cdNorm);
+				this.currentDrawing = [];
 			}
 		};
 

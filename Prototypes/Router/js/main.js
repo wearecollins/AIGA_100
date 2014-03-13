@@ -90,6 +90,12 @@ GridRouter.prototype.setupGridRoutes = function() {
 		}
 	}
 
+	//
+	var d = this.sb.publishListByType("drawing");
+	if ( d.length > 0 ){
+		this.sb.addRoute( d[0].clientName, d[0].remoteAddress, "drawing" , grid.name, grid.remoteAddress, "drawing");
+	}
+
 	if ( clientMinus.length == 0 || grid === undefined ) return;
 
 	var div = 10/clientMinus.length;
