@@ -70,7 +70,7 @@ $(document).ready( function() {
 
 		//-------------------------------------------------------
 		this.onTouchStart = function( id, x,y ){
-			console.log( id );
+			console.log( id +":"+ this.touchId);
 			if ( this.touchId == -1 ){
 				this.touchId = id;
 				this.currentDrawing.push({x:x, y:y});
@@ -79,8 +79,7 @@ $(document).ready( function() {
 
 		//-------------------------------------------------------
 		this.onTouchMove = function( id, x,y ){
-			console.log( id );
-			console.log( id );
+			console.log( id +":"+ this.touchId +":"+ this.currentDrawing.length);
 			if ( id == this.touchId ){
 				this.currentDrawing.push({x:x, y:y});
 			}
