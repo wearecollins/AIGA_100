@@ -70,7 +70,6 @@ $(document).ready( function() {
 
 		//-------------------------------------------------------
 		this.onTouchStart = function( id, x,y ){
-			console.log( id +":"+ this.touchId);
 			if ( this.touchId == -1 ){
 				this.touchId = id;
 				this.currentDrawing.push({x:x, y:y});
@@ -79,7 +78,6 @@ $(document).ready( function() {
 
 		//-------------------------------------------------------
 		this.onTouchMove = function( id, x,y ){
-			console.log( id +":"+ this.touchId +":"+ this.currentDrawing.length);
 			if ( id == this.touchId ){
 				this.currentDrawing.push({x:x, y:y});
 			}
@@ -87,9 +85,10 @@ $(document).ready( function() {
 
 		//-------------------------------------------------------
 		this.onTouchEnd = function( id, x,y ){
-			console.log( id );
 			if ( id == this.touchId ){
 				this.touchId = -1;
+				sb.send("drawing","drawing", this.currentDrawing);
+				this.currentDrawing = [];
 			}
 		};
 
