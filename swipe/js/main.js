@@ -94,8 +94,8 @@ $(document).ready( function() {
 				var cdNorm = [];
 				for ( var i=0; i<this.currentDrawing.length; i++){
 					cdNorm.push( { 
-									x: this.currentDrawing[i].x / parseInt(this.canvas.width), 
-									y: this.currentDrawing[i].y / parseInt(this.canvas.height)
+									x: this.currentDrawing[i].x / parseInt(window.innerWidth), 
+									y: this.currentDrawing[i].y / parseInt(window.innerHeight)
 								});
 				}
 
