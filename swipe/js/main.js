@@ -57,7 +57,7 @@ $(document).ready( function() {
 
 		//-------------------------------------------------------
 		this.draw = function (){
-			this.ctx.width = this.ctx.width;
+			this.canvas.width = this.canvas.width;
 			if ( this.currentDrawing.length > 0 ){
 				this.ctx.beginPath();
 				this.ctx.moveTo(this.currentDrawing[0].x, this.currentDrawing[0].y);
