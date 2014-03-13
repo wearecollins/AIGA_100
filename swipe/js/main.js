@@ -49,6 +49,14 @@ $(document).ready( function() {
 			// todo: set w/h
 			this.ctx 	= this.canvas.getContext('2d');
 			window.scrollTo(0,1);
+
+			// grid
+			this.grid = [];
+			for ( var x=0; x<10; x++){
+				for ( var y=0; y<10; y++){
+					this.grid.push({x: x, y: y, filled: false });
+				}
+			}
 		}
 
 		//-------------------------------------------------------
@@ -60,13 +68,29 @@ $(document).ready( function() {
 		this.draw = function (){
 			this.canvas.width = this.canvas.width;
 			this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
-			if ( this.currentDrawing.length > 0 ){
+			/*if ( this.currentDrawing.length > 0 ){
 				this.ctx.beginPath();
 				this.ctx.moveTo(this.currentDrawing[0].x, this.currentDrawing[0].y);
 				for ( var i=1; i<this.currentDrawing.length; i++){
 					this.ctx.lineTo(this.currentDrawing[i].x, this.currentDrawing[i].y);
 				}
 				this.ctx.stroke();
+			}*/
+
+			var w = 10;
+			var x = parseInt(this.canvas.width) / 2.0 - (w * 10 /2.0);
+			var y = parseInt(this.canvas.height) / 2.0 - (w * 10 /2.0);
+
+			for ( var i=0; i<this.grid.length; i++){
+				this.ctx.rect( 	x + this.grid[i] * w,
+								y + this.grid[i] * w, 
+								w,
+								w);
+				if ( this.grid[i].filled ){
+					this.ctx.fill();
+				} else {
+					this.ctx.stroke();
+				}
 			}
 		}	
 
