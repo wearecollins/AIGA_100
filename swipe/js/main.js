@@ -64,34 +64,45 @@ $(document).ready( function() {
 
 		}
 
+		var log = true;
+
 		//-------------------------------------------------------
 		this.draw = function (){
 			this.canvas.width = this.canvas.width;
 			this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
-			if ( this.currentDrawing.length > 0 ){
-				this.ctx.beginPath();
-				this.ctx.moveTo(this.currentDrawing[0].x, this.currentDrawing[0].y);
-				for ( var i=1; i<this.currentDrawing.length; i++){
-					this.ctx.lineTo(this.currentDrawing[i].x, this.currentDrawing[i].y);
-				}
-				this.ctx.stroke();
-			}
-
-			// var w = 10;
-			// var x = parseInt(this.canvas.width) / 2.0 - (w * 10 /2.0);
-			// var y = parseInt(this.canvas.height) / 2.0 - (w * 10 /2.0);
-
-			// for ( var i=0; i<this.grid.length; i++){
-			// 	this.ctx.rect( 	x + this.grid[i] * w,
-			// 					y + this.grid[i] * w, 
-			// 					w,
-			// 					w);
-			// 	if ( this.grid[i].filled ){
-			// 		this.ctx.fill();
-			// 	} else {
-			// 		this.ctx.stroke();
+			// if ( this.currentDrawing.length > 0 ){
+			// 	this.ctx.beginPath();
+			// 	this.ctx.moveTo(this.currentDrawing[0].x, this.currentDrawing[0].y);
+			// 	for ( var i=1; i<this.currentDrawing.length; i++){
+			// 		this.ctx.lineTo(this.currentDrawing[i].x, this.currentDrawing[i].y);
 			// 	}
+			// 	this.ctx.stroke();
 			// }
+
+			var w = 100;
+			var x = parseInt(this.canvas.width) / 2.0 - ((w * 10)/2.0);
+			var y = parseInt(this.canvas.height) / 2.0 - ((w * 10) /2.0);
+
+
+			for ( var i=0; i<this.grid.length; i++){
+				if ( log ){
+					console.log( x + this.grid[i].x * w,
+								y + this.grid[i].y * w, 
+								w,
+								w);
+				}
+				this.ctx.beginPath();
+				this.ctx.rect( 	x + this.grid[i].x * w,
+								y + this.grid[i].y * w, 
+								w,
+								w);
+				if ( this.grid[i].filled ){
+					this.ctx.fill();
+				} else {
+					this.ctx.stroke();
+				}
+			}
+			log = false;
 		}	
 
 		//-------------------------------------------------------
