@@ -97,7 +97,6 @@ $(document).ready( function() {
 								(w * .8)/2,
 								0,2*Math.PI);
 				if ( this.grid[i].filled ){
-					console.log("yes");
 					this.ctx.fill();
 				} else {
 					this.ctx.stroke();
@@ -107,10 +106,14 @@ $(document).ready( function() {
 		}	
 
 		this.checkGrid = function(x,y){
-			console.log( this.checkGrid );
+
+			var w = 25;
+			var cx = parseInt(this.canvas.width) / 2.0 - ((w * 10)/2.0);
+			var cy = parseInt(this.canvas.height) / 2.0 - ((w * 10) /2.0);
+
 			for ( var i=0; i<this.grid.length; i++){
-				var rx = x + this.grid[i].x * w;
-				var ry = y + this.grid[i].y * w;
+				var rx = cx + this.grid[i].x * w;
+				var ry = cy + this.grid[i].y * w;
 
 				if ( x <= rx + w/2 && x >= rx - w/2 &&
 					 y <= ry + w/2 && y >= ry - w/2 ){
