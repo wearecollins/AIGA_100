@@ -79,7 +79,7 @@ $(document).ready( function() {
 			// 	this.ctx.stroke();
 			// }
 
-			var w = 100;
+			var w = 50;
 			var x = parseInt(this.canvas.width) / 2.0 - ((w * 10)/2.0);
 			var y = parseInt(this.canvas.height) / 2.0 - ((w * 10) /2.0);
 
