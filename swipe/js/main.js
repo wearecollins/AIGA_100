@@ -97,6 +97,7 @@ $(document).ready( function() {
 								(w * .8)/2,
 								0,2*Math.PI);
 				if ( this.grid[i].filled ){
+					console.log("yes");
 					this.ctx.fill();
 				} else {
 					this.ctx.stroke();
@@ -106,6 +107,7 @@ $(document).ready( function() {
 		}	
 
 		this.checkGrid = function(x,y){
+			console.log( this.checkGrid );
 			for ( var i=0; i<this.grid.length; i++){
 				var rx = x + this.grid[i].x * w;
 				var ry = y + this.grid[i].y * w;
