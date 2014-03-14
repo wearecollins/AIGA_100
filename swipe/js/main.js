@@ -58,6 +58,9 @@ $(document).ready( function() {
 					this.grid.push({x: x, y: y, filled: false });
 				}
 			}
+
+			this.gridIndices = [];
+
 			this.color = {};
 			this.color.r = SUD.randomInt(0,255);
 			this.color.g = SUD.randomInt(0,255);
@@ -112,6 +115,7 @@ $(document).ready( function() {
 			log = false;
 		}	
 
+		//-------------------------------------------------------
 		this.checkGrid = function(x,y){
 
 			var w = 50;
@@ -125,10 +129,10 @@ $(document).ready( function() {
 				if ( x <= rx + w/2 && x >= rx - w/2 &&
 					 y <= ry + w/2 && y >= ry - w/2 ){
 					this.grid[i].filled = true;
-					return true;
+					return i;
 				}
 			}
-			return false;
+			return -1;
 		}
 
 		//-------------------------------------------------------
@@ -138,7 +142,10 @@ $(document).ready( function() {
 				//this.currentDrawing.push({x:x, y:y});
 				
 				// are we over any grid squares?
-				this.checkGrid(x,y);
+				var ind = this.checkGrid(x,y);
+				if ( ind != -1 ){
+					this.gridIndices.push(ind);
+				}
 			}
 		};
 
@@ -146,7 +153,10 @@ $(document).ready( function() {
 		this.onTouchMove = function( id, x,y ){
 			if ( id == this.touchId ){
 				//this.currentDrawing.push({x:x, y:y});
-				this.checkGrid(x,y);
+				var ind = this.checkGrid(x,y);
+				if ( ind != -1 ){
+					this.gridIndices.push(ind);
+				}
 			}
 		};
 
@@ -170,11 +180,13 @@ $(document).ready( function() {
 				//this.currentDrawing = [];
 				
 				// send grid obj + color
-				sb.send("grid", "grid", {grid: this.grid, color: this.color })
+				sb.send("grid", "grid", {grid: this.grid, color: this.color, indices:this.gridIndices })
 
 				for ( var i=0; i<this.grid.length; i++){
 					this.grid[i].filled = false;
 				}
+
+				this.gridIndices = [];
 			}
 		};
 
