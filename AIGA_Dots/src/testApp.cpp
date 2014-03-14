@@ -82,6 +82,7 @@ void testApp::setup(){
         spacebrew.addSubscribe("dot_"+ofToString(i)+"_b", &dots[i].b );
     }
     spacebrew.addSubscribe("drawing", "drawing" );
+    spacebrew.addSubscribe("grid", "grid" );
     
     //spacebrew.setAutoReconnect();
     spacebrew.connect(br_server, "grid_display");
@@ -219,10 +220,44 @@ void testApp::update(){
                 drawings[i].age++;
             }
             
-            
             for ( int i=drawings.size()-1; i>=0; i--){
                 if ( drawings[i].age >= maxDrawingAge ){
                     drawings.erase(drawings.begin() + i);
+                }
+            }
+        }
+    }
+    // MODE: Interactive grid
+    else if ( currentMode == MODE_INTERACTIVE_GRID ){
+        if ( gridDrawings.size() != 0 ){
+            // first update indices
+            for ( int i=0; i<gridDrawings.size(); i++){
+                if ( ofGetElapsedTimeMillis() - gridDrawings[i].lastChanged > swipeChangeTimer ){
+                    gridDrawings[i].index++;
+                    if (  gridDrawings[i].index >= gridDrawings[i].grid.size() ){
+                        gridDrawings[i].index = 0;
+                    }
+                    gridDrawings[i].lastChanged = ofGetElapsedTimeMillis();
+                }
+                
+                int x = 9 - gridDrawings[i].index % 10;
+                int y = floor(gridDrawings[i].index/10);
+                int ind = x + y * 10;
+                
+                int indO = gridDrawings[i].index;
+                if ( gridDrawings[i].grid[indO] ){
+                    float mult =(float) (maxDrawingAge-gridDrawings[i].age) / maxDrawingAge;
+                    dots[ind].r = gridDrawings[i].color.r * mult;
+                    dots[ind].g = gridDrawings[i].color.g * mult;
+                    dots[ind].b = gridDrawings[i].color.b * mult;
+                }
+                gridDrawings[i].age++;
+            }
+            
+            
+            for ( int i=gridDrawings.size()-1; i>=0; i--){
+                if ( gridDrawings[i].age >= maxDrawingAge ){
+                    gridDrawings.erase(gridDrawings.begin() + i);
                 }
             }
         }
@@ -280,6 +315,17 @@ void testApp::keyPressed(int key){
 void testApp::keyReleased(int key){}
 void testApp::mouseMoved(int x, int y ){}
 
+float jsonAsFloat( Json::Value val, string prop ){
+    if ( val[prop].isString() ){
+        return ofToFloat( val[prop].asString() );
+    } else if ( val[prop].isInt() ){
+        return val[prop].asInt();
+    } else if ( val[prop].isDouble() ){
+        return val[prop].asDouble();
+    } else {
+        cout <<"Mystery type "<<val.type()<<endl;
+    }
+}
 
 //--------------------------------------------------------------
 void testApp::onMessage( Spacebrew::Message & m ){
@@ -292,29 +338,49 @@ void testApp::onMessage( Spacebrew::Message & m ){
         r.parse(m.value, val);
         
         // drawing is json array...
-    
-        
         Drawing d;
         d.color = ofColor(ofRandom(255),ofRandom(255),ofRandom(255));
         
         for (int i=0; i<val.size(); i++){
             Json::Value v = val[i];
-            float x, y;
-            if ( v["x"].isString() ){
-                x = ofToInt( v["x"].asString() );
-                y = ofToInt( v["y"].asString() );
-            } else if ( v["x"].isInt() ){
-                x = v["x"].asInt();
-                y = v["y"].asInt();
-            } else if ( v["x"].isDouble() ){
-                x = v["x"].asDouble();
-                y = v["y"].asDouble();
-            } else {
-                cout << "hm "<< v["x"].type() << endl;
-            }
+            float x = jsonAsFloat(v, "x");
+            float y = jsonAsFloat(v, "x");
             d.points.push_back(ofVec2f(x,y));
         }
         drawings.push_back(d);
+    } else if ( m.type == "grid" ){
+        Json::Value val;
+        Json::Reader r;
+        r.parse(m.value, val);
+        
+        // drawing is json array...
+        
+        
+        GridDrawing d;
+        // set color
+        
+        if ( val["color"].isObject() ){
+            d.color.r = jsonAsFloat(val["color"], "r");
+            d.color.g = jsonAsFloat(val["color"], "g");
+            d.color.b = jsonAsFloat(val["color"], "b");
+        }
+        
+        if ( val["grid"].isArray() ){
+            for (int i=0; i<val["grid"].size(); i++){
+                Json::Value v = val["grid"][i];
+                bool filled = false;
+                if ( v["filled"].isBool() ){
+                    filled = v["filled"].asBool();
+                } else if ( v["filled"].isInt() ){
+                    filled = v["filled"].asBool();
+                } else {
+                    cout << v["filled"].type();
+                }
+                d.grid.push_back(filled);
+            }
+        }
+        
+        gridDrawings.push_back(d);
     }
 }
 

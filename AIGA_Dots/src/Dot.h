@@ -77,7 +77,7 @@ public:
             
 //            float h = (float) sin(ofGetElapsedTimeMillis() * (speed * 10) );
 //            floatColor.setHue( floatColor.getHue() + ofMap(h, -1.,1.,-.001,.001) );
-        } else if ( mode== MODE_INTERACTIVE_SWIPE ) {
+        } else if ( mode== MODE_INTERACTIVE_SWIPE || mode== MODE_INTERACTIVE_GRID ) {
             
             floatColor.r = floatColor.r * .9 + ( r / 255.0 ) * .1;
             floatColor.g = floatColor.g * .9 + ( g / 255.0 ) * .1;

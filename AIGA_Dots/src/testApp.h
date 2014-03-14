@@ -14,6 +14,14 @@ struct Drawing {
     ofColor color;
 };
 
+struct GridDrawing {
+    vector<bool> grid;
+    int index = 0;
+    int age = 0;
+    int lastChanged = 0;
+    ofColor color;
+};
+
 class testApp : public ofBaseApp{
 
 	public:
@@ -47,6 +55,7 @@ class testApp : public ofBaseApp{
     
         // swipe
         vector<Drawing> drawings;
+        vector<GridDrawing> gridDrawings;
         int index;
     
         // spacebrew
