@@ -31,6 +31,7 @@ $(document).ready( function() {
 
 			// configure the publication and subscription feeds
 			sb.addPublish( "drawing", "drawing", "[]" );
+			sb.addPublish( "grid", "grid", "{}" );
 			
 			sb.addSubscribe( "mode", "range" );
 			sb.addSubscribe( "randomR", "range" );
@@ -168,6 +169,9 @@ $(document).ready( function() {
 				//sb.send("drawing","drawing", cdNorm);
 				//this.currentDrawing = [];
 				
+				// send grid obj + color
+				sb.send("grid", "grid", {grid: this.grid, color: this.color })
+
 				for ( var i=0; i<this.grid.length; i++){
 					this.grid[i].filled = false;
 				}
