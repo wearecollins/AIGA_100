@@ -16,6 +16,7 @@ struct Drawing {
 
 struct GridDrawing {
     vector<bool> grid;
+    vector<int> indices;
     int index = 0;
     int age = 0;
     int lastChanged = 0;
@@ -68,4 +69,5 @@ class testApp : public ofBaseApp{
         ofVideoPlayer video;
     
         ofFbo screen;
+        ofFbo pattern;
 };

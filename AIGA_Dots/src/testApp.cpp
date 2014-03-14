@@ -6,11 +6,10 @@ float circleInt = 360.0 / circleRes;
 ofVec2f dims;
 
 float scale = 1.0;
-int spacing = 36;
-int gridSize = 10;
 
 bool bMapChip = false;
 bool bShowRender = false;
+bool bShowPattern = false;
 
 string br_server = "spacebrew.robotconscience.com";
 
@@ -21,8 +20,8 @@ bool bNeedToSend        = false;
 
 // swipe counter
 int lastSwipeChanged    = 0;
-int swipeChangeTimer    = 100;
-float maxDrawingAge     = 60 * 10;
+int swipeChangeTimer    = 30;
+float maxDrawingAge     = 60 * 5;
 
 //--------------------------------------------------------------
 void testApp::setup(){
@@ -58,6 +57,8 @@ void testApp::setup(){
         bars.push_back(0.0);
     }
     
+    currentMode = MODE_INTERACTIVE_GRID;
+    
     // setup gui
     gui = new ofxUICanvas(0,0, ofGetWidth()/2.0, ofGetHeight());
     gui->toggleVisible();
@@ -65,6 +66,7 @@ void testApp::setup(){
     gui->addToggle("Map Chip", &bMapChip);
     gui->addIntSlider("Mode", MODE_COLOR, MODE_DATA, &currentMode);
     gui->addToggle("Show Rendering", &bShowRender );
+    gui->addToggle("Show Pattern", &bShowPattern);
     lastMode = currentMode;
     
 //    ofSetLogLevel(OF_LOG_VERBOSE);
@@ -96,10 +98,61 @@ void testApp::setup(){
     rendering.loadImage("view.jpg");
     
     screen.allocate(ofGetWidth(), ofGetHeight());
+    
+    ofDisableLighting();
 }
 
 //--------------------------------------------------------------
 void testApp::update(){
+    
+    if ( !pattern.isAllocated() ){
+        // render pattern
+        pattern.allocate(1024,1024);
+        pattern.getTextureReference().setTextureWrap(GL_MIRRORED_REPEAT,GL_MIRRORED_REPEAT);
+        
+        ofDirectory dir;
+        int n = dir.listDir("patterns");
+        vector<ofImage> ptns;
+        for (int i=0; i<n; i++){
+            ptns.push_back(ofImage());
+            ptns.back().loadImage(dir.getPath(i));
+        }
+        
+//        ptns[0].loadImage("patterns/dots.png");
+//        ptns[1].loadImage("patterns/stripes.png");
+        
+        pattern.begin();
+        ofDisableAlphaBlending();
+        ofClear(255);
+        ofSetColor(255,255,255,255);
+        for (int x=0; x<pattern.getWidth(); x+=64){
+            for (int y=0; y<pattern.getHeight(); y+=64){
+                // draw two rows
+                ofImage p = ptns[(int) floor(ofRandom(ptns.size()))];
+                p.draw(x,y);
+                p.draw(x+16,y);
+                p.draw(x+32,y);
+                p.draw(x+48,y);
+                
+                p.draw(x,y+16);
+                p.draw(x+16,y+16);
+                p.draw(x+32,y+16);
+                p.draw(x+48,y+16);
+                
+                p.draw(x,y+32);
+                p.draw(x+16,y+32);
+                p.draw(x+32,y+32);
+                p.draw(x+48,y+32);
+                
+                p.draw(x,y+48);
+                p.draw(x+16,y+48);
+                p.draw(x+32,y+48);
+                p.draw(x+48,y+48);
+            }
+        }
+        pattern.end();
+    }
+    
     for (int i=0; i<dots.size(); i++){
         dots[i].mode = (Mode) currentMode;
     }
@@ -118,7 +171,16 @@ void testApp::update(){
             video.setLoopState(OF_LOOP_NORMAL);
         } else if ( currentMode == MODE_INTERACTIVE_SWIPE ){
             for (int i=0; i<dots.size(); i++){
-                dots[i].r = dots[i].g = dots[i].b = 0;
+                dots[i].r = dots[i].g = dots[i].b = 255;
+            }
+        } else {
+            for (int i=0; i<dots.size(); i++){
+                dots[i].r = ofRandom(255);
+                dots[i].g = ofRandom(255);
+                dots[i].b = ofRandom(255);
+                dots[i].floatColor.r = dots[i].r / 255.;
+                dots[i].floatColor.g = dots[i].g / 255.;
+                dots[i].floatColor.b = dots[i].b / 255.;
             }
         }
     }
@@ -211,7 +273,7 @@ void testApp::update(){
                 for (int j=0; j<dots.size(); j++){
                     ofVec2f d = ofVec2f(dots[j].x, dots[j].y);
                     if ( d.distance(sv) < dots[j].width * 2 ){
-                        float mult =(float) (maxDrawingAge-drawings[i].age) / maxDrawingAge;
+                        float mult = 1.0;//(float) (maxDrawingAge-drawings[i].age) / maxDrawingAge;
                         dots[j].r = drawings[i].color.r * mult;
                         dots[j].g = drawings[i].color.g * mult;
                         dots[j].b = drawings[i].color.b * mult;
@@ -234,17 +296,19 @@ void testApp::update(){
             for ( int i=0; i<gridDrawings.size(); i++){
                 if ( ofGetElapsedTimeMillis() - gridDrawings[i].lastChanged > swipeChangeTimer ){
                     gridDrawings[i].index++;
-                    if (  gridDrawings[i].index >= gridDrawings[i].grid.size() ){
-                        gridDrawings[i].index = 0;
+                    if (  gridDrawings[i].index >= gridDrawings[i].indices.size() ){
+//                        gridDrawings[i].index = 0;
+                        gridDrawings[i].age = 1000;
+                        continue;
                     }
                     gridDrawings[i].lastChanged = ofGetElapsedTimeMillis();
                 }
                 
-                int x = 9 - gridDrawings[i].index % 10;
-                int y = floor(gridDrawings[i].index/10);
+                int x = 9 - gridDrawings[i].indices[gridDrawings[i].index] % 10;
+                int y = floor(gridDrawings[i].indices[gridDrawings[i].index]/10);
                 int ind = x + y * 10;
                 
-                int indO = gridDrawings[i].index;
+                int indO = gridDrawings[i].indices[gridDrawings[i].index];
                 if ( gridDrawings[i].grid[indO] ){
                     float mult =(float) (maxDrawingAge-gridDrawings[i].age) / maxDrawingAge;
                     dots[ind].r = gridDrawings[i].color.r * mult;
@@ -266,6 +330,10 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
+    ofColor white;
+    ofColor offWhite(200,200,200);
+    ofBackgroundGradient(white, offWhite);
+    
 //    kidd.draw(realX - 25, realY - 25);
     if (bShowRender) {
         ofSetColor(255);
@@ -273,11 +341,13 @@ void testApp::draw(){
         rendering.draw(0,0, rendering.width * scale, rendering.height * scale);
     }
     
-    ofEnableLighting();
+    //ofEnableLighting();
     ofEnableDepthTest();
     camera.begin();
     bool bMap = bMapChip;
     if ( bMap ) kidd.bind();
+    else pattern.getTextureReference().bind();
+    
     ofPushMatrix();
     ofTranslate(-ofGetWidth()/4.0, -ofGetHeight()/4.0);//realX, realY);
     for (int i=0; i<dots.size(); i++){
@@ -285,11 +355,16 @@ void testApp::draw(){
     }
     ofPopMatrix();
     if ( bMap ) kidd.unbind();
+    else pattern.getTextureReference().unbind();
+    
     camera.end();
     ofDisableDepthTest();
     ofDisableLighting();
     
     ofDrawBitmapString("Press ' ' to clear", 20,20);
+    if ( bShowPattern ){
+        pattern.draw(0,0);
+    }
 }
 
 //--------------------------------------------------------------
@@ -315,16 +390,21 @@ void testApp::keyPressed(int key){
 void testApp::keyReleased(int key){}
 void testApp::mouseMoved(int x, int y ){}
 
-float jsonAsFloat( Json::Value val, string prop ){
-    if ( val[prop].isString() ){
-        return ofToFloat( val[prop].asString() );
-    } else if ( val[prop].isInt() ){
-        return val[prop].asInt();
-    } else if ( val[prop].isDouble() ){
-        return val[prop].asDouble();
+float jsonAsFloat( Json::Value val ){
+    if ( val.isString() ){
+        return ofToFloat( val.asString() );
+    } else if ( val.isInt() ){
+        return val.asInt();
+    } else if ( val.isDouble() ){
+        return val.asDouble();
     } else {
         cout <<"Mystery type "<<val.type()<<endl;
+        return 0.0;
     }
+}
+
+float jsonAsFloat( Json::Value val, string prop ){
+    return jsonAsFloat(val[prop]);
 }
 
 //--------------------------------------------------------------
@@ -344,7 +424,7 @@ void testApp::onMessage( Spacebrew::Message & m ){
         for (int i=0; i<val.size(); i++){
             Json::Value v = val[i];
             float x = jsonAsFloat(v, "x");
-            float y = jsonAsFloat(v, "x");
+            float y = jsonAsFloat(v, "y");
             d.points.push_back(ofVec2f(x,y));
         }
         drawings.push_back(d);
@@ -377,6 +457,13 @@ void testApp::onMessage( Spacebrew::Message & m ){
                     cout << v["filled"].type();
                 }
                 d.grid.push_back(filled);
+            }
+        }
+        
+        if ( val["indices"].isArray() ){
+            for (int i=0; i<val["indices"].size(); i++){
+                Json::Value v = val["indices"][i];
+                d.indices.push_back(jsonAsFloat(v));
             }
         }
         

@@ -8,3 +8,8 @@ enum Mode {
     MODE_VIDEO,
     MODE_DATA
 };
+
+
+static const int spacing = 36;
+static const int gridSize = 10;
+const float gridWidth = spacing * gridSize;

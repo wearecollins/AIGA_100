@@ -44,7 +44,7 @@ public:
         for ( i; i<mesh.getNumVertices(); i++){
             mesh.setVertex(i, mesh.getVertex(i).rotate(90.0, 0.0, 0.0) );
             ofVec3f vert = mesh.getVertex(i);
-            mesh.setTexCoord(i, ofVec2f( (x + vert.x)/(ofGetWidth()/2.0) ,1-(y + vert.y)/(ofGetHeight()/2.0)) );
+            mesh.setTexCoord(i, ofVec2f( (x + vert.x)/(gridWidth) ,1-(y + vert.y)/(gridWidth)) );
             mesh.addColor(ofFloatColor(1.0));
         }
         
@@ -82,6 +82,10 @@ public:
             floatColor.r = floatColor.r * .9 + ( r / 255.0 ) * .1;
             floatColor.g = floatColor.g * .9 + ( g / 255.0 ) * .1;
             floatColor.b = floatColor.b * .9 + ( b/ 255.0 ) * .1;
+            
+            r = r * .9 + 255 * .1;
+            g = g * .9 + 255 * .1;
+            b = b * .9 + 255 * .1;
         }
         
         
