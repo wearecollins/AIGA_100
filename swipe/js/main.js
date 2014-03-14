@@ -88,6 +88,7 @@ $(document).ready( function() {
 			var y = parseInt(this.canvas.height) / 2.0 - ((w * 9) /2.0);
 
 			this.ctx.fillStyle = ("rgb("+ this.color.r+"," + this.color.g + "," + this.color.b + ")");
+			this.ctx.strokeStyle = ("rgb("+ this.color.r+"," + this.color.g + "," + this.color.b + ")");
 
 			for ( var i=0; i<this.grid.length; i++){
 				if ( log ){
