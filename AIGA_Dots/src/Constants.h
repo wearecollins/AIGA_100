@@ -1,0 +1,9 @@
+#pragma once
+
+enum Mode {
+    MODE_COLOR = 0,
+    MODE_INTERACTIVE_COLOR,
+    MODE_INTERACTIVE_SWIPE,
+    MODE_VIDEO,
+    MODE_DATA
+};

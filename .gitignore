@@ -1,0 +1,4 @@
+*.app
+xcuserdata
+.DS_Store
+*.mov
