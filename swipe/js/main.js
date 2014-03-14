@@ -57,6 +57,10 @@ $(document).ready( function() {
 					this.grid.push({x: x, y: y, filled: false });
 				}
 			}
+			this.color = {};
+			this.color.r = SUD.randomInt(0,255);
+			this.color.g = SUD.randomInt(0,255);
+			this.color.b = SUD.randomInt(0,255);
 		}
 
 		//-------------------------------------------------------
@@ -80,9 +84,10 @@ $(document).ready( function() {
 			// }
 
 			var w = 50;
-			var x = parseInt(this.canvas.width) / 2.0 - ((w * 10)/2.0);
-			var y = parseInt(this.canvas.height) / 2.0 - ((w * 10) /2.0);
+			var x = parseInt(this.canvas.width) / 2.0 - ((w * 9)/2.0);
+			var y = parseInt(this.canvas.height) / 2.0 - ((w * 9) /2.0);
 
+			this.ctx.fillStyle = ("rgb("+ this.color.r+"," + this.color.g + "," + this.color.b + ")");
 
 			for ( var i=0; i<this.grid.length; i++){
 				if ( log ){
