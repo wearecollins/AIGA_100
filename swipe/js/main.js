@@ -79,7 +79,7 @@ $(document).ready( function() {
 			// 	this.ctx.stroke();
 			// }
 
-			var w = 25;
+			var w = 50;
 			var x = parseInt(this.canvas.width) / 2.0 - ((w * 10)/2.0);
 			var y = parseInt(this.canvas.height) / 2.0 - ((w * 10) /2.0);
 
@@ -107,7 +107,7 @@ $(document).ready( function() {
 
 		this.checkGrid = function(x,y){
 
-			var w = 25;
+			var w = 50;
 			var cx = parseInt(this.canvas.width) / 2.0 - ((w * 10)/2.0);
 			var cy = parseInt(this.canvas.height) / 2.0 - ((w * 10) /2.0);
 
