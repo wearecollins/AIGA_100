@@ -79,7 +79,7 @@ $(document).ready( function() {
 			// 	this.ctx.stroke();
 			// }
 
-			var w = 50;
+			var w = 25;
 			var x = parseInt(this.canvas.width) / 2.0 - ((w * 10)/2.0);
 			var y = parseInt(this.canvas.height) / 2.0 - ((w * 10) /2.0);
 
@@ -92,10 +92,10 @@ $(document).ready( function() {
 								w);
 				}
 				this.ctx.beginPath();
-				this.ctx.rect( 	x + this.grid[i].x * w,
+				this.ctx.arc( 	x + this.grid[i].x * w,
 								y + this.grid[i].y * w, 
-								w,
-								w);
+								(w * .8)/2,
+								0,2*Math.PI);
 				if ( this.grid[i].filled ){
 					this.ctx.fill();
 				} else {
@@ -105,18 +105,36 @@ $(document).ready( function() {
 			log = false;
 		}	
 
+		this.checkGrid = function(x,y){
+			for ( var i=0; i<this.grid.length; i++){
+				var rx = x + this.grid[i].x * w;
+				var ry = y + this.grid[i].y * w;
+
+				if ( x <= rx + w/2 && x >= rx - w/2 &&
+					 y <= ry + w/2 && y >= ry - w/2 ){
+					this.grid[i].filled = true;
+					return true;
+				}
+			}
+			return false;
+		}
+
 		//-------------------------------------------------------
 		this.onTouchStart = function( id, x,y ){
 			if ( this.touchId == -1 ){
 				this.touchId = id;
-				this.currentDrawing.push({x:x, y:y});
+				//this.currentDrawing.push({x:x, y:y});
+				
+				// are we over any grid squares?
+				this.checkGrid(x,y);
 			}
 		};
 
 		//-------------------------------------------------------
 		this.onTouchMove = function( id, x,y ){
 			if ( id == this.touchId ){
-				this.currentDrawing.push({x:x, y:y});
+				//this.currentDrawing.push({x:x, y:y});
+				this.checkGrid(x,y);
 			}
 		};
 
@@ -126,18 +144,22 @@ $(document).ready( function() {
 				this.touchId = -1;
 
 				// normalize current drawing
-				var cdNorm = [];
-				for ( var i=0; i<this.currentDrawing.length; i++){
-					cdNorm.push( { 
-									x: this.currentDrawing[i].x / parseInt(window.innerWidth), 
-									y: this.currentDrawing[i].y / parseInt(window.innerHeight)
-								});
+				// var cdNorm = [];
+				// for ( var i=0; i<this.currentDrawing.length; i++){
+				// 	cdNorm.push( { 
+				// 					x: this.currentDrawing[i].x / parseInt(window.innerWidth), 
+				// 					y: this.currentDrawing[i].y / parseInt(window.innerHeight)
+				// 				});
+				// }
+
+				//console.log( cdNorm );
+
+				//sb.send("drawing","drawing", cdNorm);
+				//this.currentDrawing = [];
+				
+				for ( var i=0; i<this.grid.length; i++){
+					this.grid[i].filled = false;
 				}
-
-				console.log( cdNorm );
-
-				sb.send("drawing","drawing", cdNorm);
-				this.currentDrawing = [];
 			}
 		};
 
