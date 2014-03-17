@@ -315,16 +315,19 @@ function HSVtoRGB(h, s, v) {
 					// color
 					case 0:
 						this.showHide("#color");
+						this.registerTouchEvents();
 						break;
 
 					// grid
 					case 1:
 						this.showHide("#grid");
+						this.registerTouchEvents();
 						break;
 
 					// text
 					case 2:
 						this.showHide("#text");
+						this.unregisterTouchEvents();
 						break;
 				}
 			} else if ( name == "randomR" ){
