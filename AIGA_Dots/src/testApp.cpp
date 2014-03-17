@@ -101,7 +101,7 @@ void testApp::setup(){
     spacebrew.addSubscribe("grid", "grid" );
     spacebrew.addSubscribe("text", Spacebrew::TYPE_STRING );
     
-    //spacebrew.setAutoReconnect();
+    spacebrew.setAutoReconnect();
     spacebrew.connect(br_server, "grid_display");
     Spacebrew::addListener(this, spacebrew);
     
