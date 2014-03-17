@@ -91,15 +91,15 @@ function HSVtoRGB(h, s, v) {
 		}
 
 		this.registerTouchEvents = function(){
-			document.body.addEventListener("touchstart", this._onTouchStart.bind(this), false);
-			document.body.addEventListener("touchmove", this._onTouchMove.bind(this), false);
-			document.body.addEventListener("touchend", this._onTouchEnd.bind(this), false);
+			document.body.ontouchstart = this._onTouchStart.bind(this);
+			document.body.ontouchmove = this._onTouchMove.bind(this);
+			document.body.ontouchend = this._onTouchEnd.bind(this);
 		}
 
 		this.unregisterTouchEvents = function(){
-			document.body.removeEventListener("touchstart", this._onTouchStart.bind(this), false);
-			document.body.removeEventListener("touchmove", this._onTouchMove.bind(this), false);
-			document.body.removeEventListener("touchend", this._onTouchEnd.bind(this), false);
+			document.body.ontouchstart = this._onTouchStart.bind(this);
+			document.body.ontouchmove = this._onTouchMove.bind(this);
+			document.body.ontouchend = this._onTouchEnd.bind(this);
 		}
 
 		//-------------------------------------------------------
