@@ -55,18 +55,27 @@ function HSVtoRGB(h, s, v) {
 			//this.unregisterMouseEvents();
 			this.registerTouchEvents();
 
-			// setup spacebrew
-			var random_id = "0000" + Math.floor(Math.random() * 10000);
-			var app_name = "Swipe_" + random_id.substring(random_id.length-4);
-
 			this.setupSpacebrew();
 
+			// grid
+			this.grid = [];
+			for ( var x=0; x<10; x++){
+				for ( var y=0; y<10; y++){
+					this.grid.push({x: x, y: y, filled: false });
+				}
+			}
 			this.currentDrawing = [];
 			this.touchId 		= -1;
+			this.gridIndices = [];
 
 			this.gridCanvas = document.getElementById("gridCanvas");
 			// todo: set w/h
 			this.gridCtx 	= this.gridCanvas.getContext('2d');
+
+			this.color = {};
+			this.color.r = SUD.randomInt(0,255);
+			this.color.g = SUD.randomInt(0,255);
+			this.color.b = SUD.randomInt(0,255);
 
 			this.modes = [];
 			this.modes.push("#grid");
@@ -79,6 +88,9 @@ function HSVtoRGB(h, s, v) {
 
 		//-------------------------------------------------------
 		this.setupSpacebrew = function() {
+			var random_id = "0000" + Math.floor(Math.random() * 10000);
+			var app_name = "Swipe_" + random_id.substring(random_id.length-4);
+
 			// create spacebrew client object
 			sb = new Spacebrew.Client();
 			sb.send_interval = 0;
@@ -127,16 +139,29 @@ function HSVtoRGB(h, s, v) {
 
 				// grid
 				case 1:
-					console.log("grid")
+					//console.log("grid")
+					var w = 50;
+					var x = parseInt(this.gridCanvas.width) / 2.0 - ((w * 9)/2.0);
+					var y = parseInt(this.gridCanvas.height) / 2.0 - ((w * 9) /2.0);
+					
 					this.gridCanvas.width = this.gridCanvas.width;
 					this.gridCtx.clearRect(0,0,this.gridCanvas.width,this.gridCanvas.height);
-					if ( this.currentDrawing.length > 0 ){
+			
+
+					this.gridCtx.fillStyle = ("rgb("+ this.color.r+"," + this.color.g + "," + this.color.b + ")");
+					this.gridCtx.strokeStyle = ("rgb("+ this.color.r+"," + this.color.g + "," + this.color.b + ")");
+
+					for ( var i=0; i<this.grid.length; i++){
 						this.gridCtx.beginPath();
-						this.gridCtx.moveTo(this.currentDrawing[0].x, this.currentDrawing[0].y);
-						for ( var i=1; i<this.currentDrawing.length; i++){
-							this.gridCtx.lineTo(this.currentDrawing[i].x, this.currentDrawing[i].y);
+						this.gridCtx.arc( 	x + this.grid[i].x * w,
+										y + this.grid[i].y * w, 
+										(w * .8)/2,
+										0,2*Math.PI);
+						if ( this.grid[i].filled ){
+							this.gridCtx.fill();
+						} else {
+							this.gridCtx.stroke();
 						}
-						this.gridCtx.stroke();
 					}
 					break;
 
@@ -147,6 +172,7 @@ function HSVtoRGB(h, s, v) {
 			}
 		}	
 
+		//-------------------------------------------------------
 		this.updateAndSendColor = function(x,y){
 			var hue = SUD.clamp(SUD.map(x,0,window.innerWidth, 0, 1.0), 0,1.0);
 			var sat = SUD.clamp(SUD.map(y,0,window.innerHeight, 0, 1.0),0.,1.0);
@@ -163,6 +189,41 @@ function HSVtoRGB(h, s, v) {
 		}
 
 		//-------------------------------------------------------
+		this.checkGrid = function(x,y){
+
+			var w = 50;
+			var cx = parseInt(this.gridCanvas.width) / 2.0 - ((w * 10)/2.0);
+			var cy = parseInt(this.gridCanvas.height) / 2.0 - ((w * 10) /2.0);
+
+			for ( var i=0; i<this.grid.length; i++){
+				var rx = cx + this.grid[i].x * w;
+				var ry = cy + this.grid[i].y * w;
+
+				if ( x <= rx + w/2 && x >= rx - w/2 &&
+					 y <= ry + w/2 && y >= ry - w/2 ){
+					this.grid[i].filled = true;
+					return i;
+				}
+			}
+			return -1;
+		}
+
+		//-------------------------------------------------------
+		this.onMousePressed = function( x,y ){
+			this.onTouchStart(1,x,y);
+		};
+
+		//-------------------------------------------------------
+		this.onMouseDragged = function( x,y ){
+			this.onTouchMove(1,x,y);
+		};
+
+		//-------------------------------------------------------
+		this.onMouseReleased = function( x,y ){
+			this.onTouchEnd(1,x,y);
+		};
+
+		//-------------------------------------------------------
 		this.onTouchStart = function( id, x,y ){
 			switch ( this.mode ){
 				case 0:
@@ -171,7 +232,13 @@ function HSVtoRGB(h, s, v) {
 				case 1:
 					if ( this.touchId == -1 ){
 						this.touchId = id;
-						this.currentDrawing.push({x:x, y:y});
+						//this.currentDrawing.push({x:x, y:y});
+						
+						// are we over any grid squares?
+						var ind = this.checkGrid(x,y);
+						if ( ind != -1 ){
+							this.gridIndices.push(ind);
+						}
 					}
 					break;
 				case 2:
@@ -187,7 +254,11 @@ function HSVtoRGB(h, s, v) {
 					break;
 				case 1:
 					if ( id == this.touchId ){
-						this.currentDrawing.push({x:x, y:y});
+						//this.currentDrawing.push({x:x, y:y});
+						var ind = this.checkGrid(x,y);
+						if ( ind != -1 ){
+							this.gridIndices.push(ind);
+						}
 					}
 					break;
 				case 2:
@@ -205,19 +276,14 @@ function HSVtoRGB(h, s, v) {
 					if ( id == this.touchId ){
 						this.touchId = -1;
 
-						// normalize current drawing
-						var cdNorm = [];
-						for ( var i=0; i<this.currentDrawing.length; i++){
-							cdNorm.push( { 
-											x: this.currentDrawing[i].x / parseInt(window.innerWidth), 
-											y: this.currentDrawing[i].y / parseInt(window.innerHeight)
-										});
+						// send grid obj + color
+						sb.send("grid", "grid", {grid: this.grid, color: this.color, indices:this.gridIndices })
+
+						for ( var i=0; i<this.grid.length; i++){
+							this.grid[i].filled = false;
 						}
 
-						console.log( cdNorm );
-
-						sb.send("drawing","drawing", cdNorm);
-						this.currentDrawing = [];
+						this.gridIndices = [];
 					}
 					break;
 				case 2:
