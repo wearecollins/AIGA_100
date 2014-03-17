@@ -97,9 +97,9 @@ function HSVtoRGB(h, s, v) {
 		}
 
 		this.unregisterTouchEvents = function(){
-			document.body.ontouchstart = this._onTouchStart.bind(this);
-			document.body.ontouchmove = this._onTouchMove.bind(this);
-			document.body.ontouchend = this._onTouchEnd.bind(this);
+			document.body.ontouchstart = null;
+			document.body.ontouchmove = null;
+			document.body.ontouchend = null;
 		}
 
 		//-------------------------------------------------------
