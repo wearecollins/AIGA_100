@@ -164,7 +164,11 @@ void testApp::update(){
         dots[i].mode = (Mode) currentMode;
     }
     if ( lastMode != currentMode ){
-        spacebrew.sendRange("mode", currentMode);
+        int sendMode = 0;
+        if ( currentMode == MODE_INTERACTIVE_COLOR ) sendMode = 0;
+        else if ( currentMode == MODE_INTERACTIVE_GRID ) sendMode = 1;
+        else if ( currentMode == MODE_INTERACTIVE_TEXT ) sendMode = 2;
+        spacebrew.sendRange("mode", sendMode);
         lastMode = currentMode;
         
         if ( currentMode == MODE_DATA ){

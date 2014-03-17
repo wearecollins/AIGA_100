@@ -1,5 +1,8 @@
 html, body {
 	background-color:#fff;
+	font-size: 50px;
+	font-family: Helvetica;
+	font-weight: bold;
 }
 
 #gridCanvas {
@@ -27,4 +30,16 @@ html, body {
 #text {
 	visibility: hidden;
 	display: none;
+}
+
+#textField {
+	padding: 20px;
+	width: 600px;
+	height:20px;
+	font-size: 20px;
+}
+
+#button {
+	height:20px;
+	font-size: 20px;
 }

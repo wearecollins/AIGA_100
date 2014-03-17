@@ -72,6 +72,10 @@ function HSVtoRGB(h, s, v) {
 			// todo: set w/h
 			this.gridCtx 	= this.gridCanvas.getContext('2d');
 
+			// text
+			this.button = document.getElementById("button");
+			this.button.onclick = this.textPressed.bind(this);
+
 			this.color = {};
 			this.color.r = SUD.randomInt(0,255);
 			this.color.g = SUD.randomInt(0,255);
@@ -98,7 +102,7 @@ function HSVtoRGB(h, s, v) {
 
 			// configure the publication and subscription feeds
 			// grid
-			sb.addPublish( "drawing", "drawing", "[]" );
+			sb.addPublish( "grid", "grid", "[]" );
 
 			// color
 			sb.addPublish( "red", "range", "0" );
@@ -126,7 +130,6 @@ function HSVtoRGB(h, s, v) {
 			this.rE = this.rE * .75 + this.r * .25;
 			this.gE = this.gE * .75 + this.g * .25;
 			this.bE = this.bE * .75 + this.b * .25;
-			if ( this.mode == 0 ) $("#colorCanvas").css("background-color", "rgb(" + Math.round(this.rE) +","+ Math.round(this.gE) +"," + Math.round(this.bE) + ")");
 		}
 
 		//-------------------------------------------------------
@@ -134,7 +137,7 @@ function HSVtoRGB(h, s, v) {
 			switch( this.mode ){
 				// color
 				case 0:
-					showHide("#color");
+					$("#color").css("background-color", "rgb(" + Math.round(this.rE) +","+ Math.round(this.gE) +"," + Math.round(this.bE) + ")");
 					break;
 
 				// grid
@@ -167,7 +170,6 @@ function HSVtoRGB(h, s, v) {
 
 				// text
 				case 2:
-					showHide("#text");
 					break;
 			}
 		}	
@@ -209,8 +211,23 @@ function HSVtoRGB(h, s, v) {
 		}
 
 		//-------------------------------------------------------
+		this.textPressed = function(e){
+			var t = document.forms[0].textField.value;
+			console.log(t);
+			if ( t.length > 0 ){
+				sb.send("text", "string", t);
+				document.forms[0].textField.value = "";
+			}
+		}
+
+		//-------------------------------------------------------
 		this.onMousePressed = function( x,y ){
 			this.onTouchStart(1,x,y);
+		};
+
+		//-------------------------------------------------------
+		this.onMouseMoved = function( x,y ){
+			this.onTouchMove(1,x,y);
 		};
 
 		//-------------------------------------------------------
@@ -298,17 +315,17 @@ function HSVtoRGB(h, s, v) {
 				switch( value ){
 					// color
 					case 0:
-						showHide("#color");
+						this.showHide("#color");
 						break;
 
 					// grid
 					case 1:
-						showHide("#grid");
+						this.showHide("#grid");
 						break;
 
 					// text
 					case 2:
-						showHide("#text");
+						this.showHide("#text");
 						break;
 				}
 			} else if ( name == "randomR" ){
@@ -320,10 +337,10 @@ function HSVtoRGB(h, s, v) {
 			}
 		};
 
-		function showHide ( show ) {
-			for ( var i=0; i<modes.length; i++){
-				$(modes[i]).css("visibility", "hidden");
-				$(modes[i]).css("display", "none");
+		this.showHide = function( show ) {
+			for ( var i=0; i<this.modes.length; i++){
+				$(this.modes[i]).css("visibility", "hidden");
+				$(this.modes[i]).css("display", "none");
 			}
 
 			$(show).css("visibility", "visible");
