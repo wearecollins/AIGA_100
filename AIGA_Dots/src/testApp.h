@@ -23,6 +23,14 @@ struct GridDrawing {
     ofColor color;
 };
 
+struct TextSquare {
+    string text;
+    string lastText;
+    int index = 0;
+    int lastChanged = 0;
+    bool backwards = false;
+};
+
 class testApp : public ofBaseApp{
 
 	public:
@@ -53,6 +61,9 @@ class testApp : public ofBaseApp{
     
         // rendering
         ofImage rendering;
+        vector<TextSquare> currentStrings;
+        ofTrueTypeFont font;
+        void renderText();
     
         // swipe
         vector<Drawing> drawings;
@@ -70,4 +81,5 @@ class testApp : public ofBaseApp{
     
         ofFbo screen;
         ofFbo pattern;
+        ofFbo type;
 };

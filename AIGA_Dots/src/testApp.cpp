@@ -29,13 +29,27 @@ void testApp::setup(){
     ofBackground(0);
     realX = ofGetWidth()/2.0 - (gridSize/2.0 * spacing) + spacing/2.0;
     realY = ofGetHeight()/2.0 - (gridSize/2.0 * spacing) + spacing/2.0;
+    
+    font.loadFont("circular/CircularStd-Bold.otf", dotWidth * .9 );
+    
     for ( int x = 0; x < gridSize; x ++){
+        TextSquare ts;
+        ts.text = ts.lastText = "chill";
+        currentStrings.push_back( ts );
         for (int y=0; y<gridSize; y++){
             dots.push_back(Dot());
             dots.back().x = x * spacing;
             dots.back().y = y * spacing;
             dots.back().z = y * spacing;
             dots.back().setup();
+            dots.back().loadFont(font);
+            
+            dots.back().r = ofRandom(255);
+            dots.back().g = ofRandom(255);
+            dots.back().b = ofRandom(255);
+            dots.back().floatColor.r = dots.back().r / 255.;
+            dots.back().floatColor.g = dots.back().g / 255.;
+            dots.back().floatColor.b = dots.back().b / 255.;
         }
     }
     ofEnableDepthTest();
@@ -85,6 +99,7 @@ void testApp::setup(){
     }
     spacebrew.addSubscribe("drawing", "drawing" );
     spacebrew.addSubscribe("grid", "grid" );
+    spacebrew.addSubscribe("text", Spacebrew::TYPE_STRING );
     
     //spacebrew.setAutoReconnect();
     spacebrew.connect(br_server, "grid_display");
@@ -129,28 +144,20 @@ void testApp::update(){
             for (int y=0; y<pattern.getHeight(); y+=64){
                 // draw two rows
                 ofImage p = ptns[(int) floor(ofRandom(ptns.size()))];
-                p.draw(x,y);
-                p.draw(x+16,y);
-                p.draw(x+32,y);
-                p.draw(x+48,y);
-                
-                p.draw(x,y+16);
-                p.draw(x+16,y+16);
-                p.draw(x+32,y+16);
-                p.draw(x+48,y+16);
-                
-                p.draw(x,y+32);
-                p.draw(x+16,y+32);
-                p.draw(x+32,y+32);
-                p.draw(x+48,y+32);
-                
-                p.draw(x,y+48);
-                p.draw(x+16,y+48);
-                p.draw(x+32,y+48);
-                p.draw(x+48,y+48);
+                for ( int i=0; i<4; i++){
+                    for ( int j=0; j<4; j++){
+                        p.draw(x + i * 16,y + j * 16);
+                    }
+                }
             }
         }
         pattern.end();
+    }
+    
+    if ( !type.isAllocated() ){
+        // render pattern
+        type.allocate(512, 512);
+        renderText();
     }
     
     for (int i=0; i<dots.size(); i++){
@@ -185,146 +192,180 @@ void testApp::update(){
         }
     }
     
-    // MODE: DATA
-    if ( currentMode == MODE_DATA ){
-        
-        for (int y=0; y<gridSize; y++){
-            float val = sin(barInc += .002);
-            if ( val > 0 ){
-                val = val * bars[y];
-            } else if ( barInc > .05 ){
-                for (int i=0; i<bars.size(); i++){
-                    bars[i] = ofRandom(10);
-                }
-                barInc = 0.0;
-            } else {
-                val = 0;
-            }
-            for ( int x = 0; x < gridSize; x ++){
-                int ind = x + y*gridSize;
-                if ( x < val - 1 ){
-                    dots[ ind ].floatColor.setSaturation(1.0);
-                    dots[ind].floatColor.setBrightness(1.0);
-                    dots[ind].floatColor.setHue(bars[y] / 10.0);
-                } else {
-                    dots[ind].floatColor.setSaturation(dots[ind].floatColor.getSaturation() * .7);
-                    dots[ind].floatColor.setBrightness(dots[ind].floatColor.getSaturation() * .7);
-                }
-            }
-        }
-    // MODE: VIDEO
-    } else if ( currentMode == MODE_VIDEO ){
-        video.update();
-        if ( video.isFrameNew() ){
+    switch (currentMode) {
+        case MODE_DATA:
             for (int y=0; y<gridSize; y++){
+                float val = sin(barInc += .002);
+                if ( val > 0 ){
+                    val = val * bars[y];
+                } else if ( barInc > .05 ){
+                    for (int i=0; i<bars.size(); i++){
+                        bars[i] = ofRandom(10);
+                    }
+                    barInc = 0.0;
+                } else {
+                    val = 0;
+                }
                 for ( int x = 0; x < gridSize; x ++){
                     int ind = x + y*gridSize;
-                    float sX = (float) x/gridSize * video.getWidth();
-                    float sY = (float) y/gridSize * video.getHeight();
-                    ofColor c = video.getPixelsRef().getColor(sX, sY);
-                    ofFloatColor fc = ofFloatColor(c.r/255.0, c.g/255.0, c.b/255.0);
-                    dots[ind].floatColor = dots[ind].floatColor * .9 + fc * .1;
-                }
-            }
-        }
-    }
-    
-    // MODE: INTERACTIVE COLOR
-    else if ( currentMode == MODE_INTERACTIVE_COLOR ){
-        if (ofGetElapsedTimeMillis() - lastMessageReceived > messageTimeout && bNeedToSend ){
-            cout << "SEND RANDOM "<<endl;
-            //...do something!
-            int r = ofRandom(255);
-            int g = ofRandom(255);
-            int b = ofRandom(255);
-            
-            for (int i=0; i<dots.size(); i++){
-                dots[i].r = r;
-                dots[i].g = g;
-                dots[i].b = b;
-            }
-            
-            bNeedToSend = false;
-            spacebrew.sendRange("randomR", r );
-            spacebrew.sendRange("randomG", g );
-            spacebrew.sendRange("randomB", b );
-        }
-    }
-    
-    // MODE: Interactive swipe
-    else if ( currentMode == MODE_INTERACTIVE_SWIPE ){
-        if ( drawings.size() != 0 ){
-            // first update indices
-            for ( int i=0; i<drawings.size(); i++){
-                if ( ofGetElapsedTimeMillis() - drawings[i].lastChanged > swipeChangeTimer ){
-                    drawings[i].index++;
-                    if (  drawings[i].index >= drawings[i].points.size() ){
-                        drawings[i].index = 0;
-                    }
-                    drawings[i].lastChanged = ofGetElapsedTimeMillis();
-                }
-                
-                ofVec2f sv = drawings[i].points[drawings[i].index];
-                
-                sv.x *= gridSize * spacing;
-                sv.y *= gridSize * spacing;
-                sv.y = gridSize * spacing - sv.y;
-                
-                for (int j=0; j<dots.size(); j++){
-                    ofVec2f d = ofVec2f(dots[j].x, dots[j].y);
-                    if ( d.distance(sv) < dots[j].width * 2 ){
-                        float mult = 1.0;//(float) (maxDrawingAge-drawings[i].age) / maxDrawingAge;
-                        dots[j].r = drawings[i].color.r * mult;
-                        dots[j].g = drawings[i].color.g * mult;
-                        dots[j].b = drawings[i].color.b * mult;
+                    if ( x < val - 1 ){
+                        dots[ ind ].floatColor.setSaturation(1.0);
+                        dots[ind].floatColor.setBrightness(1.0);
+                        dots[ind].floatColor.setHue(bars[y] / 10.0);
+                    } else {
+                        dots[ind].floatColor.setSaturation(dots[ind].floatColor.getSaturation() * .7);
+                        dots[ind].floatColor.setBrightness(dots[ind].floatColor.getSaturation() * .7);
                     }
                 }
-                drawings[i].age++;
             }
+            break;
             
-            for ( int i=drawings.size()-1; i>=0; i--){
-                if ( drawings[i].age >= maxDrawingAge ){
-                    drawings.erase(drawings.begin() + i);
-                }
-            }
-        }
-    }
-    // MODE: Interactive grid
-    else if ( currentMode == MODE_INTERACTIVE_GRID ){
-        if ( gridDrawings.size() != 0 ){
-            // first update indices
-            for ( int i=0; i<gridDrawings.size(); i++){
-                if ( ofGetElapsedTimeMillis() - gridDrawings[i].lastChanged > swipeChangeTimer ){
-                    gridDrawings[i].index++;
-                    if (  gridDrawings[i].index >= gridDrawings[i].indices.size() ){
-//                        gridDrawings[i].index = 0;
-                        gridDrawings[i].age = 1000;
-                        continue;
+        case MODE_VIDEO:
+            video.update();
+            if ( video.isFrameNew() ){
+                for (int y=0; y<gridSize; y++){
+                    for ( int x = 0; x < gridSize; x ++){
+                        int ind = x + y*gridSize;
+                        float sX = (float) x/gridSize * video.getWidth();
+                        float sY = (float) y/gridSize * video.getHeight();
+                        ofColor c = video.getPixelsRef().getColor(sX, sY);
+                        ofFloatColor fc = ofFloatColor(c.r/255.0, c.g/255.0, c.b/255.0);
+                        dots[ind].floatColor = dots[ind].floatColor * .9 + fc * .1;
                     }
-                    gridDrawings[i].lastChanged = ofGetElapsedTimeMillis();
-                }
-                
-                int x = 9 - gridDrawings[i].indices[gridDrawings[i].index] % 10;
-                int y = floor(gridDrawings[i].indices[gridDrawings[i].index]/10);
-                int ind = x + y * 10;
-                
-                int indO = gridDrawings[i].indices[gridDrawings[i].index];
-                if ( gridDrawings[i].grid[indO] ){
-                    float mult =(float) (maxDrawingAge-gridDrawings[i].age) / maxDrawingAge;
-                    dots[ind].r = gridDrawings[i].color.r * mult;
-                    dots[ind].g = gridDrawings[i].color.g * mult;
-                    dots[ind].b = gridDrawings[i].color.b * mult;
-                }
-                gridDrawings[i].age++;
-            }
-            
-            
-            for ( int i=gridDrawings.size()-1; i>=0; i--){
-                if ( gridDrawings[i].age >= maxDrawingAge ){
-                    gridDrawings.erase(gridDrawings.begin() + i);
                 }
             }
-        }
+            break;
+            
+        case MODE_INTERACTIVE_COLOR:
+            if (ofGetElapsedTimeMillis() - lastMessageReceived > messageTimeout && bNeedToSend ){
+                cout << "SEND RANDOM "<<endl;
+                //...do something!
+                int r = ofRandom(255);
+                int g = ofRandom(255);
+                int b = ofRandom(255);
+                
+                for (int i=0; i<dots.size(); i++){
+                    dots[i].r = r;
+                    dots[i].g = g;
+                    dots[i].b = b;
+                }
+                
+                bNeedToSend = false;
+                spacebrew.sendRange("randomR", r );
+                spacebrew.sendRange("randomG", g );
+                spacebrew.sendRange("randomB", b );
+            }
+            break;
+            
+        case MODE_INTERACTIVE_SWIPE:
+            if ( drawings.size() != 0 ){
+                // first update indices
+                for ( int i=0; i<drawings.size(); i++){
+                    if ( ofGetElapsedTimeMillis() - drawings[i].lastChanged > swipeChangeTimer ){
+                        drawings[i].index++;
+                        if (  drawings[i].index >= drawings[i].points.size() ){
+                            drawings[i].index = 0;
+                        }
+                        drawings[i].lastChanged = ofGetElapsedTimeMillis();
+                    }
+                    
+                    ofVec2f sv = drawings[i].points[drawings[i].index];
+                    
+                    sv.x *= gridSize * spacing;
+                    sv.y *= gridSize * spacing;
+                    sv.y = gridSize * spacing - sv.y;
+                    
+                    for (int j=0; j<dots.size(); j++){
+                        ofVec2f d = ofVec2f(dots[j].x, dots[j].y);
+                        if ( d.distance(sv) < dots[j].width * 2 ){
+                            float mult = 1.0;//(float) (maxDrawingAge-drawings[i].age) / maxDrawingAge;
+                            dots[j].r = drawings[i].color.r * mult;
+                            dots[j].g = drawings[i].color.g * mult;
+                            dots[j].b = drawings[i].color.b * mult;
+                        }
+                    }
+                    drawings[i].age++;
+                }
+                
+                for ( int i=drawings.size()-1; i>=0; i--){
+                    if ( drawings[i].age >= maxDrawingAge ){
+                        drawings.erase(drawings.begin() + i);
+                    }
+                }
+            }
+            break;
+            
+        case MODE_INTERACTIVE_GRID:
+            if ( gridDrawings.size() != 0 ){
+                // first update indices
+                for ( int i=0; i<gridDrawings.size(); i++){
+                    if ( ofGetElapsedTimeMillis() - gridDrawings[i].lastChanged > swipeChangeTimer ){
+                        gridDrawings[i].index++;
+                        if (  gridDrawings[i].index >= gridDrawings[i].indices.size() ){
+                            //                        gridDrawings[i].index = 0;
+                            gridDrawings[i].age = 1000;
+                            continue;
+                        }
+                        gridDrawings[i].lastChanged = ofGetElapsedTimeMillis();
+                    }
+                    
+                    int x = 9 - gridDrawings[i].indices[gridDrawings[i].index] % 10;
+                    int y = floor(gridDrawings[i].indices[gridDrawings[i].index]/10);
+                    int ind = x + y * 10;
+                    
+                    int indO = gridDrawings[i].indices[gridDrawings[i].index];
+                    if ( gridDrawings[i].grid[indO] ){
+                        float mult =(float) (maxDrawingAge-gridDrawings[i].age) / maxDrawingAge;
+                        dots[ind].r = gridDrawings[i].color.r * mult;
+                        dots[ind].g = gridDrawings[i].color.g * mult;
+                        dots[ind].b = gridDrawings[i].color.b * mult;
+                    }
+                    gridDrawings[i].age++;
+                }
+                
+                
+                for ( int i=gridDrawings.size()-1; i>=0; i--){
+                    if ( gridDrawings[i].age >= maxDrawingAge ){
+                        gridDrawings.erase(gridDrawings.begin() + i);
+                    }
+                }
+            }
+            break;
+            
+        case MODE_INTERACTIVE_TEXT:
+            for ( int i=0; i<currentStrings.size(); i++){
+                if ( currentStrings[i].text.size() > 0 ){
+                    for ( int x=0; x<gridSize; x++){
+                        // i == y
+                        int index = x + i * gridSize;
+                        
+                        TextSquare & ts = currentStrings[i];
+                        // first update textsquare
+                        if (ts.index + 1 < currentStrings[i].text.size()
+                            && ofGetElapsedTimeMillis() - ts.lastChanged > swipeChangeTimer ){
+                            ts.index++;
+                            ts.lastChanged = ofGetElapsedTimeMillis();
+                        }
+                        
+                        int in = x;
+                        if ( ts.backwards ){
+                            in = x - (gridSize - currentStrings[i].text.size());
+                        }
+                        
+                        if ( currentStrings.size() > i
+                            && currentStrings[i].text.size() > in
+                            && ts.index >= in){
+                            dots[index].setText(currentStrings[i].text.substr(in,1));
+                        } else {
+                            dots[index].setText("");
+                        }
+                    }
+                }
+            }
+            break;
+            
+        default:
+            break;
     }
 }
 
@@ -334,19 +375,26 @@ void testApp::draw(){
     ofColor offWhite(200,200,200);
     ofBackgroundGradient(white, offWhite);
     
-//    kidd.draw(realX - 25, realY - 25);
     if (bShowRender) {
         ofSetColor(255);
         float scale = (float) ofGetWidth()/rendering.width;
         rendering.draw(0,0, rendering.width * scale, rendering.height * scale);
     }
     
+    if (currentMode == MODE_INTERACTIVE_TEXT){
+        renderText();
+    }
+    
     //ofEnableLighting();
     ofEnableDepthTest();
     camera.begin();
+    ofSetColor(255);
     bool bMap = bMapChip;
+    bool bound = currentMode == MODE_INTERACTIVE_TEXT;
     if ( bMap ) kidd.bind();
-    else pattern.getTextureReference().bind();
+    else if ( bound ) {
+        type.getTextureReference().bind();
+    }
     
     ofPushMatrix();
     ofTranslate(-ofGetWidth()/4.0, -ofGetHeight()/4.0);//realX, realY);
@@ -355,7 +403,9 @@ void testApp::draw(){
     }
     ofPopMatrix();
     if ( bMap ) kidd.unbind();
-    else pattern.getTextureReference().unbind();
+    else if ( bound ) {
+        type.getTextureReference().unbind();
+    }
     
     camera.end();
     ofDisableDepthTest();
@@ -363,8 +413,42 @@ void testApp::draw(){
     
     ofDrawBitmapString("Press ' ' to clear", 20,20);
     if ( bShowPattern ){
-        pattern.draw(0,0);
+        ofSetColor(255);
+        type.draw(0,0);
     }
+}
+
+
+//--------------------------------------------------------------
+void testApp::renderText(){
+    
+    type.begin();
+    
+    ofDisableAlphaBlending();
+    ofClear(255);
+    ofSetColor(255,255,255,255);
+    
+    float typeSpacing = (float) 512.0/gridSize;
+    float letterWidth = (float) typeSpacing * ((float) dotWidth/spacing);
+    
+    for ( int x = 0; x < gridSize; x ++){
+        for (int y=0; y<gridSize; y++){
+            int sqX = x * typeSpacing;
+            int sqY = y * typeSpacing;
+            Dot & d = dots[ x + y * gridSize ];
+            ofColor c = ofColor(d.floatColor.r * 255., d.floatColor.g * 255., d.floatColor.b * 255. );
+            ofSetColor(c);
+            ofRect(sqX, sqY, typeSpacing, typeSpacing + 10); //??
+            if ( d.getText().size() > 0 ){
+                ofSetColor(255);
+                ofDisableDepthTest();
+                float offx = font.stringWidth(d.getText()) / 2.0;
+                float offy = font.stringHeight(d.getText()) / 2.0 + font.getLineHeight() * .5;
+                font.drawString( d.getText(), sqX + letterWidth/2.0 - offx, sqY + letterWidth/2.0 - offy);
+            }
+        }
+    }
+    type.end();
 }
 
 //--------------------------------------------------------------
@@ -468,6 +552,14 @@ void testApp::onMessage( Spacebrew::Message & m ){
         }
         
         gridDrawings.push_back(d);
+    } else if ( m.name == "text" ){
+        //hm
+        int ind = floor(ofRandom(currentStrings.size()));
+        currentStrings[ind].lastText = currentStrings[ind].text;
+        currentStrings[ind].text = m.valueString();
+        currentStrings[ind].index = 0;
+        currentStrings[ind].lastChanged = ofGetElapsedTimeMillis();
+        currentStrings[ind].backwards = ofRandom(10) > 4 ? true : false;
     }
 }
 

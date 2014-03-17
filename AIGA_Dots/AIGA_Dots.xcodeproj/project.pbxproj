@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		010E548218D7480B00C58BBD /* Dot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 010E548118D7480B00C58BBD /* Dot.cpp */; };
 		01F3386418CF645800F7122D /* ofxUI2DGraph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 01F337D018CF645800F7122D /* ofxUI2DGraph.cpp */; };
 		01F3386518CF645800F7122D /* ofxUI2DPad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 01F337D218CF645800F7122D /* ofxUI2DPad.cpp */; };
 		01F3386618CF645800F7122D /* ofxUIBaseDraws.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 01F337D418CF645800F7122D /* ofxUIBaseDraws.cpp */; };
@@ -118,6 +119,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		010E548118D7480B00C58BBD /* Dot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Dot.cpp; sourceTree = "<group>"; };
 		0177E6D418D2A2F000F9CAA4 /* Client.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Client.h; sourceTree = "<group>"; };
 		0177E6D518D2A2F000F9CAA4 /* Connection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Connection.h; sourceTree = "<group>"; };
 		0177E6D618D2A2F000F9CAA4 /* Events.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Events.h; sourceTree = "<group>"; };
@@ -617,6 +619,7 @@
 				E4B69E1E0A3A1BDC003C02F2 /* testApp.cpp */,
 				E4B69E1F0A3A1BDC003C02F2 /* testApp.h */,
 				01A87AD818C7A7FF00AD9D5F /* Dot.h */,
+				010E548118D7480B00C58BBD /* Dot.cpp */,
 				01F338D218CF738900F7122D /* Constants.h */,
 			);
 			path = src;
@@ -739,6 +742,7 @@
 				01F338D118CF6EFB00F7122D /* ofxXmlSettings.cpp in Sources */,
 				E4B69E200A3A1BDC003C02F2 /* main.cpp in Sources */,
 				01F3386E18CF645800F7122D /* ofxUIEnvelopeEditor.cpp in Sources */,
+				010E548218D7480B00C58BBD /* Dot.cpp in Sources */,
 				E4B69E210A3A1BDC003C02F2 /* testApp.cpp in Sources */,
 				01F3386918CF645800F7122D /* ofxUICanvas.cpp in Sources */,
 				01F3387C18CF645800F7122D /* ofxUIMultiImageButton.cpp in Sources */,
