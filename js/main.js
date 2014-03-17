@@ -212,8 +212,7 @@ function HSVtoRGB(h, s, v) {
 
 		//-------------------------------------------------------
 		this.textPressed = function(e){
-			var t = document.forms[0].textField.value;
-			console.log(t);
+			var t =  $("#textField").val();
 			if ( t.length > 0 ){
 				sb.send("text", "string", t);
 				document.forms[0].textField.value = "";
