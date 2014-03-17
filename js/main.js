@@ -227,7 +227,7 @@ function HSVtoRGB(h, s, v) {
 			var t =  $("#textField").val();
 			if ( t.length > 0 ){
 				sb.send("text", "string", t);
-				document.forms[0].textField.value = "";
+				$("#textField").val("")
 			}
 		}
 
