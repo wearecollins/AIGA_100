@@ -78,14 +78,9 @@ void Dot::draw( bool bRender ){
             break;
             
         case MODE_INTERACTIVE_COLOR:
-            {
-                floatColor.r = floatColor.r * .9 + ( r / 255.0 ) * .1;
-                floatColor.g = floatColor.g * .9 + ( g / 255.0 ) * .1;
-                floatColor.b = floatColor.b * .9 + ( b / 255.0 ) * .1;
-                
-                //            float h = (float) sin(ofGetElapsedTimeMillis() * (speed * 10) );
-                //            floatColor.setHue( floatColor.getHue() + ofMap(h, -1.,1.,-.001,.001) );
-            }
+            floatColor.r = floatColor.r * .9 + ( r / 255.0 ) * .1;
+            floatColor.g = floatColor.g * .9 + ( g / 255.0 ) * .1;
+            floatColor.b = floatColor.b * .9 + ( b / 255.0 ) * .1;
             break;
             
         case MODE_INTERACTIVE_GRID:
@@ -122,10 +117,10 @@ void Dot::draw( bool bRender ){
     }
     
     for (int i=0; i<mesh.getNumVertices(); i++){
-        if (mesh.getVertex(i).z == 1.5 ){
+//        if (mesh.getVertex(i).z == 1.5 ){
             if ( mode != MODE_INTERACTIVE_TEXT ) mesh.setColor(i, floatColor);
             else mesh.setColor(i, ofFloatColor(255) );
-        }
+//        }
     }
     
     ofPushMatrix();
