@@ -362,7 +362,7 @@ Spacebrew.Client.prototype.send = function( name, type, value ){
    	// if send block is not active then send message
    	if (!this.send_blocked) {
 	   	this.socket.send(JSON.stringify(this.msg));
-		this.send_blocked = true;
+		/*this.send_blocked = true;
 		this.msg = undefined;
 
 		// set the timer to unblock message sending
@@ -371,7 +371,7 @@ Spacebrew.Client.prototype.send = function( name, type, value ){
 			if (self.msg != undefined) {  	// if message exists then sent it
 				self.send(self.msg.message.name, self.msg.message.type, self.msg.message.value);
 			}
-		}, self.send_interval);
+		}, self.send_interval);*/
    	} 
 }
 
