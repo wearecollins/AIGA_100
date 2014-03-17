@@ -90,6 +90,18 @@ function HSVtoRGB(h, s, v) {
 			this.mode = 1;
 		}
 
+		this.registerTouchEvents = function(){
+			window.addEventListener("touchstart", this._onTouchStart.bind(this), false);
+			window.addEventListener("touchmove", this._onTouchMove.bind(this), false);
+			window.addEventListener("touchend", this._onTouchEnd.bind(this), false);
+		}
+
+		this.unregisterTouchEvents = function(){
+			window.removeEventListener("touchstart", this._onTouchStart.bind(this), false);
+			window.removeEventListener("touchmove", this._onTouchMove.bind(this), false);
+			window.removeEventListener("touchend", this._onTouchEnd.bind(this), false);
+		}
+
 		//-------------------------------------------------------
 		this.setupSpacebrew = function() {
 			var random_id = "0000" + Math.floor(Math.random() * 10000);
@@ -241,6 +253,7 @@ function HSVtoRGB(h, s, v) {
 
 		//-------------------------------------------------------
 		this.onTouchStart = function( id, x,y ){
+			console.log("ys");
 			switch ( this.mode ){
 				case 0:
 					this.updateAndSendColor(x,y);
