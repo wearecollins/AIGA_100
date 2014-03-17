@@ -48,8 +48,6 @@ class testApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
     
-        void onMessage( Spacebrew::Message & m );
-		
         vector<Dot> dots;
         ofImage kidd;
         ofLight simpleLight;
@@ -72,6 +70,9 @@ class testApp : public ofBaseApp{
     
         // spacebrew
         Spacebrew::Connection spacebrew;
+        void onOpen( ofxLibwebsockets::Event& args );
+        void onMessage( Spacebrew::Message & m );
+        
     
         // GUI
         int currentMode, lastMode;

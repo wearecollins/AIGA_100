@@ -62,10 +62,6 @@ void Dot::draw( bool bRender ){
     if ( lastMode != mode ){
         if (mode == MODE_COLOR ) ran = ofRandom(1.0);
         else if ( mode == MODE_INTERACTIVE_COLOR ){
-            floatColor.setSaturation(0.1);
-            r = floatColor.r * 255;
-            g = floatColor.g * 255;
-            b = floatColor.b * 255;
         }
     }
     lastMode = mode;
@@ -106,6 +102,19 @@ void Dot::draw( bool bRender ){
             break;
         
         case MODE_INTERACTIVE_TEXT:
+            if ( text == "" ){
+                floatColor.r = floatColor.r * .9 + .4 * .1;
+                floatColor.g = floatColor.g * .9 + .4 * .1;
+                floatColor.b = floatColor.b * .9 + .4 * .1;
+            } else if (text == " ") {
+                floatColor.r = floatColor.r * .9 + ( r * .5 / 255.0 ) * .1;
+                floatColor.g = floatColor.g * .9 + ( g * .5 / 255.0 ) * .1;
+                floatColor.b = floatColor.b * .9 + ( b * .5/ 255.0 ) * .1;
+            } else {
+                floatColor.r = floatColor.r * .9 + ( r / 255.0 ) * .1;
+                floatColor.g = floatColor.g * .9 + ( g / 255.0 ) * .1;
+                floatColor.b = floatColor.b * .9 + ( b/ 255.0 ) * .1;
+            }
             break;
             
         default:

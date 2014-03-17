@@ -30,11 +30,11 @@ void testApp::setup(){
     realX = ofGetWidth()/2.0 - (gridSize/2.0 * spacing) + spacing/2.0;
     realY = ofGetHeight()/2.0 - (gridSize/2.0 * spacing) + spacing/2.0;
     
-    font.loadFont("circular/CircularStd-Bold.otf", dotWidth * .9 );
+    font.loadFont("circular/CircularStd-Bold.otf", dotWidth * 1.7 );
     
     for ( int x = 0; x < gridSize; x ++){
         TextSquare ts;
-        ts.text = ts.lastText = "chill";
+        ts.text = ts.lastText = "";
         currentStrings.push_back( ts );
         for (int y=0; y<gridSize; y++){
             dots.push_back(Dot());
@@ -103,7 +103,9 @@ void testApp::setup(){
     
     spacebrew.setAutoReconnect();
     spacebrew.connect(br_server, "grid_display");
+    
     Spacebrew::addListener(this, spacebrew);
+    ofAddListener(spacebrew.onOpenEvent, this, &testApp::onOpen);
     
     // video map
     video.loadMovie("test.mov");
@@ -156,7 +158,7 @@ void testApp::update(){
     
     if ( !type.isAllocated() ){
         // render pattern
-        type.allocate(512, 512);
+        type.allocate(1024, 1024);
         renderText();
     }
     
@@ -432,17 +434,22 @@ void testApp::renderText(){
     ofClear(255);
     ofSetColor(255,255,255,255);
     
-    float typeSpacing = (float) 512.0/gridSize;
+    float typeSpacing = (float) 1024.0/gridSize;
     float letterWidth = (float) typeSpacing * ((float) dotWidth/spacing);
     
     for ( int x = 0; x < gridSize; x ++){
         for (int y=0; y<gridSize; y++){
-            int sqX = x * typeSpacing;
-            int sqY = y * typeSpacing;
+            float sqX = x * typeSpacing;
+            float sqY = y * typeSpacing;
             Dot & d = dots[ x + y * gridSize ];
-            ofColor c = ofColor(d.floatColor.r * 255., d.floatColor.g * 255., d.floatColor.b * 255. );
+            // hax
+            Dot & dc = dots[ x + (y+1 < gridSize ? y+1 : y) * gridSize ];
+            ofColor c = ofColor(dc.floatColor.r * 255., dc.floatColor.g * 255., dc.floatColor.b * 255.  );
+            if ( y+1 >= gridSize ){
+                c.set(102,102,102);
+            }
             ofSetColor(c);
-            ofRect(sqX, sqY, typeSpacing, typeSpacing + 10); //??
+            ofRect(sqX, sqY, typeSpacing, typeSpacing); //??
             if ( d.getText().size() > 0 ){
                 ofSetColor(255);
                 ofDisableDepthTest();
@@ -493,6 +500,15 @@ float jsonAsFloat( Json::Value val ){
 
 float jsonAsFloat( Json::Value val, string prop ){
     return jsonAsFloat(val[prop]);
+}
+
+
+//--------------------------------------------------------------
+void testApp::onOpen( ofxLibwebsockets::Event& args ){
+    int sendMode = 0;
+    if ( currentMode == MODE_INTERACTIVE_COLOR ) sendMode = 0;
+    else if ( currentMode == MODE_INTERACTIVE_GRID ) sendMode = 1;
+    else if ( currentMode == MODE_INTERACTIVE_TEXT ) sendMode = 2;
 }
 
 //--------------------------------------------------------------
