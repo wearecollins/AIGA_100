@@ -58,7 +58,7 @@ void Dot::setup(){
     mode = MODE_INTERACTIVE_COLOR;
 }
 //--------------------------------------------------------------
-void Dot::draw( bool bRender ){
+void Dot::draw( bool bMap, bool bRender ){
     if ( lastMode != mode ){
         if (mode == MODE_COLOR ) ran = ofRandom(1.0);
         else if ( mode == MODE_INTERACTIVE_COLOR ){

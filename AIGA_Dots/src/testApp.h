@@ -49,7 +49,12 @@ class testApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
     
         vector<Dot> dots;
+    
+        // images
         ofImage kidd;
+        vector<ofImage> centennialImages;
+        void renderCentennial();
+    
         ofLight simpleLight;
         ofEasyCam camera;
 
@@ -69,10 +74,11 @@ class testApp : public ofBaseApp{
         int index;
     
         // spacebrew
-        Spacebrew::Connection spacebrew;
+        Spacebrew::AdminConnection spacebrew;
         void onOpen( ofxLibwebsockets::Event& args );
         void onMessage( Spacebrew::Message & m );
-        
+        void onClientConnect( Spacebrew::Config & c);
+    
     
         // GUI
         int currentMode, lastMode;

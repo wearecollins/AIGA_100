@@ -10,6 +10,7 @@ float scale = 1.0;
 bool bMapChip = false;
 bool bShowRender = false;
 bool bShowPattern = false;
+bool bMapCentArt = false;
 
 string br_server = "spacebrew.robotconscience.com";
 
@@ -22,6 +23,10 @@ bool bNeedToSend        = false;
 int lastSwipeChanged    = 0;
 int swipeChangeTimer    = 30;
 float maxDrawingAge     = 60 * 5;
+
+int r = 255;
+int g = 255;
+int b = 255;
 
 //--------------------------------------------------------------
 void testApp::setup(){
@@ -38,6 +43,7 @@ void testApp::setup(){
         currentStrings.push_back( ts );
         for (int y=0; y<gridSize; y++){
             dots.push_back(Dot());
+            dots.back().index = x + y * gridSize;
             dots.back().x = x * spacing;
             dots.back().y = y * spacing;
             dots.back().z = y * spacing;
@@ -81,6 +87,7 @@ void testApp::setup(){
     gui->addIntSlider("Mode", MODE_COLOR, MODE_DATA, &currentMode);
     gui->addToggle("Show Rendering", &bShowRender );
     gui->addToggle("Show Pattern", &bShowPattern);
+    gui->addToggle("Map Cent Art", &bMapCentArt);
     lastMode = currentMode;
     
 //    ofSetLogLevel(OF_LOG_VERBOSE);
@@ -92,11 +99,14 @@ void testApp::setup(){
     spacebrew.addPublish("randomB", Spacebrew::TYPE_RANGE);
     
     // add 100 listeners...
-    for ( int i=0; i<dots.size(); i++){
-        spacebrew.addSubscribe("dot_"+ofToString(i)+"_r", &dots[i].r );
-        spacebrew.addSubscribe("dot_"+ofToString(i)+"_g", &dots[i].g );
-        spacebrew.addSubscribe("dot_"+ofToString(i)+"_b", &dots[i].b );
-    }
+//    for ( int i=0; i<dots.size(); i++){
+//        spacebrew.addSubscribe("dot_"+ofToString(i)+"_r", &dots[i].r );
+//        spacebrew.addSubscribe("dot_"+ofToString(i)+"_g", &dots[i].g );
+//        spacebrew.addSubscribe("dot_"+ofToString(i)+"_b", &dots[i].b );
+//    }
+    spacebrew.addSubscribe("grid_r", &r );
+    spacebrew.addSubscribe("grid_g", &g );
+    spacebrew.addSubscribe("grid_b", &b );
     spacebrew.addSubscribe("drawing", "drawing" );
     spacebrew.addSubscribe("grid", "grid" );
     spacebrew.addSubscribe("text", Spacebrew::TYPE_STRING );
@@ -106,10 +116,18 @@ void testApp::setup(){
     
     Spacebrew::addListener(this, spacebrew);
     ofAddListener(spacebrew.onOpenEvent, this, &testApp::onOpen);
+    ofAddListener(spacebrew.onClientConnectEvent, this, &testApp::onClientConnect);
+    
+    // centennial images
+    ofDirectory dir;
+    for ( int i=0; i<dir.listDir("centart"); i++){
+        centennialImages.push_back(ofImage());
+        centennialImages.back().loadImage( dir.getPath(i) );
+    }
     
     // video map
-    video.loadMovie("test.mov");
-    video.stop();
+    //video.loadMovie("test.mov");
+    //video.stop();
     
     // background rendering
     rendering.loadImage("view.jpg");
@@ -162,9 +180,10 @@ void testApp::update(){
         renderText();
     }
     
-    for (int i=0; i<dots.size(); i++){
-        dots[i].mode = (Mode) currentMode;
+    for (Dot & d : dots){
+        d.mode = (Mode) currentMode;
     }
+    
     if ( lastMode != currentMode ){
         int sendMode = 0;
         if ( currentMode == MODE_INTERACTIVE_COLOR ) sendMode = 0;
@@ -174,8 +193,8 @@ void testApp::update(){
         lastMode = currentMode;
         
         if ( currentMode == MODE_DATA ){
-            for (int i=0; i<bars.size(); i++){
-                bars[i] = ofRandom(10);
+            for (auto & b : bars){
+                b = ofRandom(10);
             }
             barInc = 0.0;
         } else if ( currentMode == MODE_VIDEO ){
@@ -183,17 +202,17 @@ void testApp::update(){
             video.play();
             video.setLoopState(OF_LOOP_NORMAL);
         } else if ( currentMode == MODE_INTERACTIVE_SWIPE ){
-            for (int i=0; i<dots.size(); i++){
-                dots[i].r = dots[i].g = dots[i].b = 255;
+            for (Dot & d : dots){
+                d.r = d.g = d.b = 255;
             }
         } else {
-            for (int i=0; i<dots.size(); i++){
-                dots[i].r = ofRandom(255);
-                dots[i].g = ofRandom(255);
-                dots[i].b = ofRandom(255);
-                dots[i].floatColor.r = dots[i].r / 255.;
-                dots[i].floatColor.g = dots[i].g / 255.;
-                dots[i].floatColor.b = dots[i].b / 255.;
+            for (Dot & d : dots){
+                d.r = ofRandom(255);
+                d.g = ofRandom(255);
+                d.b = ofRandom(255);
+                d.floatColor.r = d.r / 255.;
+                d.floatColor.g = d.g / 255.;
+                d.floatColor.b = d.b / 255.;
             }
         }
     }
@@ -246,20 +265,27 @@ void testApp::update(){
             if (ofGetElapsedTimeMillis() - lastMessageReceived > messageTimeout && bNeedToSend ){
                 cout << "SEND RANDOM "<<endl;
                 //...do something!
-                int r = ofRandom(255);
-                int g = ofRandom(255);
-                int b = ofRandom(255);
+                r = ofRandom(255);
+                g = ofRandom(255);
+                b = ofRandom(255);
                 
-                for (int i=0; i<dots.size(); i++){
-                    dots[i].r = r;
-                    dots[i].g = g;
-                    dots[i].b = b;
+                for ( Dot & d : dots){
+                    d.r = r;
+                    d.g = g;
+                    d.b = b;
                 }
                 
                 bNeedToSend = false;
                 spacebrew.sendRange("randomR", r );
                 spacebrew.sendRange("randomG", g );
                 spacebrew.sendRange("randomB", b );
+            } else {
+                
+                for ( Dot & d : dots){
+                    d.r = r;
+                    d.g = g;
+                    d.b = b;
+                }
             }
             break;
             
@@ -325,6 +351,10 @@ void testApp::update(){
                         dots[ind].r = gridDrawings[i].color.r * mult;
                         dots[ind].g = gridDrawings[i].color.g * mult;
                         dots[ind].b = gridDrawings[i].color.b * mult;
+                        
+                        if ( mult >= .99 ){
+                            dots[ind].index++;
+                        }
                     }
                     gridDrawings[i].age++;
                 }
@@ -389,6 +419,8 @@ void testApp::draw(){
     
     if (currentMode == MODE_INTERACTIVE_TEXT){
         renderText();
+    } else if ( bMapCentArt ){
+        renderCentennial();
     }
     
     //ofEnableLighting();
@@ -396,17 +428,20 @@ void testApp::draw(){
     camera.begin();
     ofSetColor(255);
     bool bMap = bMapChip;
-    bool bound = currentMode == MODE_INTERACTIVE_TEXT;
-    if ( bMap ) kidd.bind();
-    else if ( bound ) {
+    bool bound = currentMode == MODE_INTERACTIVE_TEXT || bMapCentArt;
+    if ( bMap ){
+        kidd.bind();
+    } else if ( bound ) {
         type.getTextureReference().bind();
     }
     
     ofPushMatrix();
     ofTranslate(-ofGetWidth()/4.0, -ofGetHeight()/4.0);//realX, realY);
-    for (int i=0; i<dots.size(); i++){
-        dots[i].draw();
+    
+    for ( Dot & d : dots){
+        d.draw();
     }
+    
     ofPopMatrix();
     if ( bMap ) kidd.unbind();
     else if ( bound ) {
@@ -463,10 +498,57 @@ void testApp::renderText(){
 }
 
 //--------------------------------------------------------------
+void testApp::renderCentennial(){
+    ofPushStyle();
+    type.begin();
+    ofClear(255);
+    ofSetColor(255,255,255,255);
+    
+    float typeSpacing = (float) 1024.0/gridSize;
+    float letterWidth = (float) typeSpacing * ((float) dotWidth/spacing);
+    
+    int index = 0;
+    
+    ofBlendMode mode = ofGetStyle().blendingMode;
+    
+    ofEnableBlendMode(OF_BLENDMODE_MULTIPLY);
+    
+    for ( int x = 0; x < gridSize; x ++){
+        for (int y=0; y<gridSize; y++){
+            float sqX = x * typeSpacing;
+            float sqY = y * typeSpacing;
+            Dot d = dots[ x + y * gridSize ];
+            ofColor c = ofColor(d.floatColor.r * 255., d.floatColor.g * 255., d.floatColor.b * 255.  );
+            ofSetColor(c);
+            ofRect(sqX, sqY, typeSpacing, typeSpacing); //??
+            int index = dots[ x + y * gridSize ].index;
+            while ( index >= centennialImages.size() ){
+                index -= dots.size();
+                if ( index < 0 ){
+                    index *= -1;
+                }
+            }
+            
+            centennialImages[ index ].draw(sqX, sqY, typeSpacing, typeSpacing);
+            index++;
+            if ( index >= centennialImages.size() ){
+                index = 0;
+            }
+        }
+    }
+    
+    ofEnableAlphaBlending();
+    
+    ofEnableBlendMode(mode);
+    type.end();
+    ofPopStyle();
+}
+
+//--------------------------------------------------------------
 void testApp::keyPressed(int key){
     if ( key == ' ' ){
-        for (int i=0; i<dots.size(); i++){
-            dots[i].clear();
+        for ( Dot & d : dots){
+            d.clear();
         }
     } else if ( key == '='){
         scale += .1;
@@ -581,6 +663,16 @@ void testApp::onMessage( Spacebrew::Message & m ){
         currentStrings[ind].lastChanged = ofGetElapsedTimeMillis();
         currentStrings[ind].backwards = ofRandom(10) > 4 ? true : false;
     }
+}
+
+
+void testApp::onClientConnect( Spacebrew::Config & c){
+    cout << "connect"<<endl;
+    int sendMode = 0;
+    if ( currentMode == MODE_INTERACTIVE_COLOR ) sendMode = 0;
+    else if ( currentMode == MODE_INTERACTIVE_GRID ) sendMode = 1;
+    else if ( currentMode == MODE_INTERACTIVE_TEXT ) sendMode = 2;
+    spacebrew.sendRange("mode", sendMode);
 }
 
 void testApp::mouseDragged(int x, int y, int button){

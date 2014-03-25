@@ -14,11 +14,13 @@
 class Dot : public ofVec3f {
 public:
     
+    int index;
+    
     // build
     void setup();
     void loadFont( ofTrueTypeFont & font );
     
-    void draw( bool bRender = true);
+    void draw( bool bMap = false, bool bRender = true);
     void clear();
     
     void mousePressed( ofVec2f m );
