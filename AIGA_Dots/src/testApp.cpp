@@ -10,7 +10,7 @@ float scale = 1.0;
 bool bMapChip = false;
 bool bShowRender = false;
 bool bShowPattern = false;
-bool bMapCentArt = false;
+bool bRenderClocks = true;
 
 string br_server = "spacebrew.robotconscience.com";
 
@@ -27,6 +27,17 @@ float maxDrawingAge     = 60 * 5;
 int r = 255;
 int g = 255;
 int b = 255;
+
+// clock settings
+int numFaces = 1;
+int mode = 0;
+bool bColorFace = true;
+bool bPreciseDraw = false;
+float lineWidth = 1.0;
+float hueVariance = 0;
+
+// camera mouse
+bool bCameraMouse = false;
 
 //--------------------------------------------------------------
 void testApp::setup(){
@@ -56,8 +67,16 @@ void testApp::setup(){
             dots.back().floatColor.r = dots.back().r / 255.;
             dots.back().floatColor.g = dots.back().g / 255.;
             dots.back().floatColor.b = dots.back().b / 255.;
+            
+            // build clock face
+            clocks.push_back(Clock());
+            clocks.back().radius = 1024.0 / 10.0 / 2.0;
+            clocks.back().liveRadius =  clocks.back().radius * .9;
+            clocks.back().x = clocks.back().radius + x * clocks.back().radius * 2.0;
+            clocks.back().y = clocks.back().radius + y * clocks.back().radius * 2.0;
         }
     }
+    
     ofEnableDepthTest();
     ofEnableSmoothing();
     
@@ -68,6 +87,8 @@ void testApp::setup(){
     kidd.update();
     
     camera.setDistance(1000);
+    camera.move(-150, 0, -200);
+    camera.disableMouseInput();
     simpleLight.enable();
     simpleLight.setPosition(ofGetWidth(), ofGetHeight(), 1);
     simpleLight.setPointLight();
@@ -80,14 +101,41 @@ void testApp::setup(){
     currentMode = MODE_INTERACTIVE_GRID;
     
     // setup gui
-    gui = new ofxUICanvas(0,0, ofGetWidth()/2.0, ofGetHeight());
+    gui = new ofxUICanvas(0,0,ofGetWidth() / 4.0, ofGetHeight() );
     gui->toggleVisible();
+    gui2 = new ofxUICanvas(ofGetWidth() / 4.0,0,ofGetWidth() / 4.0, ofGetHeight() );
+    gui2->toggleVisible();
     
     gui->addToggle("Map Chip", &bMapChip);
     gui->addIntSlider("Mode", MODE_COLOR, MODE_DATA, &currentMode);
     gui->addToggle("Show Rendering", &bShowRender );
     gui->addToggle("Show Pattern", &bShowPattern);
-    gui->addToggle("Map Cent Art", &bMapCentArt);
+    gui->addToggle("Map Clocks", &bRenderClocks);
+    
+    // clock gui
+    
+    colorImage.loadImage("spectrum.png");
+    gui->addLabel("Face color");
+    gui->addImageSampler("color", &colorImage, ofGetWidth() * .2, ofGetWidth() * .2);
+    gui->addSlider("Face saturation", 0, 255, 0.0);
+    gui->addSlider("Face brightness", 0, 255, 0.0);
+    gui->addIntSlider("numFaces", 1, 25, &numFaces);
+    gui->addIntSlider("color mode", 0, 5, &mode);
+    gui->addSlider("lineWidth", 1.0, 10.0, &lineWidth);
+    gui->addSlider("hueVariance", 0.0, 255., &hueVariance);
+    
+    gui2->addLabel("Arm color");
+    gui2->addImageSampler("arm color", &colorImage, ofGetWidth() * .2, ofGetWidth() * .2);
+    gui2->addSlider("arm saturation", 0, 255, 0.0);
+    gui2->addSlider("arm brightness", 0, 255, 0.0);
+    gui2->addToggle("magnet or draw", &bPreciseDraw);
+    
+    gui->loadSettings("gui-settings.xml");
+    gui2->loadSettings("gui2-settings.xml");
+    
+    ofAddListener(gui->newGUIEvent, this, &testApp::onGui );
+    ofAddListener(gui2->newGUIEvent, this, &testApp::onGui );
+    
     lastMode = currentMode;
     
 //    ofSetLogLevel(OF_LOG_VERBOSE);
@@ -118,13 +166,6 @@ void testApp::setup(){
     ofAddListener(spacebrew.onOpenEvent, this, &testApp::onOpen);
     ofAddListener(spacebrew.onClientConnectEvent, this, &testApp::onClientConnect);
     
-    // centennial images
-    ofDirectory dir;
-    for ( int i=0; i<dir.listDir("centart"); i++){
-        centennialImages.push_back(ofImage());
-        centennialImages.back().loadImage( dir.getPath(i) );
-    }
-    
     // video map
     //video.loadMovie("test.mov");
     //video.stop();
@@ -135,6 +176,38 @@ void testApp::setup(){
     screen.allocate(ofGetWidth(), ofGetHeight());
     
     ofDisableLighting();
+}
+
+//--------------------------------------------------------------
+void testApp::onGui( ofxUIEventArgs &e ){
+    if ( e.getName() == "color"){
+        ofxUIImageSampler * s = (ofxUIImageSampler*) e.widget;
+        for ( auto & c : clocks ){
+            c.faceColor = s->getColor();
+            c.faceColor.setHue( ofWrap(s->getColor().getHue() + ofMap(c.y, 0, 700.0, 0, hueVariance), 0, 255));
+        }
+    } else if ( e.getName() == "arm color"){
+        ofxUIImageSampler * s = (ofxUIImageSampler*) e.widget;
+        for ( auto & c : clocks ){
+            c.armColor = s->getColor();
+        }
+    } else if ( e.getName() == "face brightness" ){
+        for ( auto & c : clocks ){
+            c.faceColor.setBrightness(e.getSlider()->getScaledValue());
+        }
+    } else if ( e.getName() == "face saturation" ){
+        for ( auto & c : clocks ){
+            c.faceColor.setSaturation(e.getSlider()->getScaledValue());
+        }
+    }else if ( e.getName() == "arm brightness" ){
+        for ( auto & c : clocks ){
+            c.armColor.setBrightness(e.getSlider()->getScaledValue());
+        }
+    } else if ( e.getName() == "arm saturation" ){
+        for ( auto & c : clocks ){
+            c.armColor.setSaturation(e.getSlider()->getScaledValue());
+        }
+    }
 }
 
 //--------------------------------------------------------------
@@ -224,8 +297,8 @@ void testApp::update(){
                 if ( val > 0 ){
                     val = val * bars[y];
                 } else if ( barInc > .05 ){
-                    for (int i=0; i<bars.size(); i++){
-                        bars[i] = ofRandom(10);
+                    for (float & i : bars ){
+                        i = ofRandom(10);
                     }
                     barInc = 0.0;
                 } else {
@@ -341,16 +414,23 @@ void testApp::update(){
                         gridDrawings[i].lastChanged = ofGetElapsedTimeMillis();
                     }
                     
-                    int x = 9 - gridDrawings[i].indices[gridDrawings[i].index] % 10;
-                    int y = floor(gridDrawings[i].indices[gridDrawings[i].index]/10);
+                    int y = 9 - gridDrawings[i].indices[gridDrawings[i].index] % 10;
+                    int x = floor(gridDrawings[i].indices[gridDrawings[i].index]/10);
                     int ind = x + y * 10;
                     
                     int indO = gridDrawings[i].indices[gridDrawings[i].index];
                     if ( gridDrawings[i].grid[indO] ){
                         float mult =(float) (maxDrawingAge-gridDrawings[i].age) / maxDrawingAge;
-                        dots[ind].r = gridDrawings[i].color.r * mult;
-                        dots[ind].g = gridDrawings[i].color.g * mult;
-                        dots[ind].b = gridDrawings[i].color.b * mult;
+                        if ( !bRenderClocks ){
+                            dots[ind].r = gridDrawings[i].color.r * mult;
+                            dots[ind].g = gridDrawings[i].color.g * mult;
+                            dots[ind].b = gridDrawings[i].color.b * mult;
+                        } else {
+                            static float mult = 1024.0 / 10.0;
+                            for ( Clock & c : clocks ){
+                                c.magnet(mult/2.0 + (x * mult),mult + (y * mult));
+                            }
+                        }
                         
                         if ( mult >= .99 ){
                             dots[ind].index++;
@@ -419,8 +499,8 @@ void testApp::draw(){
     
     if (currentMode == MODE_INTERACTIVE_TEXT){
         renderText();
-    } else if ( bMapCentArt ){
-        renderCentennial();
+    } else if ( bRenderClocks ){
+        renderClocks();
     }
     
     //ofEnableLighting();
@@ -428,7 +508,7 @@ void testApp::draw(){
     camera.begin();
     ofSetColor(255);
     bool bMap = bMapChip;
-    bool bound = currentMode == MODE_INTERACTIVE_TEXT || bMapCentArt;
+    bool bound = currentMode == MODE_INTERACTIVE_TEXT || bRenderClocks;
     if ( bMap ){
         kidd.bind();
     } else if ( bound ) {
@@ -457,6 +537,26 @@ void testApp::draw(){
         ofSetColor(255);
         type.draw(0,0);
     }
+}
+
+//--------------------------------------------------------------
+void testApp::renderClocks(){
+    
+    type.begin();
+    
+    ofDisableAlphaBlending();
+    ofClear(255);
+    ofSetColor(255,255,255,255);
+    
+    float typeSpacing = (float) 1024.0/gridSize;
+    float letterWidth = (float) typeSpacing * ((float) dotWidth/spacing);
+    
+    for ( Clock & c : clocks){
+        c.draw();
+        c.numFaces = numFaces;
+        c.colorMode = mode;
+    }
+    type.end();
 }
 
 
@@ -498,53 +598,6 @@ void testApp::renderText(){
 }
 
 //--------------------------------------------------------------
-void testApp::renderCentennial(){
-    ofPushStyle();
-    type.begin();
-    ofClear(255);
-    ofSetColor(255,255,255,255);
-    
-    float typeSpacing = (float) 1024.0/gridSize;
-    float letterWidth = (float) typeSpacing * ((float) dotWidth/spacing);
-    
-    int index = 0;
-    
-    ofBlendMode mode = ofGetStyle().blendingMode;
-    
-    ofEnableBlendMode(OF_BLENDMODE_MULTIPLY);
-    
-    for ( int x = 0; x < gridSize; x ++){
-        for (int y=0; y<gridSize; y++){
-            float sqX = x * typeSpacing;
-            float sqY = y * typeSpacing;
-            Dot d = dots[ x + y * gridSize ];
-            ofColor c = ofColor(d.floatColor.r * 255., d.floatColor.g * 255., d.floatColor.b * 255.  );
-            ofSetColor(c);
-            ofRect(sqX, sqY, typeSpacing, typeSpacing); //??
-            int index = dots[ x + y * gridSize ].index;
-            while ( index >= centennialImages.size() ){
-                index -= dots.size();
-                if ( index < 0 ){
-                    index *= -1;
-                }
-            }
-            
-            centennialImages[ index ].draw(sqX, sqY, typeSpacing, typeSpacing);
-            index++;
-            if ( index >= centennialImages.size() ){
-                index = 0;
-            }
-        }
-    }
-    
-    ofEnableAlphaBlending();
-    
-    ofEnableBlendMode(mode);
-    type.end();
-    ofPopStyle();
-}
-
-//--------------------------------------------------------------
 void testApp::keyPressed(int key){
     if ( key == ' ' ){
         for ( Dot & d : dots){
@@ -556,17 +609,31 @@ void testApp::keyPressed(int key){
         scale -= .1;
     } else if ( key == 'g' ){
         gui->toggleVisible();
+        gui2->toggleVisible();
         if ( gui->isVisible() ){
             camera.disableMouseInput();
-        } else {
+        } else if ( bCameraMouse ){
             camera.enableMouseInput();
         }
+    } else if ( key == 's' ){
+        gui->saveSettings("gui-settings.xml");
+        gui2->saveSettings("gui2-settings.xml");
+    }
+    if ( key == OF_KEY_SHIFT ){
+        bCameraMouse = true;
+        camera.enableMouseInput();
     }
 }
 
-void testApp::keyReleased(int key){}
-void testApp::mouseMoved(int x, int y ){}
+//--------------------------------------------------------------
+void testApp::keyReleased(int key){
+    if ( key == OF_KEY_SHIFT ){
+        bCameraMouse = false;
+        camera.disableMouseInput();
+    }
+}
 
+//--------------------------------------------------------------
 float jsonAsFloat( Json::Value val ){
     if ( val.isString() ){
         return ofToFloat( val.asString() );
@@ -580,10 +647,10 @@ float jsonAsFloat( Json::Value val ){
     }
 }
 
+//--------------------------------------------------------------
 float jsonAsFloat( Json::Value val, string prop ){
     return jsonAsFloat(val[prop]);
 }
-
 
 //--------------------------------------------------------------
 void testApp::onOpen( ofxLibwebsockets::Event& args ){
@@ -675,24 +742,40 @@ void testApp::onClientConnect( Spacebrew::Config & c){
     spacebrew.sendRange("mode", sendMode);
 }
 
+//--------------------------------------------------------------
 void testApp::mouseDragged(int x, int y, int button){
-    for (int i=0; i<dots.size(); i++){
-//        dots[i].mousePressed(ofVec2f(x-realX,y-realY));
+    for ( auto & c : clocks ){
+        //        if ( c.bAnimating )
+        if ( !bPreciseDraw ) c.magnet(x,ofGetHeight()-y);
+        //c.onMouseDragged(x, y);
+    }
+}
+
+
+//--------------------------------------------------------------
+void testApp::mouseMoved(int x, int y ){}
+
+
+//--------------------------------------------------------------
+void testApp::mousePressed(int x, int y, int button){
+    for ( auto & c : clocks ){
+        if ( bPreciseDraw )
+            c.checkHit(x,y);
     }
 }
 
 //--------------------------------------------------------------
-void testApp::mousePressed(int x, int y, int button){
-    for (int i=0; i<dots.size(); i++){
-//        dots[i].mousePressed(ofVec2f(x-realX,y-realY));
-    }
-
-}
 void testApp::mouseReleased(int x, int y, int button){
-    for (int i=0; i<dots.size(); i++){
-//        dots[i].mouseReleased(ofVec2f(x-realX,y-realY));
+    for ( auto & c : clocks ){
+        //c.onMouseReleased(x, y);
+    }
+    
+    if (!bPreciseDraw) return;
+    for ( auto & c : clocks ){
+        c.checkHit(x,y, ofGetKeyPressed(OF_KEY_CONTROL));
     }
 }
+
 void testApp::windowResized(int w, int h){}
 void testApp::gotMessage(ofMessage msg){}
 void testApp::dragEvent(ofDragInfo dragInfo){ }

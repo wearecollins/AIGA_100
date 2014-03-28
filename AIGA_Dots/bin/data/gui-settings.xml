@@ -1,0 +1,65 @@
+<Widget>
+    <Kind>2</Kind>
+    <Name>Map Chip</Name>
+    <Value>0</Value>
+</Widget>
+<Widget>
+    <Kind>42</Kind>
+    <Name>Mode</Name>
+    <Value>3</Value>
+</Widget>
+<Widget>
+    <Kind>2</Kind>
+    <Name>Show Rendering</Name>
+    <Value>0</Value>
+</Widget>
+<Widget>
+    <Kind>2</Kind>
+    <Name>Show Pattern</Name>
+    <Value>0</Value>
+</Widget>
+<Widget>
+    <Kind>2</Kind>
+    <Name>Map Clocks</Name>
+    <Value>1</Value>
+</Widget>
+<Widget>
+    <Kind>28</Kind>
+    <Name>color</Name>
+    <XValue>0.949218750</XValue>
+    <YValue>0.082031250</YValue>
+    <RColor>252</RColor>
+    <GColor>27</GColor>
+    <BColor>79</BColor>
+    <AColor>255</AColor>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>Face saturation</Name>
+    <Value>165.544342041</Value>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>Face brightness</Name>
+    <Value>102.822578430</Value>
+</Widget>
+<Widget>
+    <Kind>42</Kind>
+    <Name>numFaces</Name>
+    <Value>1</Value>
+</Widget>
+<Widget>
+    <Kind>42</Kind>
+    <Name>color mode</Name>
+    <Value>5</Value>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>lineWidth</Name>
+    <Value>1.000000000</Value>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>hueVariance</Name>
+    <Value>25.336538315</Value>
+</Widget>

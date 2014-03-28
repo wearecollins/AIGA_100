@@ -52,7 +52,7 @@ void Dot::setup(){
     // set texcoords
     for (i=0; i<mesh.getNumVertices(); i++){
         ofVec3f vert = mesh.getVertex(i);
-        mesh.setTexCoord(i, ofVec2f( (x + vert.x  - min.x)/w, 1 - (( y + vert.y - min.y)/h) ) );
+        mesh.setTexCoord(i, ofVec2f( ofMap(vert.x / width, -.5, .5, x/w, x/w + .1), ofMap( (vert.y / width), -.5, .5, y/h, y/h + .1) ) );
     }
     
     mode = MODE_INTERACTIVE_COLOR;

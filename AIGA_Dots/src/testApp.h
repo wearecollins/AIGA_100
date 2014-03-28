@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "Constants.h"
 #include "Dot.h"
+#include "Clock.h"
 #include "ofxUI.h"
 #include "ofxSpacebrew.h"
 
@@ -46,14 +47,17 @@ class testApp : public ofBaseApp{
 		void mouseReleased(int x, int y, int button);
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
-		void gotMessage(ofMessage msg);
+        void gotMessage(ofMessage msg);
+        void onGui( ofxUIEventArgs &e );
     
         vector<Dot> dots;
     
         // images
         ofImage kidd;
-        vector<ofImage> centennialImages;
-        void renderCentennial();
+    
+        // clock faces
+        vector<Clock> clocks;
+        ofImage colorImage;
     
         ofLight simpleLight;
         ofEasyCam camera;
@@ -67,6 +71,7 @@ class testApp : public ofBaseApp{
         vector<TextSquare> currentStrings;
         ofTrueTypeFont font;
         void renderText();
+        void renderClocks();
     
         // swipe
         vector<Drawing> drawings;
@@ -83,6 +88,7 @@ class testApp : public ofBaseApp{
         // GUI
         int currentMode, lastMode;
         ofxUICanvas * gui;
+        ofxUICanvas * gui2;
     
         ofVideoPlayer video;
     

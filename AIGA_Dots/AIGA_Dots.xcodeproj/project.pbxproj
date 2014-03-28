@@ -120,6 +120,7 @@
 
 /* Begin PBXFileReference section */
 		010E548118D7480B00C58BBD /* Dot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Dot.cpp; sourceTree = "<group>"; };
+		0121B67D18E5C445004D873B /* Clock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Clock.h; sourceTree = "<group>"; };
 		0177E6D418D2A2F000F9CAA4 /* Client.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Client.h; sourceTree = "<group>"; };
 		0177E6D518D2A2F000F9CAA4 /* Connection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Connection.h; sourceTree = "<group>"; };
 		0177E6D618D2A2F000F9CAA4 /* Events.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Events.h; sourceTree = "<group>"; };
@@ -621,6 +622,7 @@
 				01A87AD818C7A7FF00AD9D5F /* Dot.h */,
 				010E548118D7480B00C58BBD /* Dot.cpp */,
 				01F338D218CF738900F7122D /* Constants.h */,
+				0121B67D18E5C445004D873B /* Clock.h */,
 			);
 			path = src;
 			sourceTree = SOURCE_ROOT;
