@@ -1,6 +1,8 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ofxUI.h"
+#include "ofxXmlSettings.h"
 #include "Clock.h"
 
 class ofApp : public ofBaseApp{
@@ -19,5 +21,9 @@ class ofApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
-        
+    
+        ofImage colorImage;
+        ofxUICanvas * gui;
+        ofxUICanvas * gui2;
+        void onGui( ofxUIEventArgs &e );
 };
