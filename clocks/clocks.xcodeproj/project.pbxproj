@@ -57,6 +57,7 @@
 		016D83B718E23774001BCF3B /* tinyxmlerror.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 016D83B118E23774001BCF3B /* tinyxmlerror.cpp */; };
 		016D83B818E23774001BCF3B /* tinyxmlparser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 016D83B218E23774001BCF3B /* tinyxmlparser.cpp */; };
 		016D83B918E23774001BCF3B /* ofxXmlSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 016D83B418E23774001BCF3B /* ofxXmlSettings.cpp */; };
+		01D242D418EB18EC00873CED /* Clock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 01D242D318EB18EC00873CED /* Clock.cpp */; };
 		BBAB23CB13894F3D00AA2426 /* GLUT.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBAB23BE13894E4700AA2426 /* GLUT.framework */; };
 		E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E4328148138ABC890047C5CB /* openFrameworksDebug.a */; };
 		E45BE97B0E8CC7DD009D7055 /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E45BE9710E8CC7DD009D7055 /* AGL.framework */; };
@@ -216,6 +217,7 @@
 		016D83B218E23774001BCF3B /* tinyxmlparser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tinyxmlparser.cpp; sourceTree = "<group>"; };
 		016D83B418E23774001BCF3B /* ofxXmlSettings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxXmlSettings.cpp; sourceTree = "<group>"; };
 		016D83B518E23774001BCF3B /* ofxXmlSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxXmlSettings.h; sourceTree = "<group>"; };
+		01D242D318EB18EC00873CED /* Clock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Clock.cpp; sourceTree = "<group>"; };
 		BBAB23BE13894E4700AA2426 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../libs/glut/lib/osx/GLUT.framework; sourceTree = "<group>"; };
 		E4328143138ABC890047C5CB /* openFrameworksLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = openFrameworksLib.xcodeproj; path = ../../../libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj; sourceTree = SOURCE_ROOT; };
 		E45BE9710E8CC7DD009D7055 /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = /System/Library/Frameworks/AGL.framework; sourceTree = "<absolute>"; };
@@ -489,6 +491,7 @@
 				E4B69E1E0A3A1BDC003C02F2 /* ofApp.cpp */,
 				E4B69E1F0A3A1BDC003C02F2 /* ofApp.h */,
 				016D83AB18E1DEDE001BCF3B /* Clock.h */,
+				01D242D318EB18EC00873CED /* Clock.cpp */,
 			);
 			path = src;
 			sourceTree = SOURCE_ROOT;
@@ -597,6 +600,7 @@
 				012D7F7718E3253100BBF5C2 /* ofxUILabel.cpp in Sources */,
 				012D7F8918E3253100BBF5C2 /* ofxUITabBar.cpp in Sources */,
 				016D83B718E23774001BCF3B /* tinyxmlerror.cpp in Sources */,
+				01D242D418EB18EC00873CED /* Clock.cpp in Sources */,
 				012D7F8418E3253100BBF5C2 /* ofxUISlider.cpp in Sources */,
 				E4B69E200A3A1BDC003C02F2 /* main.cpp in Sources */,
 				012D7F6718E3253100BBF5C2 /* ofxUIBiLabelSlider.cpp in Sources */,

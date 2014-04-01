@@ -22,8 +22,5 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
     
-        ofImage colorImage;
-        ofxUICanvas * gui;
-        ofxUICanvas * gui2;
-        void onGui( ofxUIEventArgs &e );
+        Clocks clocks;
 };
