@@ -21,11 +21,11 @@
 <Widget>
     <Kind>28</Kind>
     <Name>letterColor</Name>
-    <XValue>0.515625000</XValue>
-    <YValue>0.000000000</YValue>
-    <RColor>237</RColor>
-    <GColor>237</GColor>
-    <BColor>237</BColor>
+    <XValue>0.639648438</XValue>
+    <YValue>0.054687560</YValue>
+    <RColor>20</RColor>
+    <GColor>62</GColor>
+    <BColor>251</BColor>
     <AColor>255</AColor>
 </Widget>
 <Widget>

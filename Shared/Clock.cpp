@@ -220,13 +220,14 @@ void Clock::draw(){
         float hue = ofWrap(lc.getHue() * mult + sin( ofGetElapsedTimeMillis() * .0001) * 10.0, 0, 255.0f);
         lc.setHue( hue );
         
-        setColor(lc, liveLetterColor, colorAngles[i * 2], colorAngles[i * 2 + 1]);
+        setColor(faceColor);
+        //setColor(lc, liveLetterColor, colorAngles[i * 2], colorAngles[i * 2 + 1]);
         // ?
         face.drawWireframe();
         //ofCircle(0,0,r);
         
         if ( bColorFace ){
-            ofSetColor(armColor);
+            ofSetColor(liveLetterColor);
         } else {
             ofSetColor(lc);
         }
@@ -245,7 +246,7 @@ void Clock::draw(){
         lc.setHue( hue );
         
         if ( bColorFace ){
-            ofSetColor(armColor);
+            ofSetColor(liveLetterColor);
         } else {
             ofSetColor(lc);
         }
@@ -271,16 +272,22 @@ void Clock::draw(){
             }
         }
         b = false;
-        float val = ofMap((ofGetElapsedTimeMillis() - lastFroze)-2000, 0, 1500, 0, 1.0, true);
-        liveLetterColor.lerp(faceColor, val);
-        if (val >= 1.0 ){
-            for ( auto & a : colorAngles ){
-                a = 0;
+        
+        //if ( colorAngles[0] != colorAngles[1] ){
+            float val = ofMap((ofGetElapsedTimeMillis() - lastFroze)-2000, 0, 1500, 0, 1.0, true);
+            liveLetterColor.lerp(armColor, val);
+            if (val >= 1.0 ){
+                for ( auto & a : colorAngles ){
+                    a = 0;
+                }
             }
-        }
+        //}
         bLetter = false;
     } else if ( bLetter ) {
-        liveLetterColor.lerp(letterColor, ofMap((ofGetElapsedTimeMillis() - lastFroze), 0, 500, 0, 1.0, true));
+        // hax
+        if ( colorAngles[0] != colorAngles[1] ){
+            liveLetterColor.lerp(letterColor, ofMap((ofGetElapsedTimeMillis() - lastFroze), 0, 500, 0, 1.0, true));
+        }
     }
     if ( ofGetElapsedTimeMillis() - lastFroze > 2000 ){
         vel.x = vel.x * .9 + 1 * .1;
@@ -664,8 +671,13 @@ void Clocks::setupGui(){
 void Clocks::onGui( ofxUIEventArgs &e ){
     if ( e.getName() == "color"){
         ofxUIImageSampler * s = (ofxUIImageSampler*) e.widget;
-        if ( bColorTextSeparately ) setNonLetterFaceColors(s->getColor(), hueVariance);
-        else setFaceColors(s->getColor(), hueVariance);
+        ofxUISlider * b = (ofxUISlider*) gui->getWidget("Face brightness");
+        ofxUISlider * sat = (ofxUISlider*) gui->getWidget("Face saturation");
+        ofColor c(s->getColor());
+        c.setSaturation(sat->getScaledValue());
+        c.setBrightness(b->getScaledValue());
+        if ( bColorTextSeparately ) setNonLetterFaceColors(c, hueVariance);
+        else setFaceColors(c, hueVariance);
         
     } else if ( e.getName() == "letterColor"){
         ofxUIImageSampler * s = (ofxUIImageSampler*) e.widget;
@@ -673,38 +685,39 @@ void Clocks::onGui( ofxUIEventArgs &e ){
         
     } else if ( e.getName() == "arm color"){
         ofxUIImageSampler * s = (ofxUIImageSampler*) e.widget;
-        if ( bColorTextSeparately ) setNonLetterFaceColors(s->getColor(), hueVariance, true);
-        else setFaceColors(s->getColor(), hueVariance, true);
+        
+        ofxUISlider * b = (ofxUISlider*) gui2->getWidget("arm saturation");
+        ofxUISlider * sat = (ofxUISlider*) gui2->getWidget("arm brightness");
+        ofColor c(s->getColor());
+        c.setSaturation(sat->getScaledValue());
+        c.setBrightness(b->getScaledValue());
+        
+        cout << "arm? "<<c<<endl;
+        
+        if ( bColorTextSeparately ) setNonLetterFaceColors(c, hueVariance, true);
+        else setFaceColors(c, hueVariance, true);
+        
     } else if ( e.getName() == "letterArmColor" ){
         ofxUIImageSampler * s = (ofxUIImageSampler*) e.widget;
         if ( bColorTextSeparately ) setLetterFaceColors(s->getColor(), hueVariance, true);
         else setFaceColors(s->getColor(), hueVariance, true);
-    } else if ( e.getName() == "face brightness" ){
+    } else if ( e.getName() == "Face brightness" ){
         for ( auto & c : clocks ){
             c.faceColor.setBrightness(e.getSlider()->getScaledValue());
         }
-    } else if ( e.getName() == "face saturation" ){
+    } else if ( e.getName() == "Face saturation" ){
         for ( auto & c : clocks ){
             c.faceColor.setSaturation(e.getSlider()->getScaledValue());
         }
     } else if ( e.getName() == "arm brightness" ){
-        
-        ofxUIImageSampler * s = (ofxUIImageSampler*) gui2->getWidget("arm color");
-        ofColor c = s->getColor();
-        c.setBrightness(e.getSlider()->getScaledValue());
-        
-        if ( bColorTextSeparately ) setNonLetterFaceColors(s->getColor(), hueVariance, true);
-        else setFaceColors(s->getColor(), hueVariance, true);
-        
+        for ( auto & c : clocks ){
+            c.armColor.setBrightness(e.getSlider()->getScaledValue());
+        }
     } else if ( e.getName() == "arm saturation" ){
         
-        ofxUIImageSampler * s = (ofxUIImageSampler*) gui2->getWidget("arm color");
-        ofColor c = s->getColor();
-        c.setSaturation(e.getSlider()->getScaledValue());
-        
-        if ( bColorTextSeparately ) setNonLetterFaceColors(s->getColor(), hueVariance, true);
-        else setFaceColors(s->getColor(), hueVariance, true);
-        
+        for ( auto & c : clocks ){
+            c.armColor.setSaturation(e.getSlider()->getScaledValue());
+        }
     } else if ( e.getName() == "letter arm brightness" ){
         
         ofxUIImageSampler * s = (ofxUIImageSampler*) gui2->getWidget("letterArmColor");
@@ -731,7 +744,7 @@ void Clocks::setClocks( Letter letter, int offsetX, int offsetY, int letterWidth
             int ind = (y - offsetY) + (x - offsetX) * clockLetterHeight;
             int cind = y + x * 10.0;
             clocks[cind].rotateClockTo( letter.angles[ind][0], letter.angles[ind][1]);
-            clocks[cind].setColor( clocks[cind].faceColor, clocks[cind].letterColor, letter.colorAngles[ind][0], letter.colorAngles[ind][1] );
+            //clocks[cind].setColor( clocks[cind].faceColor, clocks[cind].letterColor, letter.colorAngles[ind][0], letter.colorAngles[ind][1] );
             clocks[cind].rotateColorTo( letter.colorAngles[ind][0], letter.colorAngles[ind][1]);
             clocks[cind].lastFroze = ofGetElapsedTimeMillis();
             clocks[cind].bLetter = true;

@@ -1,11 +1,11 @@
 <Widget>
     <Kind>28</Kind>
     <Name>color</Name>
-    <XValue>0.981249988</XValue>
-    <YValue>0.062500000</YValue>
+    <XValue>0.937500000</XValue>
+    <YValue>0.037500001</YValue>
     <RColor>252</RColor>
-    <GColor>22</GColor>
-    <BColor>38</BColor>
+    <GColor>20</GColor>
+    <BColor>86</BColor>
     <AColor>255</AColor>
 </Widget>
 <Widget>
@@ -21,11 +21,11 @@
 <Widget>
     <Kind>28</Kind>
     <Name>letterColor</Name>
-    <XValue>0.806249976</XValue>
-    <YValue>0.206249997</YValue>
-    <RColor>226</RColor>
-    <GColor>64</GColor>
-    <BColor>252</BColor>
+    <XValue>0.587499976</XValue>
+    <YValue>0.056249999</YValue>
+    <RColor>28</RColor>
+    <GColor>134</GColor>
+    <BColor>251</BColor>
     <AColor>255</AColor>
 </Widget>
 <Widget>
@@ -46,5 +46,5 @@
 <Widget>
     <Kind>4</Kind>
     <Name>hueVariance</Name>
-    <Value>54.495967865</Value>
+    <Value>13.281250000</Value>
 </Widget>

@@ -68,7 +68,7 @@ void testApp::setup(){
     
     float sc = texW / 1024.0;
     float clockRadius = 32 * sc;
-    clocks.setup(10, 10, ofVec2f(96 * sc, 81 * sc), 108 * sc, 55 * sc, clockRadius );
+    clocks.setup(10, 10, ofVec2f(96 * sc, 81 * sc), 108 * sc, 54 * sc, clockRadius );
     
     ofEnableDepthTest();
     ofEnableSmoothing();
