@@ -6,6 +6,7 @@
 #include "Clock.h"
 #include "ofxUI.h"
 #include "ofxSpacebrew.h"
+#include "ofxMapamok.h"
 
 struct Drawing {
     vector<ofVec2f> points;
@@ -48,16 +49,17 @@ class testApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
         void gotMessage(ofMessage msg);
-        void onGui( ofxUIEventArgs &e );
     
         vector<Dot> dots;
+    
+        // PROJECTION MAPPING
+        ofxMapaMok mapamok;
     
         // images
         ofImage kidd;
     
         // clock faces
-        vector<Clock> clocks;
-        ofImage colorImage;
+        Clocks clocks;
     
         ofLight simpleLight;
         ofEasyCam camera;
@@ -84,11 +86,9 @@ class testApp : public ofBaseApp{
         void onMessage( Spacebrew::Message & m );
         void onClientConnect( Spacebrew::Config & c);
     
-    
         // GUI
         int currentMode, lastMode;
         ofxUICanvas * gui;
-        ofxUICanvas * gui2;
     
         ofVideoPlayer video;
     

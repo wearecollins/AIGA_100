@@ -11,6 +11,7 @@ bool bMapChip = false;
 bool bShowRender = false;
 bool bShowPattern = false;
 bool bRenderClocks = true;
+bool bRenderMapamok = true;
 
 string br_server = "spacebrew.robotconscience.com";
 
@@ -28,13 +29,8 @@ int r = 255;
 int g = 255;
 int b = 255;
 
-// clock settings
-int numFaces = 1;
-int mode = 0;
-bool bColorFace = true;
-bool bPreciseDraw = false;
-float lineWidth = 1.0;
-float hueVariance = 0;
+float texW = 2048;
+float texH = 2048;
 
 // camera mouse
 bool bCameraMouse = false;
@@ -67,21 +63,18 @@ void testApp::setup(){
             dots.back().floatColor.r = dots.back().r / 255.;
             dots.back().floatColor.g = dots.back().g / 255.;
             dots.back().floatColor.b = dots.back().b / 255.;
-            
-            // build clock face
-            clocks.push_back(Clock());
-            clocks.back().radius = 1024.0 / 10.0 / 2.0;
-            clocks.back().liveRadius =  clocks.back().radius * .9;
-            clocks.back().x = clocks.back().radius + x * clocks.back().radius * 2.0;
-            clocks.back().y = clocks.back().radius + y * clocks.back().radius * 2.0;
         }
     }
+    
+    float sc = texW / 1024.0;
+    float clockRadius = 32 * sc;
+    clocks.setup(10, 10, ofVec2f(96 * sc, 81 * sc), 108 * sc, 55 * sc, clockRadius );
     
     ofEnableDepthTest();
     ofEnableSmoothing();
     
     ofSetTextureWrap(GL_MIRRORED_REPEAT,GL_MIRRORED_REPEAT);
-    ofDisableArbTex();
+    //ofDisableArbTex();
     kidd.loadImage("kidd.jpg");
     kidd.getTextureReference().setTextureWrap(GL_MIRRORED_REPEAT,GL_MIRRORED_REPEAT);
     kidd.update();
@@ -101,40 +94,20 @@ void testApp::setup(){
     currentMode = MODE_INTERACTIVE_GRID;
     
     // setup gui
-    gui = new ofxUICanvas(0,0,ofGetWidth() / 4.0, ofGetHeight() );
+    gui = new ofxUICanvas(ofGetWidth() / 4.0 * 2.0 ,0,ofGetWidth() / 4.0, ofGetHeight() );
     gui->toggleVisible();
-    gui2 = new ofxUICanvas(ofGetWidth() / 4.0,0,ofGetWidth() / 4.0, ofGetHeight() );
-    gui2->toggleVisible();
     
     gui->addToggle("Map Chip", &bMapChip);
     gui->addIntSlider("Mode", MODE_COLOR, MODE_DATA, &currentMode);
     gui->addToggle("Show Rendering", &bShowRender );
     gui->addToggle("Show Pattern", &bShowPattern);
     gui->addToggle("Map Clocks", &bRenderClocks);
+    gui->addToggle("Use mapping", &bRenderMapamok);
+    gui->addSlider("Map Near", 0, 100.0, &mapamok.near);
+    gui->addSlider("Map Far", 0, 10000, &mapamok.far);
     
     // clock gui
-    
-    colorImage.loadImage("spectrum.png");
-    gui->addLabel("Face color");
-    gui->addImageSampler("color", &colorImage, ofGetWidth() * .2, ofGetWidth() * .2);
-    gui->addSlider("Face saturation", 0, 255, 0.0);
-    gui->addSlider("Face brightness", 0, 255, 0.0);
-    gui->addIntSlider("numFaces", 1, 25, &numFaces);
-    gui->addIntSlider("color mode", 0, 5, &mode);
-    gui->addSlider("lineWidth", 1.0, 10.0, &lineWidth);
-    gui->addSlider("hueVariance", 0.0, 255., &hueVariance);
-    
-    gui2->addLabel("Arm color");
-    gui2->addImageSampler("arm color", &colorImage, ofGetWidth() * .2, ofGetWidth() * .2);
-    gui2->addSlider("arm saturation", 0, 255, 0.0);
-    gui2->addSlider("arm brightness", 0, 255, 0.0);
-    gui2->addToggle("magnet or draw", &bPreciseDraw);
-    
-    gui->loadSettings("gui-settings.xml");
-    gui2->loadSettings("gui2-settings.xml");
-    
-    ofAddListener(gui->newGUIEvent, this, &testApp::onGui );
-    ofAddListener(gui2->newGUIEvent, this, &testApp::onGui );
+    gui->loadSettings("main-settings.xml");
     
     lastMode = currentMode;
     
@@ -166,48 +139,18 @@ void testApp::setup(){
     ofAddListener(spacebrew.onOpenEvent, this, &testApp::onOpen);
     ofAddListener(spacebrew.onClientConnectEvent, this, &testApp::onClientConnect);
     
-    // video map
-    //video.loadMovie("test.mov");
-    //video.stop();
-    
     // background rendering
     rendering.loadImage("view.jpg");
     
     screen.allocate(ofGetWidth(), ofGetHeight());
     
+    // setup mapamok
+    mapamok.loadSettings("mapamok.xml");
+    mapamok.loadMesh("model.dae", texW, texH);
+    mapamok.drawMode = DRAW_FACES;
+    mapamok.useLights = false;
+    
     ofDisableLighting();
-}
-
-//--------------------------------------------------------------
-void testApp::onGui( ofxUIEventArgs &e ){
-    if ( e.getName() == "color"){
-        ofxUIImageSampler * s = (ofxUIImageSampler*) e.widget;
-        for ( auto & c : clocks ){
-            c.faceColor = s->getColor();
-            c.faceColor.setHue( ofWrap(s->getColor().getHue() + ofMap(c.y, 0, 700.0, 0, hueVariance), 0, 255));
-        }
-    } else if ( e.getName() == "arm color"){
-        ofxUIImageSampler * s = (ofxUIImageSampler*) e.widget;
-        for ( auto & c : clocks ){
-            c.armColor = s->getColor();
-        }
-    } else if ( e.getName() == "face brightness" ){
-        for ( auto & c : clocks ){
-            c.faceColor.setBrightness(e.getSlider()->getScaledValue());
-        }
-    } else if ( e.getName() == "face saturation" ){
-        for ( auto & c : clocks ){
-            c.faceColor.setSaturation(e.getSlider()->getScaledValue());
-        }
-    }else if ( e.getName() == "arm brightness" ){
-        for ( auto & c : clocks ){
-            c.armColor.setBrightness(e.getSlider()->getScaledValue());
-        }
-    } else if ( e.getName() == "arm saturation" ){
-        for ( auto & c : clocks ){
-            c.armColor.setSaturation(e.getSlider()->getScaledValue());
-        }
-    }
 }
 
 //--------------------------------------------------------------
@@ -215,7 +158,7 @@ void testApp::update(){
     
     if ( !pattern.isAllocated() ){
         // render pattern
-        pattern.allocate(1024,1024);
+        pattern.allocate(texW, texH);
         pattern.getTextureReference().setTextureWrap(GL_MIRRORED_REPEAT,GL_MIRRORED_REPEAT);
         
         ofDirectory dir;
@@ -249,8 +192,8 @@ void testApp::update(){
     
     if ( !type.isAllocated() ){
         // render pattern
-        type.allocate(1024, 1024);
-        renderText();
+        type.allocate(texW, texH);
+        renderClocks();
     }
     
     for (Dot & d : dots){
@@ -426,10 +369,8 @@ void testApp::update(){
                             dots[ind].g = gridDrawings[i].color.g * mult;
                             dots[ind].b = gridDrawings[i].color.b * mult;
                         } else {
-                            static float mult = 1024.0 / 10.0;
-                            for ( Clock & c : clocks ){
-                                c.magnet(mult/2.0 + (x * mult),mult + (y * mult));
-                            }
+                            static float mult = texW / 10.0;
+                            clocks.magnet(mult/2.0 + (x * mult), mult + (y * mult));
                         }
                         
                         if ( mult >= .99 ){
@@ -483,59 +424,68 @@ void testApp::update(){
         default:
             break;
     }
+    
+    if ( bRenderMapamok ){
+        mapamok.update();
+    }
 }
 
 //--------------------------------------------------------------
 void testApp::draw(){
-    ofColor white;
-    ofColor offWhite(200,200,200);
-    ofBackgroundGradient(white, offWhite);
-    
-    if (bShowRender) {
-        ofSetColor(255);
-        float scale = (float) ofGetWidth()/rendering.width;
-        rendering.draw(0,0, rendering.width * scale, rendering.height * scale);
-    }
-    
-    if (currentMode == MODE_INTERACTIVE_TEXT){
-        renderText();
-    } else if ( bRenderClocks ){
+    if ( bRenderMapamok ){
         renderClocks();
-    }
-    
-    //ofEnableLighting();
-    ofEnableDepthTest();
-    camera.begin();
-    ofSetColor(255);
-    bool bMap = bMapChip;
-    bool bound = currentMode == MODE_INTERACTIVE_TEXT || bRenderClocks;
-    if ( bMap ){
-        kidd.bind();
-    } else if ( bound ) {
-        type.getTextureReference().bind();
-    }
-    
-    ofPushMatrix();
-    ofTranslate(-ofGetWidth()/4.0, -ofGetHeight()/4.0);//realX, realY);
-    
-    for ( Dot & d : dots){
-        d.draw();
-    }
-    
-    ofPopMatrix();
-    if ( bMap ) kidd.unbind();
-    else if ( bound ) {
-        type.getTextureReference().unbind();
-    }
-    
-    camera.end();
-    ofDisableDepthTest();
-    ofDisableLighting();
-    
-    ofDrawBitmapString("Press ' ' to clear", 20,20);
-    if ( bShowPattern ){
+        mapamok.draw( &type.getTextureReference() );
+        
+    } else {
+        ofColor white;
+        ofColor offWhite(200,200,200);
+        ofBackgroundGradient(white, offWhite);
+        
+        if (bShowRender) {
+            ofSetColor(255);
+            float scale = (float) ofGetWidth()/rendering.width;
+            rendering.draw(0,0, rendering.width * scale, rendering.height * scale);
+        }
+        
+        if (currentMode == MODE_INTERACTIVE_TEXT){
+            renderText();
+        } else if ( bRenderClocks ){
+            renderClocks();
+        }
+        
+        //ofEnableLighting();
+        ofEnableDepthTest();
+        camera.begin();
         ofSetColor(255);
-        type.draw(0,0);
+        bool bMap = bMapChip;
+        bool bound = currentMode == MODE_INTERACTIVE_TEXT || bRenderClocks;
+        if ( bMap ){
+            kidd.bind();
+        } else if ( bound ) {
+            type.getTextureReference().bind();
+        }
+        
+        ofPushMatrix();
+        ofTranslate(-ofGetWidth()/4.0, -ofGetHeight()/4.0);//realX, realY);
+        
+        for ( Dot & d : dots){
+            d.draw();
+        }
+        
+        ofPopMatrix();
+        if ( bMap ) kidd.unbind();
+        else if ( bound ) {
+            type.getTextureReference().unbind();
+        }
+        
+        camera.end();
+        ofDisableDepthTest();
+        ofDisableLighting();
+        
+        if ( bShowPattern ){
+            ofSetColor(255);
+            type.draw(0,0);
+        }
     }
 }
 
@@ -543,19 +493,13 @@ void testApp::draw(){
 void testApp::renderClocks(){
     
     type.begin();
-    
-    ofDisableAlphaBlending();
+//    ofDisableAlphaBlending();
     ofClear(255);
-    ofSetColor(255,255,255,255);
-    
-    float typeSpacing = (float) 1024.0/gridSize;
-    float letterWidth = (float) typeSpacing * ((float) dotWidth/spacing);
-    
-    for ( Clock & c : clocks){
-        c.draw();
-        c.numFaces = numFaces;
-        c.colorMode = mode;
-    }
+    ofPushMatrix();
+    ofScale(-1,1);
+    ofTranslate(-type.getWidth(), 0);
+    clocks.draw();
+    ofPopMatrix();
     type.end();
 }
 
@@ -569,7 +513,7 @@ void testApp::renderText(){
     ofClear(255);
     ofSetColor(255,255,255,255);
     
-    float typeSpacing = (float) 1024.0/gridSize;
+    float typeSpacing = (float) texW/gridSize;
     float letterWidth = (float) typeSpacing * ((float) dotWidth/spacing);
     
     for ( int x = 0; x < gridSize; x ++){
@@ -609,15 +553,18 @@ void testApp::keyPressed(int key){
         scale -= .1;
     } else if ( key == 'g' ){
         gui->toggleVisible();
-        gui2->toggleVisible();
         if ( gui->isVisible() ){
             camera.disableMouseInput();
         } else if ( bCameraMouse ){
             camera.enableMouseInput();
         }
     } else if ( key == 's' ){
-        gui->saveSettings("gui-settings.xml");
-        gui2->saveSettings("gui2-settings.xml");
+        gui->saveSettings("main-settings.xml");
+    } else if ( key == 'f' ){
+        ofToggleFullscreen();
+    } else if ( key == 'S'){
+        mapamok.saveSettings();
+        mapamok.saveCalibration();
     }
     if ( key == OF_KEY_SHIFT ){
         bCameraMouse = true;
@@ -743,39 +690,16 @@ void testApp::onClientConnect( Spacebrew::Config & c){
 }
 
 //--------------------------------------------------------------
-void testApp::mouseDragged(int x, int y, int button){
-    for ( auto & c : clocks ){
-        //        if ( c.bAnimating )
-        if ( !bPreciseDraw ) c.magnet(x,ofGetHeight()-y);
-        //c.onMouseDragged(x, y);
-    }
-}
-
+void testApp::mouseDragged(int x, int y, int button){}
 
 //--------------------------------------------------------------
 void testApp::mouseMoved(int x, int y ){}
 
+//--------------------------------------------------------------
+void testApp::mousePressed(int x, int y, int button){}
 
 //--------------------------------------------------------------
-void testApp::mousePressed(int x, int y, int button){
-    for ( auto & c : clocks ){
-        if ( bPreciseDraw )
-            c.checkHit(x,y);
-    }
-}
-
-//--------------------------------------------------------------
-void testApp::mouseReleased(int x, int y, int button){
-    for ( auto & c : clocks ){
-        //c.onMouseReleased(x, y);
-    }
-    
-    if (!bPreciseDraw) return;
-    for ( auto & c : clocks ){
-        c.checkHit(x,y, ofGetKeyPressed(OF_KEY_CONTROL));
-    }
-}
-
+void testApp::mouseReleased(int x, int y, int button){}
 void testApp::windowResized(int w, int h){}
 void testApp::gotMessage(ofMessage msg){}
 void testApp::dragEvent(ofDragInfo dragInfo){ }

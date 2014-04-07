@@ -1,25 +1,65 @@
 <Widget>
     <Kind>28</Kind>
     <Name>arm color</Name>
-    <XValue>0.000000000</XValue>
-    <YValue>1.000000000</YValue>
-    <RColor>237</RColor>
-    <GColor>237</GColor>
-    <BColor>237</BColor>
+    <XValue>0.462500006</XValue>
+    <YValue>0.156250000</YValue>
+    <RColor>58</RColor>
+    <GColor>254</GColor>
+    <BColor>198</BColor>
     <AColor>255</AColor>
 </Widget>
 <Widget>
     <Kind>4</Kind>
     <Name>arm saturation</Name>
-    <Value>173.770156860</Value>
+    <Value>0.000000000</Value>
 </Widget>
 <Widget>
     <Kind>4</Kind>
     <Name>arm brightness</Name>
-    <Value>91.512092590</Value>
+    <Value>0.000000000</Value>
+</Widget>
+<Widget>
+    <Kind>28</Kind>
+    <Name>letterArmColor</Name>
+    <XValue>0.112499997</XValue>
+    <YValue>0.962499976</YValue>
+    <RColor>255</RColor>
+    <GColor>252</GColor>
+    <BColor>248</BColor>
+    <AColor>255</AColor>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>letter arm saturation</Name>
+    <Value>14.609375000</Value>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>letter arm brightness</Name>
+    <Value>243.046875000</Value>
 </Widget>
 <Widget>
     <Kind>2</Kind>
     <Name>magnet or draw</Name>
+    <Value>0</Value>
+</Widget>
+<Widget>
+    <Kind>2</Kind>
+    <Name>Color text area separately</Name>
+    <Value>0</Value>
+</Widget>
+<Widget>
+    <Kind>42</Kind>
+    <Name>Which Clock</Name>
+    <Value>0</Value>
+</Widget>
+<Widget>
+    <Kind>42</Kind>
+    <Name>currentAngleA</Name>
+    <Value>0</Value>
+</Widget>
+<Widget>
+    <Kind>42</Kind>
+    <Name>currentAngleB</Name>
     <Value>0</Value>
 </Widget>

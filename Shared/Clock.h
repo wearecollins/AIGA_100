@@ -23,26 +23,36 @@ public:
     bool bColorFace;
     int lastFroze;
     
+    // test
+    int colorIndex;
+    int colorIncrement;
+    
     bool bAnimating;
     int  rotMode;
     
     vector<float> angles;
+    vector<float> colorAngles;
     vector<float> targetAngle;
     int lastNext;
     
     ofVec2f vel;
     
     ofColor faceColor, armColor;
+    void setColor( ofColor c );
+    void setColor( ofColor c, int startAngle, int endAngle );
     
     Clock();
     
+    void setup();
     void update();
     void draw();
     
     void rotateClockTo ( float angleA, float angleB );
+    void rotateColorTo ( float angleA, float angleB );
     void reset();
     
     bool bMouseDown;
+    bool bDoColor;
     
     void checkHit( int mx, int my, bool bFlip = false );
     void nextRotate();
@@ -58,6 +68,8 @@ public:
     void rotateTo( int mx, int my );
     void magnet( int mx, int my );
     
+protected:
+    ofMesh face;
 };
 
 /**
@@ -65,6 +77,7 @@ public:
  */
 struct Letter {
     vector<vector<float> > angles;
+    vector<vector<float> > colorAngles;
 };
 
 /**
@@ -102,6 +115,10 @@ public:
     ofxUICanvas * gui2;
     void setupGui();
     void onGui( ofxUIEventArgs &e );
+    
+    int currentAngleA;
+    int currentAngleB;
+    int currentClock;
     
     /**
      * @function

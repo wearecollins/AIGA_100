@@ -17,14 +17,58 @@ Clock::Clock(){
     vel.x = 1.0;
     colorMode = 0;
     offset = 0;
-    ofSetCircleResolution(300);
     bColorFace = true;
-    ofSetLineWidth(3.0);
+    bMouseDown = false;
+    bDoColor = false;
     lastFroze = 0;
     rotMode = 0;
     lastNext = 0;
+    colorIndex = 0;
     
     bAnimating = true;
+}
+
+//--------------------------------------------------------------
+void Clock::setup(){
+    ofSetCircleResolution(300);
+    ofSetLineWidth(3.0);
+    faceColor.set(255,0,0);
+    
+    // build face mesh
+    float res = 300;
+    float inc = (float) 360.0 / res;
+    
+    int i = 0;
+    colorIncrement = 90;
+    
+    ofVec2f center(0,0);
+    ofFloatColor color;
+    color.set( faceColor.r / 255.0, faceColor.g / 255.0, faceColor.b / 255.0 );
+    for ( float a = 0; a < 360.0; a+= inc ){
+        ofVec2f vec;
+        vec.x = cos( ofDegToRad(a) ) * radius;
+        vec.y = -sin( ofDegToRad(a)) * radius;
+        face.addVertex(vec);
+        
+        ofVec2f vec2;
+        vec2.x = cos( ofDegToRad(a + inc) ) * radius;
+        vec2.y = -sin( ofDegToRad(a + inc)) * radius;
+        face.addVertex(vec);
+        
+        face.addVertex(center);
+    }
+    
+    colorIndex = face.getNumVertices()-1;
+    
+    for (int i=0; i<face.getNumVertices(); i += 3){
+        face.addIndex(i);
+        face.addIndex(i + 1);
+        face.addIndex(i + 2);
+        
+        face.addColor(color);
+        face.addColor(color);
+        face.addColor(color);
+    }
 }
 
 //--------------------------------------------------------------
@@ -38,6 +82,7 @@ void Clock::update(){
     
     if ( angles.size() != numFaces * 2 ){
         angles.clear();
+        colorAngles.clear();
         targetAngle.clear();
         for (int i=0; i<numFaces; i++){
             angles.push_back(0 - 45);
@@ -45,7 +90,68 @@ void Clock::update(){
             
             targetAngle.push_back(0 - 45);
             targetAngle.push_back(90 - 45);
+            
+            colorAngles.push_back(0);
+            colorAngles.push_back(359);
         }
+    }
+}
+
+//--------------------------------------------------------------
+void Clock::setColor( ofColor c ){
+    ofFloatColor color(c.r/255.0, c.g/255.0, c.b/255.0, c.a/255.0f);
+    
+    for (int i=colorIndex; i>colorIndex-colorIncrement; i--){
+        face.setColor(i, color);
+    }
+    colorIndex -= colorIncrement;
+    if ( colorIndex < colorIncrement - 1 ){
+        colorIndex = face.getNumVertices()-1;
+    }
+}
+
+//--------------------------------------------------------------
+void Clock::setColor( ofColor c, int startAngle, int endAngle ){
+    ofFloatColor color(c.r/255.0, c.g/255.0, c.b/255.0, c.a/255.0f);
+    ofFloatColor r(1.0, 0.0, 0.0);
+    
+    int sAngleWrap = ofWrap(startAngle, 0, 360);
+    int eAngleWrap = ofWrap(endAngle, 0, 360);
+    
+    float res = 300;
+    float inc = (float) 360.0 / res;
+    int indA = sAngleWrap / inc;
+    int indB = eAngleWrap / inc;
+    
+    if ( indA > indB ){
+        if (indB == 0 ){
+            indB = 360.0 / inc;
+        } else {
+            int ta = indA;
+            int tb = indB;
+            indA = tb;
+            indB = ta;
+        }
+    }
+//    if ( bDoColor ) cout << indA << ":" << indB << endl;
+    
+    
+    for (int i=0; i<indA * 3; i += 3){
+        face.setColor(i, r);
+        face.setColor(i + 1, r);
+        face.setColor(i + 2, r);
+    }
+    
+    for (int i=indA * 3; i<indB * 3; i++){
+        face.setColor(i, color);
+        face.setColor(i + 1, color);
+        face.setColor(i + 2, color);
+    }
+    
+    for (int i=indB * 3; i<face.getNumVertices(); i += 3){
+        face.setColor(i, r);
+        face.setColor(i + 1, r);
+        face.setColor(i + 2, r);
     }
 }
 
@@ -95,12 +201,16 @@ void Clock::draw(){
         float hue = ofWrap(lc.getHue() * mult + sin( ofGetElapsedTimeMillis() * .0001) * 10.0, 0, 255.0f);
         lc.setHue( hue );
         
-        if ( bColorFace ){
-            ofSetColor(lc);
-        } else {
-            ofSetColor( i % 2 != 0 ? 200 : 255, numFaces == 1 ? 255 : (i % 2 != 0 ? 150 : 100) );
-        }
-        ofCircle(0,0,r);
+        //if ( ofGetElapsedTimeMillis() - lastFroze > 2000 && bAnimating ){
+            if ( bColorFace ){
+                setColor(lc, colorAngles[i * 2], colorAngles[i * 2 + 1]);
+            } else {
+                ofSetColor( i % 2 != 0 ? 200 : 255, numFaces == 1 ? 255 : (i % 2 != 0 ? 150 : 100) );
+            }
+        //}
+        // ?
+        face.drawWireframe();
+        //ofCircle(0,0,r);
         
         if ( bColorFace ){
             ofSetColor(armColor);
@@ -147,6 +257,19 @@ void Clock::draw(){
                 m += .5;
             }
         }
+        b = false;
+        
+//        for ( auto & a : colorAngles ){
+//            b = !b;
+//            if ( b ){
+//                a += .1 * vel.x * m;
+//                if ( a > 360.0 ) a = 0.0;
+//            } else {
+//                a -= 1. * vel.x * m;
+//                m += .5;
+//                if ( a < 0 ) a = 360.0;
+//            }
+//        }
     }
     if ( ofGetElapsedTimeMillis() - lastFroze > 2000 ){
         vel.x = vel.x * .9 + 1 * .1;
@@ -161,6 +284,19 @@ void Clock::draw(){
 void Clock::rotateClockTo ( float angleA, float angleB ){
     bool b = false;
     for ( auto & a : targetAngle ){
+        if ( b ){
+            a = angleA;
+        } else {
+            a = angleB;
+        }
+        b = !b;
+    }
+}
+
+//--------------------------------------------------------------
+void Clock::rotateColorTo ( float angleA, float angleB ){
+    bool b = false;
+    for ( auto & a : colorAngles ){
         if ( b ){
             a = angleA;
         } else {
@@ -199,6 +335,8 @@ void Clock::checkHit( int mx, int my, bool bFlip ){
     float dist = distance(m);
     if ( dist < radius ){
         bMouseDown = true;
+        bDoColor = ofGetKeyPressed( OF_KEY_SHIFT );
+//        if( bDoColor ) faceColor.set(255,0,0);
         lastNext = ofGetElapsedTimeMillis();
         if ( bFlip ){
             bColorFace = !bColorFace;
@@ -213,21 +351,33 @@ void Clock::checkHit( int mx, int my, bool bFlip ){
 //--------------------------------------------------------------
 void Clock::nextRotate(){
     rotMode++;
-    if ( rotMode > 9 * 9 ) rotMode = 0;
+    if ( rotMode > 9 * 10 ) rotMode = 0;
     
     int a1 = floor(rotMode / 9) * 45;
     int a2 = (rotMode % 9) * 45;
     //        a2 = (rotMode % 9) * 45;// + floor(rotMode / 9) * 45;
     
     bool b = false;
-    for ( auto & a : targetAngle ){
-        if ( b ){
-            a = a1 - 45;
-        } else {
-            a = a2 - 45;
+    if ( bDoColor ){
+        for ( auto & a : colorAngles ){
+            if ( b ){
+                a = a1 + 45;
+            } else {
+                a = a2 + 45;
+            }
+            b = !b;
         }
-        b = !b;
+    } else {
+        for ( auto & a : targetAngle ){
+            if ( b ){
+                a = a1 - 45;
+            } else {
+                a = a2 - 45;
+            }
+            b = !b;
+        }
     }
+    
 }
 
 //--------------------------------------------------------------
@@ -367,6 +517,9 @@ void Clock::magnet( int mx, int my ){
 
 //--------------------------------------------------------------
 Clocks::Clocks(){
+    currentAngleA = 0;
+    currentAngleB = 0;
+    currentClock = 0;
     numFaces = 1;
     mode = 0;
     bColorFace = true;
@@ -401,6 +554,10 @@ void Clocks::setup( int gridX, int gridY, int spacing, int startX, int startY, i
     setupGui();
     loadLetters();
     
+    for ( auto & c : clocks ){
+        c.setup();
+    }
+    
     ofAddListener(ofEvents().update, this, &Clocks::update);
     ofAddListener(ofEvents().keyPressed, this, &Clocks::keyPressed);
     ofAddListener(ofEvents().mouseDragged, this, &Clocks::mouseDragged);
@@ -410,10 +567,19 @@ void Clocks::setup( int gridX, int gridY, int spacing, int startX, int startY, i
 
 //--------------------------------------------------------------
 void Clocks::update( ofEventArgs & e ){
+    int i = 0;
     for ( auto & c : clocks ){
         c.numFaces = numFaces;
         c.colorMode = mode;
+        if ( i == currentClock ){
+            if ( ofGetKeyPressed( OF_KEY_SHIFT) ){
+                c.rotateClockTo(currentAngleA, currentAngleB);
+            } else if ( ofGetKeyPressed( OF_KEY_COMMAND ) ){
+                c.rotateColorTo(currentAngleA, currentAngleB);
+            }
+        }
         c.update();
+        i++;
     }
 }
 
@@ -468,6 +634,11 @@ void Clocks::setupGui(){
     
     gui2->addToggle("magnet or draw", &bPreciseDraw);
     gui2->addToggle("Color text area separately", &bColorTextSeparately);
+    
+    gui2->addLabel("Edit angle");
+    gui2->addIntSlider("Which Clock", 0, 100, &currentClock);
+    gui2->addIntSlider("currentAngleA", 0, 360, &currentAngleA);
+    gui2->addIntSlider("currentAngleB", 0, 360, &currentAngleB);
     
     gui->loadSettings("gui-settings.xml");
     gui2->loadSettings("gui2-settings.xml");
@@ -545,6 +716,8 @@ void Clocks::setClocks( Letter letter, int offsetX, int offsetY, int letterWidth
             int ind = (y - offsetY) + (x - offsetX) * clockLetterHeight;
             int cind = y + x * 10.0;
             clocks[cind].rotateClockTo( letter.angles[ind][0], letter.angles[ind][1]);
+            clocks[cind].setColor( ofColor(255,0,0), letter.colorAngles[ind][0], letter.colorAngles[ind][1] );
+            clocks[cind].rotateColorTo( letter.colorAngles[ind][0], letter.colorAngles[ind][1]);
             clocks[cind].lastFroze = ofGetElapsedTimeMillis();
         }
     }
@@ -633,6 +806,12 @@ void Clocks::loadLetters(){
                 letters[s].angles.back().push_back(a1);
                 letters[s].angles.back().push_back(a2);
                 
+                float ca1 = settings.getValue("ca1", 0.0);
+                float ca2 = settings.getValue("ca2", 0.0);
+                letters[s].colorAngles.push_back(vector<float>());
+                letters[s].colorAngles.back().push_back(ca1);
+                letters[s].colorAngles.back().push_back(ca2);
+                
                 settings.popTag();
             }
         } else {
@@ -662,21 +841,34 @@ void Clocks::keyPressed( ofKeyEventArgs & e ){
     //    }
     if ( ofGetKeyPressed( OF_KEY_ALT ) ){
         ofxXmlSettings settings;
-        for ( auto & c : clocks ){
-            settings.addTag("clock");
-            settings.pushTag("clock", settings.getNumTags("clock") - 1 );
-            settings.addValue("a1", c.angles[0]);
-            settings.addValue("a2", c.angles[1]);
-            settings.addValue("face", c.bColorFace);
-            settings.popTag();
+        char k = key;
+        string ks = ofToString(k);
+        int w = (ks == "w" || ks == "m")? 6 : 4;
+        int h = clockLetterHeight;
+        
+        //int ind = y + x * clockLetterHeight;
+        
+        for (int x=0; x<w; x++){
+            for (int y=0; y<h; y++){
+                int cind = y + x * 10.0;
+                Clock c = clocks[ cind ];
+                settings.addTag("clock");
+                settings.pushTag("clock", settings.getNumTags("clock") - 1 );
+                settings.addValue("a1", c.angles[0]);
+                settings.addValue("a2", c.angles[1]);
+                settings.addValue("ca1", c.colorAngles[0]);
+                settings.addValue("ca2", c.colorAngles[1]);
+                settings.addValue("face", c.bColorFace);
+                settings.popTag();
+            }
         }
-        settings.save("letters/" + ofToString(key) + ".xml");
+        settings.save("letters/" + ks + "_new.xml");
     } else if ( ofGetKeyPressed( OF_KEY_CONTROL ) ){
         
         char k = key;
         string ks = ofToString(k);
         if ( letters.count(ks) > 0){
-            setClocks( letters[ks], ofRandom(0, 7), ofRandom(0,5), (ks == "w" || ks == "m")? 6 : 4 );
+            setClocks( letters[ks], 0, 0, (ks == "w" || ks == "m")? 6 : 4 );
         }
         
     } else if ( key == 'r' ){
@@ -691,8 +883,10 @@ void Clocks::keyPressed( ofKeyEventArgs & e ){
         for ( auto & c : clocks ){
             c.bAnimating = !c.bAnimating;
         }
-    } if ( key == 'g' ){
+    } else if ( key == 'g' ){
         gui->toggleVisible();
+        
+    } else if ( key == 'G' ){
         gui2->toggleVisible();
     } else if ( key == 's' ){
         gui->saveSettings("gui-settings.xml");
