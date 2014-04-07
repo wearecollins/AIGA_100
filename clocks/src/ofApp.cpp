@@ -6,11 +6,12 @@ string name = "sean noreen charles dana ken leslie david kyle michael richard mi
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    ofBackground(0);
+    ofSetWindowPosition(0, 0);
+    ofBackground(255);
     ofEnableSmoothing();
     ofEnableAlphaBlending();
     
-    clocks.setup(10,10,60);
+    clocks.setup(10,10,60, 100, 100, 25);
 }
 
 int last = 0;
@@ -18,26 +19,6 @@ int ind = 0;
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    if (!clocks.bPreciseDraw){
-        static bool bDidZero = false;
-        if (!bDidZero ){
-            bDidZero = true;
-            string l = name.substr(ind,1);
-            int w = (l == "w" || l == "m" || l == " ")? 6 : 4;
-            clocks.setClocks( clocks.letters[l], (10 - w)/2, 2, w );
-        }
-        
-        if ( ofGetElapsedTimeMillis() - last > 1000 ){
-            last = ofGetElapsedTimeMillis();
-            ind++;
-            if ( ind >= name.length() ){
-                ind = 0;
-            }
-            string l = name.substr(ind,1);
-            int w = (l == "w" || l == "m" || l == " ")? 6 : 4;
-            clocks.setClocks( clocks.letters[l], (10 - w)/2, 2, w );
-        }
-    }
 }
 
 //--------------------------------------------------------------
@@ -47,7 +28,9 @@ void ofApp::draw(){
 }
 
 //--------------------------------------------------------------
-void ofApp::keyPressed(int key){}
+void ofApp::keyPressed(int key){
+    if ( key == 'f' )ofToggleFullscreen();
+}
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){}

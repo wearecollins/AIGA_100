@@ -19,6 +19,7 @@ Clock::Clock(){
     offset = 0;
     bColorFace = true;
     bMouseDown = false;
+    bLetter = false;
     bDoColor = false;
     lastFroze = 0;
     rotMode = 0;
@@ -92,7 +93,7 @@ void Clock::update(){
             targetAngle.push_back(90 - 45);
             
             colorAngles.push_back(0);
-            colorAngles.push_back(359);
+            colorAngles.push_back(0);
         }
     }
 }
@@ -111,47 +112,65 @@ void Clock::setColor( ofColor c ){
 }
 
 //--------------------------------------------------------------
-void Clock::setColor( ofColor c, int startAngle, int endAngle ){
-    ofFloatColor color(c.r/255.0, c.g/255.0, c.b/255.0, c.a/255.0f);
-    ofFloatColor r(1.0, 0.0, 0.0);
+void Clock::setColor( ofColor facec, ofColor letterc, int startAngle, int endAngle ){
+    ofFloatColor colorF(facec.r/255.0, facec.g/255.0, facec.b/255.0, facec.a/255.0f);
+    ofFloatColor colorL(letterc.r/255.0, letterc.g/255.0, letterc.b/255.0, letterc.a/255.0f);
     
-    int sAngleWrap = ofWrap(startAngle, 0, 360);
-    int eAngleWrap = ofWrap(endAngle, 0, 360);
+    int sAngleWrap = ofWrap(startAngle, 0, 450);
+    int eAngleWrap = ofWrap(endAngle, 0, 450);
     
     float res = 300;
     float inc = (float) 360.0 / res;
     int indA = sAngleWrap / inc;
     int indB = eAngleWrap / inc;
     
+    bool bBackwards = false;
+    
     if ( indA > indB ){
-        if (indB == 0 ){
+        if (indB == 0 && indA != 0 ){
             indB = 360.0 / inc;
         } else {
-            int ta = indA;
-            int tb = indB;
-            indA = tb;
-            indB = ta;
+            bBackwards = true;
         }
     }
 //    if ( bDoColor ) cout << indA << ":" << indB << endl;
     
-    
-    for (int i=0; i<indA * 3; i += 3){
-        face.setColor(i, r);
-        face.setColor(i + 1, r);
-        face.setColor(i + 2, r);
-    }
-    
-    for (int i=indA * 3; i<indB * 3; i++){
-        face.setColor(i, color);
-        face.setColor(i + 1, color);
-        face.setColor(i + 2, color);
-    }
-    
-    for (int i=indB * 3; i<face.getNumVertices(); i += 3){
-        face.setColor(i, r);
-        face.setColor(i + 1, r);
-        face.setColor(i + 2, r);
+    if ( !bBackwards ){
+        for (int i=0; i<indA * 3; i += 3){
+            face.setColor(i, colorF);
+            face.setColor(i + 1, colorF);
+            face.setColor(i + 2, colorF);
+        }
+        
+        for (int i=indA * 3; i<indB * 3; i++){
+            face.setColor(i, colorL);
+            face.setColor(i + 1, colorL);
+            face.setColor(i + 2, colorL);
+        }
+        
+        for (int i=indB * 3; i<face.getNumVertices(); i += 3){
+            face.setColor(i, colorF);
+            face.setColor(i + 1, colorF);
+            face.setColor(i + 2, colorF);
+        }
+    } else {
+        for (int i=0; i<indB * 3; i += 3){
+            face.setColor(i, colorL);
+            face.setColor(i + 1, colorL);
+            face.setColor(i + 2, colorL);
+        }
+        
+        for (int i=indB * 3; i<indA * 3; i++){
+            face.setColor(i, colorF);
+            face.setColor(i + 1, colorF);
+            face.setColor(i + 2, colorF);
+        }
+        
+        for (int i=indA * 3; i<face.getNumVertices(); i += 3){
+            face.setColor(i, colorL);
+            face.setColor(i + 1, colorL);
+            face.setColor(i + 2, colorL);
+        }
     }
 }
 
@@ -201,13 +220,7 @@ void Clock::draw(){
         float hue = ofWrap(lc.getHue() * mult + sin( ofGetElapsedTimeMillis() * .0001) * 10.0, 0, 255.0f);
         lc.setHue( hue );
         
-        //if ( ofGetElapsedTimeMillis() - lastFroze > 2000 && bAnimating ){
-            if ( bColorFace ){
-                setColor(lc, colorAngles[i * 2], colorAngles[i * 2 + 1]);
-            } else {
-                ofSetColor( i % 2 != 0 ? 200 : 255, numFaces == 1 ? 255 : (i % 2 != 0 ? 150 : 100) );
-            }
-        //}
+        setColor(lc, liveLetterColor, colorAngles[i * 2], colorAngles[i * 2 + 1]);
         // ?
         face.drawWireframe();
         //ofCircle(0,0,r);
@@ -258,18 +271,16 @@ void Clock::draw(){
             }
         }
         b = false;
-        
-//        for ( auto & a : colorAngles ){
-//            b = !b;
-//            if ( b ){
-//                a += .1 * vel.x * m;
-//                if ( a > 360.0 ) a = 0.0;
-//            } else {
-//                a -= 1. * vel.x * m;
-//                m += .5;
-//                if ( a < 0 ) a = 360.0;
-//            }
-//        }
+        float val = ofMap((ofGetElapsedTimeMillis() - lastFroze)-2000, 0, 1500, 0, 1.0, true);
+        liveLetterColor.lerp(faceColor, val);
+        if (val >= 1.0 ){
+            for ( auto & a : colorAngles ){
+                a = 0;
+            }
+        }
+        bLetter = false;
+    } else if ( bLetter ) {
+        liveLetterColor.lerp(letterColor, ofMap((ofGetElapsedTimeMillis() - lastFroze), 0, 500, 0, 1.0, true));
     }
     if ( ofGetElapsedTimeMillis() - lastFroze > 2000 ){
         vel.x = vel.x * .9 + 1 * .1;
@@ -541,13 +552,18 @@ Clocks::~Clocks(){
 
 //--------------------------------------------------------------
 void Clocks::setup( int gridX, int gridY, int spacing, int startX, int startY, int radius, float radiusMult ){
+    setup(gridX, gridY, ofVec2f(spacing, spacing), startX, startY, radius, radiusMult);
+}
+
+//--------------------------------------------------------------
+void Clocks::setup( int gridX, int gridY, ofVec2f spacing, int startX, int startY, int radius, float radiusMult ){
     for (int x=0; x<gridX; x++){
         for (int y=0; y<gridY; y++){
             clocks.push_back(Clock());
             clocks.back().radius = radius;
             clocks.back().liveRadius =  radius * radiusMult;
-            clocks.back().x = startX + x * spacing;
-            clocks.back().y = startY + y * spacing;
+            clocks.back().x = startX + x * spacing.x;
+            clocks.back().y = startY + y * spacing.y;
         }
     }
     
@@ -572,7 +588,7 @@ void Clocks::update( ofEventArgs & e ){
         c.numFaces = numFaces;
         c.colorMode = mode;
         if ( i == currentClock ){
-            if ( ofGetKeyPressed( OF_KEY_SHIFT) ){
+            if ( ofGetKeyPressed( OF_KEY_CONTROL ) && ofGetKeyPressed(OF_KEY_SHIFT) ){
                 c.rotateClockTo(currentAngleA, currentAngleB);
             } else if ( ofGetKeyPressed( OF_KEY_COMMAND ) ){
                 c.rotateColorTo(currentAngleA, currentAngleB);
@@ -615,7 +631,7 @@ void Clocks::setupGui(){
     gui->addSlider("lineWidth", 1.0, 10.0, &lineWidth);
     gui->addSlider("hueVariance", 0.0, 255., &hueVariance);
     
-    gui2 = new ofxUICanvas(ofGetWidth() / 4.0,0,ofGetWidth() / 4.0, ofGetHeight() );
+    gui2 = new ofxUICanvas(ofGetWidth() / 2.0,0,ofGetWidth() / 4.0, ofGetHeight() );
     gui2->setTriggerWidgetsUponLoad(true);
     ofAddListener(gui->newGUIEvent, this, &Clocks::onGui );
     ofAddListener(gui2->newGUIEvent, this, &Clocks::onGui );
@@ -653,8 +669,7 @@ void Clocks::onGui( ofxUIEventArgs &e ){
         
     } else if ( e.getName() == "letterColor"){
         ofxUIImageSampler * s = (ofxUIImageSampler*) e.widget;
-        if ( bColorTextSeparately ) setLetterFaceColors(s->getColor(), 0);
-        else setFaceColors(s->getColor(), hueVariance);
+        setLetterColors(s->getColor(), hueVariance);
         
     } else if ( e.getName() == "arm color"){
         ofxUIImageSampler * s = (ofxUIImageSampler*) e.widget;
@@ -716,10 +731,19 @@ void Clocks::setClocks( Letter letter, int offsetX, int offsetY, int letterWidth
             int ind = (y - offsetY) + (x - offsetX) * clockLetterHeight;
             int cind = y + x * 10.0;
             clocks[cind].rotateClockTo( letter.angles[ind][0], letter.angles[ind][1]);
-            clocks[cind].setColor( ofColor(255,0,0), letter.colorAngles[ind][0], letter.colorAngles[ind][1] );
+            clocks[cind].setColor( clocks[cind].faceColor, clocks[cind].letterColor, letter.colorAngles[ind][0], letter.colorAngles[ind][1] );
             clocks[cind].rotateColorTo( letter.colorAngles[ind][0], letter.colorAngles[ind][1]);
             clocks[cind].lastFroze = ofGetElapsedTimeMillis();
+            clocks[cind].bLetter = true;
         }
+    }
+}
+//--------------------------------------------------------------
+void Clocks::setLetterColors( ofColor color, int hueVariance ){
+    ofColor editColor;
+    for ( auto & c : clocks ){
+        c.letterColor.set(color);
+        c.letterColor.setHue( ofWrap(color.getHue() + ofMap(c.y, 0, 700.0, 0, hueVariance), 0, 255));
     }
 }
 
@@ -862,7 +886,7 @@ void Clocks::keyPressed( ofKeyEventArgs & e ){
                 settings.popTag();
             }
         }
-        settings.save("letters/" + ks + "_new.xml");
+        settings.save("letters/" + ks + ".xml");
     } else if ( ofGetKeyPressed( OF_KEY_CONTROL ) ){
         
         char k = key;

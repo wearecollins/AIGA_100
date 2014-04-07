@@ -27,7 +27,7 @@ public:
     int colorIndex;
     int colorIncrement;
     
-    bool bAnimating;
+    bool bAnimating, bLetter;
     int  rotMode;
     
     vector<float> angles;
@@ -37,9 +37,9 @@ public:
     
     ofVec2f vel;
     
-    ofColor faceColor, armColor;
+    ofColor faceColor, liveLetterColor, letterColor, armColor;
     void setColor( ofColor c );
-    void setColor( ofColor c, int startAngle, int endAngle );
+    void setColor( ofColor facec, ofColor letterc, int startAngle, int endAngle );
     
     Clock();
     
@@ -104,6 +104,7 @@ public:
     Clocks();
     ~Clocks();
     
+    void setup( int gridX, int gridY, ofVec2f spacing, int startX = 100, int startY = 100, int radius = 25, float radiusMult = .9 );
     void setup( int gridX, int gridY, int spacing, int startX = 100, int startY = 100, int radius = 25, float radiusMult = .9 );
 
     void update( ofEventArgs & e );
@@ -128,6 +129,7 @@ public:
      */
     void setClocks( Letter letter, int offsetX, int offsetY, int letterWidth = 4 );
     void setFaceColors( ofColor color, int hueVariance = 0, bool bArm = false );
+    void setLetterColors( ofColor color, int hueVariance = 0 );
     void setNonLetterFaceColors( ofColor color, int hueVariance = 0, bool bArm = false );
     void setLetterFaceColors( ofColor color, int hueVariance = 0, bool bArm = false );
     
