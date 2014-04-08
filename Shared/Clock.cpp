@@ -635,7 +635,7 @@ void Clocks::setupGui(){
     
     gui->addIntSlider("numFaces", 1, 25, &numFaces);
     gui->addIntSlider("color mode", 0, 5, &mode);
-    gui->addSlider("lineWidth", 1.0, 10.0, &lineWidth);
+    gui->addSlider("lineWidth", 1.0, 30.0, &lineWidth);
     gui->addSlider("hueVariance", 0.0, 255., &hueVariance);
     
     gui2 = new ofxUICanvas(ofGetWidth() / 2.0,0,ofGetWidth() / 4.0, ofGetHeight() );

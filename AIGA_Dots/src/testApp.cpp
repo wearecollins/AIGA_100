@@ -35,6 +35,24 @@ float texH = 2048;
 // camera mouse
 bool bCameraMouse = false;
 
+// mode + name switcher
+bool bChangeModes       = true;
+bool bInteractiveMode   = true;
+int interactiveDuration = 60 * 1000;
+int nameDuration        = 60 * 1000;
+int lastChanged         = 0;
+int currentName         = 0;
+int numNames            = 24;
+string names[] = {"sean ","noreen ","chuck ","dana ","bob ","david ","ken ","leslie ",
+                "kyle ","michael ","stephen ","abbott ","louise ","sylvia ","cheryl ",
+                "alex ","chip ","michael ","richard ","michael ","nancye ","bill ",
+                "gael ","ann "};
+
+// play out letters
+int letterIndex         = 0;
+int letterRate          = 2000;
+int letterLastChanged   = 0;
+
 //--------------------------------------------------------------
 void testApp::setup(){
     ofSetFrameRate(60);
@@ -114,21 +132,8 @@ void testApp::setup(){
 //    ofSetLogLevel(OF_LOG_VERBOSE);
     
     spacebrew.addPublish("mode", Spacebrew::TYPE_RANGE);
+    spacebrew.addPublish("name", Spacebrew::TYPE_RANGE);
     
-    spacebrew.addPublish("randomR", Spacebrew::TYPE_RANGE);
-    spacebrew.addPublish("randomG", Spacebrew::TYPE_RANGE);
-    spacebrew.addPublish("randomB", Spacebrew::TYPE_RANGE);
-    
-    // add 100 listeners...
-//    for ( int i=0; i<dots.size(); i++){
-//        spacebrew.addSubscribe("dot_"+ofToString(i)+"_r", &dots[i].r );
-//        spacebrew.addSubscribe("dot_"+ofToString(i)+"_g", &dots[i].g );
-//        spacebrew.addSubscribe("dot_"+ofToString(i)+"_b", &dots[i].b );
-//    }
-    spacebrew.addSubscribe("grid_r", &r );
-    spacebrew.addSubscribe("grid_g", &g );
-    spacebrew.addSubscribe("grid_b", &b );
-    spacebrew.addSubscribe("drawing", "drawing" );
     spacebrew.addSubscribe("grid", "grid" );
     spacebrew.addSubscribe("text", Spacebrew::TYPE_STRING );
     
@@ -155,6 +160,37 @@ void testApp::setup(){
 
 //--------------------------------------------------------------
 void testApp::update(){
+    // auto-rate changer
+    if ( bChangeModes ){
+        
+        // interactive to quote
+        if (bInteractiveMode){
+            if ( ofGetElapsedTimeMillis() - lastChanged > interactiveDuration){
+                lastChanged = ofGetElapsedTimeMillis();
+                bInteractiveMode = false;
+                currentName++;
+                if ( currentName >= numNames ){
+                    currentName = 0;
+                }
+                spacebrew.sendRange("name", currentName);
+                spacebrew.sendRange("mode", 1);
+                letterIndex = 0;
+                letterLastChanged = ofGetElapsedTimeMillis();
+                cout<<"name mode"<<endl;
+            }
+        
+        // quote to interactive
+        } else {
+            if ( ofGetElapsedTimeMillis() - lastChanged > nameDuration && letterIndex == 0){
+                lastChanged = ofGetElapsedTimeMillis();
+                bInteractiveMode = true;
+                spacebrew.sendRange("mode", 0);
+                letterIndex = 0;
+                letterLastChanged = ofGetElapsedTimeMillis();
+                cout<<"interactive mode"<<endl;
+            }
+        }
+    }
     
     if ( !pattern.isAllocated() ){
         // render pattern
@@ -200,10 +236,27 @@ void testApp::update(){
         d.mode = (Mode) currentMode;
     }
     
+    if (!bInteractiveMode){
+        if ( ofGetElapsedTimeMillis() - letterLastChanged > letterRate ){
+            letterLastChanged = ofGetElapsedTimeMillis();
+            
+            char k = names[currentName][letterIndex];
+            string ks = ofToString(k);
+            
+            clocks.setClocks(clocks.letters[ks], (ks == "w" || ks == "m")? 2 : 3, 3, (ks == "w" || ks == "m")? 6 : 4 );
+            
+            letterIndex++;
+            if ( letterIndex >= names[currentName].length() ){
+                letterIndex = 0;
+            }
+        }
+    }
+    
+    // do change this!
     if ( lastMode != currentMode ){
         int sendMode = 0;
-        if ( currentMode == MODE_INTERACTIVE_COLOR ) sendMode = 0;
-        else if ( currentMode == MODE_INTERACTIVE_GRID ) sendMode = 1;
+        if ( currentMode == MODE_INTERACTIVE_GRID ) sendMode = 0;
+        else if ( currentMode == MODE_INTERACTIVE_SWIPE ) sendMode = 1;
         else if ( currentMode == MODE_INTERACTIVE_TEXT ) sendMode = 2;
         spacebrew.sendRange("mode", sendMode);
         lastMode = currentMode;
@@ -633,8 +686,9 @@ void testApp::onMessage( Spacebrew::Message & m ){
         Json::Reader r;
         r.parse(m.value, val);
         
-        // drawing is json array...
+        cout << "CHEEL"<<endl;
         
+        // drawing is json array...
         
         GridDrawing d;
         // set color
@@ -682,11 +736,8 @@ void testApp::onMessage( Spacebrew::Message & m ){
 
 void testApp::onClientConnect( Spacebrew::Config & c){
     cout << "connect"<<endl;
-    int sendMode = 0;
-    if ( currentMode == MODE_INTERACTIVE_COLOR ) sendMode = 0;
-    else if ( currentMode == MODE_INTERACTIVE_GRID ) sendMode = 1;
-    else if ( currentMode == MODE_INTERACTIVE_TEXT ) sendMode = 2;
-    spacebrew.sendRange("mode", sendMode);
+    spacebrew.sendRange("name", currentName);
+    spacebrew.sendRange("mode", bInteractiveMode ? 1 : 0);
 }
 
 //--------------------------------------------------------------

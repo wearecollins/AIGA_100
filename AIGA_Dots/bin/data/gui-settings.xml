@@ -21,11 +21,11 @@
 <Widget>
     <Kind>28</Kind>
     <Name>letterColor</Name>
-    <XValue>0.587499976</XValue>
-    <YValue>0.056249999</YValue>
-    <RColor>28</RColor>
-    <GColor>134</GColor>
-    <BColor>251</BColor>
+    <XValue>0.512499988</XValue>
+    <YValue>0.956250012</YValue>
+    <RColor>247</RColor>
+    <GColor>255</GColor>
+    <BColor>255</BColor>
     <AColor>255</AColor>
 </Widget>
 <Widget>
@@ -41,7 +41,7 @@
 <Widget>
     <Kind>4</Kind>
     <Name>lineWidth</Name>
-    <Value>3.578125000</Value>
+    <Value>9.484375000</Value>
 </Widget>
 <Widget>
     <Kind>4</Kind>
