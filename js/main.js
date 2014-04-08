@@ -1,4 +1,4 @@
-SUD.require("js/Clock.js");
+SUD.require("js/clock.js");
 
 var app;
 var isIpad = false;
