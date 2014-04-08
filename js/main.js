@@ -1,43 +1,30 @@
+SUD.require("js/Clock.js");
+
 var app;
+var isIpad = false;
 
 $(document).ready( function() {
-	DemoApp.prototype = $.extend(true, SUD.app.BaseApp.prototype, DemoApp.prototype);
-	app 	= new DemoApp();
-	app.begin();
-});
+	DemoApp.prototype = $.extend(true, SUD.app.ThreeApp.prototype, DemoApp.prototype);
 
-// UTIL!
-function HSVtoRGB(h, s, v) {
-    var r, g, b, i, f, p, q, t;
-    if (h && s === undefined && v === undefined) {
-        s = h.s, v = h.v, h = h.h;
-    }
-    i = Math.floor(h * 6);
-    f = h * 6 - i;
-    p = v * (1 - s);
-    q = v * (1 - f * s);
-    t = v * (1 - (1 - f) * s);
-    switch (i % 6) {
-        case 0: r = v, g = t, b = p; break;
-        case 1: r = q, g = v, b = p; break;
-        case 2: r = p, g = v, b = t; break;
-        case 3: r = p, g = q, b = v; break;
-        case 4: r = t, g = p, b = v; break;
-        case 5: r = v, g = p, b = q; break;
-    }
-    return {
-        r: Math.floor(r * 255),
-        g: Math.floor(g * 255),
-        b: Math.floor(b * 255)
-    };
-}
+	isIpad = navigator.userAgent.match(/iPad/i) != null;
+
+	console.log(isIpad);
+
+	app 	= new DemoApp();
+	//var cv = document.getElementById("gridCanvas");
+	app.renderWidth = isIpad ? 2048 : 640;
+	app.renderHeight = isIpad ? 1536 : 1136;
+	// cv.width = width;
+	// cv.height = height;
+	app.begin({canvasId:"gridCanvas", renderType: "css3d", width: app.renderWidth, height: app.renderHeight });
+});
 
 // ===========================================
 // ===== DEMO APP
 // ===========================================
 
 	DemoApp = function(){
-		SUD.app.BaseApp.call( this );
+		SUD.app.ThreeApp.call( this );
 
 		var sb;
 
@@ -49,32 +36,48 @@ function HSVtoRGB(h, s, v) {
 		this.rE = 0;
 		this.gE = 0;
 		this.bE = 0;
+
+		this.names = ["sean","noreen","chuck","dana","bob","david","ken","leslie","kyle","michael","stephen","abbott","louise","sylvia","cheryl","alex","chip","michael_m","richard","michael_d","nancye","bill_m","gael","ann"];
 		
 		//-------------------------------------------------------
 		this.setup = function (){
 			//this.unregisterMouseEvents();
 			this.registerTouchEvents();
 
-			this.setupSpacebrew();
-
 			// grid
 			this.grid = [];
+			this.meshes = [];
+
+			// setup geom
+			var w = (this.renderWidth * .8) / 10 * .7;
+			var sp = w * .5;
+			var cx = this.renderWidth / 2.0 - (((w + sp) * 9 )/2.0);
+			var cy = this.renderHeight * .4 - (((w + sp)  * 9) /2.0);
+
 			for ( var x=0; x<10; x++){
 				for ( var y=0; y<10; y++){
 					this.grid.push({x: x, y: y, filled: false });
+
+					var clock = new Clock( cx + x * (w + sp), cy + y * (w + sp), w/2.0);
+					this.scene.add(clock);
+					this.meshes.push( clock );
 				}
 			}
+
+			// ortho cam
+			this.scene.remove(this.camera);
+			this.camera = new THREE.OrthographicCamera( this._canvas.width / - 2, this._canvas.width / 2, this._canvas.height / 2, this._canvas.height / - 2, - 500, 1000 );
+			this.scene.add(this.camera);
+
+			this.renderer.setClearColor( 0xffffff );
+
 			this.currentDrawing = [];
 			this.touchId 		= -1;
 			this.gridIndices = [];
 
-			this.gridCanvas = document.getElementById("gridCanvas");
+			// this.gridCanvas = document.getElementById("gridCanvas");
 			// todo: set w/h
-			this.gridCtx 	= this.gridCanvas.getContext('2d');
-
-			// text
-			this.button = document.getElementById("button");
-			this.button.onclick = this.textPressed.bind(this);
+			//this.gridCtx 	= this.gridCanvas.getContext('2d');
 
 			this.color = {};
 			this.color.r = SUD.randomInt(0,255);
@@ -83,23 +86,27 @@ function HSVtoRGB(h, s, v) {
 
 			this.modes = [];
 			this.modes.push("#grid");
-			this.modes.push("#text");
-			this.modes.push("#color");
+			this.modes.push("#quote");
 
 			window.scrollTo(0,1);
-			this.mode = 1;
-		}
+			this.mode = 0;
 
-		this.registerTouchEvents = function(){
-			document.body.ontouchstart = this._onTouchStart.bind(this);
-			document.body.ontouchmove = this._onTouchMove.bind(this);
-			document.body.ontouchend = this._onTouchEnd.bind(this);
-		}
+			// add "touch" div
+			var touchDiv = document.createElement("div");
+			touchDiv.className = "touch";
+			touchDiv.id = "touch";
+			touchDiv.innerHTML = "Touch";
 
-		this.unregisterTouchEvents = function(){
-			document.body.ontouchstart = null;
-			document.body.ontouchmove = null;
-			document.body.ontouchend = null;
+			var releaseDiv = document.createElement("div");
+			releaseDiv.className = "touch";
+			releaseDiv.id = "release";
+			releaseDiv.innerHTML = "Release";
+
+			document.getElementById("sud_container").appendChild(touchDiv);
+			document.getElementById("sud_container").appendChild(releaseDiv);
+			$("#touch").css("opacity", 1);
+
+			this.setupSpacebrew();
 		}
 
 		//-------------------------------------------------------
@@ -115,20 +122,10 @@ function HSVtoRGB(h, s, v) {
 			// configure the publication and subscription feeds
 			// grid
 			sb.addPublish( "grid", "grid", "[]" );
-
-			// color
-			sb.addPublish( "red", "range", "0" );
-			sb.addPublish( "green", "range", "0" );
-			sb.addPublish( "blue", "range", "0" );
-
-			// text
-			sb.addPublish( "text", "string" );
 			
 			// stuff we're subscribing to
 			sb.addSubscribe( "mode", "range" );
-			sb.addSubscribe( "randomR", "range" );
-			sb.addSubscribe( "randomG", "range" );
-			sb.addSubscribe( "randomB", "range" );
+			sb.addSubscribe( "name", "range");
 
 			// override Spacebrew events - this is how you catch events coming from Spacebrew
 			sb.onRangeMessage  = this.onRangeMessage.bind(this);
@@ -142,48 +139,25 @@ function HSVtoRGB(h, s, v) {
 			this.rE = this.rE * .75 + this.r * .25;
 			this.gE = this.gE * .75 + this.g * .25;
 			this.bE = this.bE * .75 + this.b * .25;
+
+			for ( var ind in this.meshes ){
+				this.meshes[ind].update();
+			}
 		}
 
 		//-------------------------------------------------------
 		this.draw = function (){
 			switch( this.mode ){
-				// color
-				case 0:
-					$("#color").css("background-color", "rgb(" + Math.round(this.rE) +","+ Math.round(this.gE) +"," + Math.round(this.bE) + ")");
-					break;
-
 				// grid
-				case 1:
-					//console.log("grid")
-					var w = 50;
-					var x = parseInt(this.gridCanvas.width) / 2.0 - ((w * 9)/2.0);
-					var y = parseInt(this.gridCanvas.height) / 2.0 - ((w * 9) /2.0);
-					
-					this.gridCanvas.width = this.gridCanvas.width;
-					this.gridCtx.clearRect(0,0,this.gridCanvas.width,this.gridCanvas.height);
-			
-
-					this.gridCtx.fillStyle = ("rgb("+ this.color.r+"," + this.color.g + "," + this.color.b + ")");
-					this.gridCtx.strokeStyle = ("rgb("+ this.color.r+"," + this.color.g + "," + this.color.b + ")");
-
-					for ( var i=0; i<this.grid.length; i++){
-						this.gridCtx.beginPath();
-						this.gridCtx.arc( 	x + this.grid[i].x * w,
-										y + this.grid[i].y * w, 
-										(w * .8)/2,
-										0,2*Math.PI);
-						if ( this.grid[i].filled ){
-							this.gridCtx.fill();
-						} else {
-							this.gridCtx.stroke();
-						}
-					}
+				case 0:
 					break;
 
-				// text
-				case 2:
+				// quotes
+				case 1:
 					break;
 			}
+			this.camera.lookAt( this.scene.position );
+			this.renderer.render( this.scene, this.camera );//, null, true );
 		}	
 
 		//-------------------------------------------------------
@@ -204,14 +178,14 @@ function HSVtoRGB(h, s, v) {
 
 		//-------------------------------------------------------
 		this.checkGrid = function(x,y){
-
-			var w = 50;
-			var cx = parseInt(this.gridCanvas.width) / 2.0 - ((w * 10)/2.0);
-			var cy = parseInt(this.gridCanvas.height) / 2.0 - ((w * 10) /2.0);
+			var w = (this.renderWidth * .8) / 10 * .7;
+			var sp = w * .5;
+			var cx = this.renderWidth / 2.0 - (((w + sp) * 9 )/2.0);
+			var cy = this.renderHeight * .4 - (((w + sp)  * 9) /2.0);
 
 			for ( var i=0; i<this.grid.length; i++){
-				var rx = cx + this.grid[i].x * w;
-				var ry = cy + this.grid[i].y * w;
+				var rx = cx + this.grid[i].x * (w + sp);
+				var ry = cy + this.grid[i].y * (w + sp);
 
 				if ( x <= rx + w/2 && x >= rx - w/2 &&
 					 y <= ry + w/2 && y >= ry - w/2 ){
@@ -224,10 +198,11 @@ function HSVtoRGB(h, s, v) {
 
 		//-------------------------------------------------------
 		this.textPressed = function(e){
-			var t =  $("#textField").val();
+			var t = document.forms[0].textField.value;
+			console.log(t);
 			if ( t.length > 0 ){
 				sb.send("text", "string", t);
-				$("#textField").val("")
+				document.forms[0].textField.value = "";
 			}
 		}
 
@@ -238,7 +213,7 @@ function HSVtoRGB(h, s, v) {
 
 		//-------------------------------------------------------
 		this.onMouseMoved = function( x,y ){
-			this.onTouchMove(1,x,y);
+			// this.onTouchMove(1,x,y);
 		};
 
 		//-------------------------------------------------------
@@ -253,21 +228,28 @@ function HSVtoRGB(h, s, v) {
 
 		//-------------------------------------------------------
 		this.onTouchStart = function( id, x,y ){
-			console.log("ys");
+
 			switch ( this.mode ){
 				case 0:
-					this.updateAndSendColor(x,y);
-					break;
-				case 1:
 					if ( this.touchId == -1 ){
 						this.touchId = id;
+						$("#touch").css("opacity", 0);
+						$("#release").css("opacity", 1);
 						//this.currentDrawing.push({x:x, y:y});
 						
+						for ( var ind in this.meshes ){
+							this.meshes[ind].magnet(x,y);
+						}
+
 						// are we over any grid squares?
 						var ind = this.checkGrid(x,y);
 						if ( ind != -1 ){
 							this.gridIndices.push(ind);
+							if ( ind != this.lastGrid ){
+								this.meshes[ind].hsv.h += .1;
+							}
 						}
+						this.lastGrid = ind;
 					}
 					break;
 				case 2:
@@ -279,29 +261,33 @@ function HSVtoRGB(h, s, v) {
 		this.onTouchMove = function( id, x,y ){
 			switch ( this.mode ){
 				case 0:
-					this.updateAndSendColor(x,y);
-					break;
-				case 1:
 					if ( id == this.touchId ){
 						//this.currentDrawing.push({x:x, y:y});
 						var ind = this.checkGrid(x,y);
 						if ( ind != -1 ){
 							this.gridIndices.push(ind);
+							if ( ind != this.lastGrid ){
+								this.meshes[ind].hsv.h += .1;
+							}
+						}
+						this.lastGrid = ind;
+
+						for ( var ind in this.meshes ){
+							this.meshes[ind].magnet(x,y);
 						}
 					}
 					break;
 				case 2:
 					break;
 			}
+
+			
 		};
 
 		//-------------------------------------------------------
 		this.onTouchEnd = function( id, x,y ){
 			switch ( this.mode ){
 				case 0:
-					// this.updateAndSendColor(x,y);
-					break;
-				case 1:
 					if ( id == this.touchId ){
 						this.touchId = -1;
 
@@ -311,6 +297,9 @@ function HSVtoRGB(h, s, v) {
 						for ( var i=0; i<this.grid.length; i++){
 							this.grid[i].filled = false;
 						}
+
+						$("#touch").css("opacity", 1);
+						$("#release").css("opacity", 0);
 
 						this.gridIndices = [];
 					}
@@ -325,32 +314,55 @@ function HSVtoRGB(h, s, v) {
 			if ( name == "mode" ){
 				this.mode = value;
 				switch( value ){
-					// color
-					case 0:
-						this.showHide("#color");
-						this.registerTouchEvents();
-						break;
-
 					// grid
-					case 1:
-						this.showHide("#grid");
-						this.registerTouchEvents();
+					case 0:
+						window.clearTimeout(window.modeTimeout);
+						$("#names").css("opacity", 0);
+						$("#quotes").css("opacity", 0);
+						$("#bigClock").css("opacity", 0);
+
+						window.modeTimeout = window.setTimeout(function(){
+							$("#sud_container").css("opacity", 1);
+						}, 1500);
+
 						break;
 
-					// text
-					case 2:
-						this.showHide("#text");
-						this.unregisterTouchEvents();
+					// quotes
+					case 1:
+						window.clearTimeout(window.modeTimeout);
+						$("#sud_container").css("opacity", 0);
+						$("#quotes").css("opacity", 0);
+
+						window.modeTimeout = window.setTimeout(function(){
+							$("#names").css("opacity", 1);
+							window.modeTimeout = window.setTimeout(function(){
+								console.log("clock");
+								$("#names").css("opacity", 0);
+								$("#bigClock").css("opacity", 1);
+
+								window.modeTimeout = window.setTimeout(function(){
+									console.log("quote");
+									$("#bigClock").css("opacity", 0);
+									$("#quotes").css("opacity", 1);
+								}, 1500 );
+							}, 2000 );
+						}, 1500 );
 						break;
 				}
-			} else if ( name == "randomR" ){
-				this.r = Math.round(value);
-			} else if ( name == "randomG" ){
-				this.g = Math.round(value);
-			} else if ( name == "randomB" ){
-				this.b = Math.round(value);
+			}else if ( name == "name" ){
+				console.log( this.names[value]);
+				if ( value < 24 ){
+					this.showName(this.names[value]);
+				}
 			}
-		};
+		}
+
+		this.showName = function(name){
+			$( "#names" ).children().css( "visibility", "hidden" );
+			$( "#quotes" ).children().css( "visibility", "hidden" );
+			$("#name_"+name).css("visibility", "visible");
+			$("#quote_"+name).css("visibility", "visible");
+		}
 
 		this.showHide = function( show ) {
 			for ( var i=0; i<this.modes.length; i++){
