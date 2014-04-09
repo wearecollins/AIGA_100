@@ -1,0 +1,9 @@
+ofxLibwebsockets
+ofxSpacebrew
+ofxAssimpModelLoader
+ofxOpenCv
+ofxXmlSettings
+ofxCv
+ofxMapamok
+ofxProCamToolkit
+ofxUI
