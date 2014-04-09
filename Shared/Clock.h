@@ -37,7 +37,7 @@ public:
     
     ofVec2f vel;
     
-    ofColor faceColor, liveLetterColor, letterColor, armColor;
+    ofColor faceColor, liveFaceColor, liveLetterColor, letterColor, armColor;
     void setColor( ofColor c );
     void setColor( ofColor facec, ofColor letterc, int startAngle, int endAngle );
     
@@ -66,7 +66,7 @@ public:
     void onMouseReleased( int mx, int my );
     
     void rotateTo( int mx, int my );
-    void magnet( int mx, int my );
+    void magnet( int mx, int my, ofColor color );
     
 protected:
     ofMesh face;
@@ -139,7 +139,7 @@ public:
     void loadLetters();
     
     // override events
-    void magnet( float attractX, float attractY );
+    void magnet( float attractX, float attractY, ofColor color );
     
     // Key && Mouse events
     

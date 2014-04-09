@@ -34,6 +34,7 @@ void Clock::setup(){
     ofSetCircleResolution(300);
     ofSetLineWidth(3.0);
     faceColor.set(255,0,0);
+    liveFaceColor.set(255, 0, 0);
     
     // build face mesh
     float res = 300;
@@ -44,7 +45,7 @@ void Clock::setup(){
     
     ofVec2f center(0,0);
     ofFloatColor color;
-    color.set( faceColor.r / 255.0, faceColor.g / 255.0, faceColor.b / 255.0 );
+    color.set( liveFaceColor.r / 255.0, liveFaceColor.g / 255.0, liveFaceColor.b / 255.0 );
     for ( float a = 0; a < 360.0; a+= inc ){
         ofVec2f vec;
         vec.x = cos( ofDegToRad(a) ) * radius;
@@ -176,34 +177,34 @@ void Clock::setColor( ofColor facec, ofColor letterc, int startAngle, int endAng
 
 //--------------------------------------------------------------
 void Clock::draw(){
-    ofColor faceColorGood(faceColor);
+    ofColor faceColorGood(liveFaceColor);
     
     switch ( colorMode ){
         case 0:
-            faceColor.setHue(ofWrap(ofWrap(offset, 0, 255) + ofMap(x + y, 0, ofGetWidth() + ofGetHeight(), 0, 120), 0, 255));
+            liveFaceColor.setHue(ofWrap(ofWrap(offset, 0, 255) + ofMap(x + y, 0, ofGetWidth() + ofGetHeight(), 0, 120), 0, 255));
             break;
         case 1:
-            faceColor.setHue(ofWrap(ofWrap(offset, 0, 255) + ofMap(y, 0, ofGetHeight(), 0, 120), 0, 255));
+            liveFaceColor.setHue(ofWrap(ofWrap(offset, 0, 255) + ofMap(y, 0, ofGetHeight(), 0, 120), 0, 255));
             break;
             
         case 2:
-            faceColor.setHue(ofWrap(ofWrap(offset, 0, 255) + ofMap(sin(x), -1.0, 1.0, 0, 255), 0, 255));
+            liveFaceColor.setHue(ofWrap(ofWrap(offset, 0, 255) + ofMap(sin(x), -1.0, 1.0, 0, 255), 0, 255));
             break;
             
         case 3:
-            faceColor.setHue(ofWrap(ofWrap(offset, 0, 255) + ofMap(tan(x + y), -1.0, 1.0, 0, 255), 0, 255));
+            liveFaceColor.setHue(ofWrap(ofWrap(offset, 0, 255) + ofMap(tan(x + y), -1.0, 1.0, 0, 255), 0, 255));
             break;
             
         case 4:
-            faceColor.setHue(ofWrap(ofWrap(offset, 0, 255) + ofMap(y * 10.0 + ofWrap(ofGetElapsedTimeMillis(), 0, ofGetHeight() * 50.0), 0.0, ofGetHeight() * 50.0, 0, 255), 0, 255));
+            liveFaceColor.setHue(ofWrap(ofWrap(offset, 0, 255) + ofMap(y * 10.0 + ofWrap(ofGetElapsedTimeMillis(), 0, ofGetHeight() * 50.0), 0.0, ofGetHeight() * 50.0, 0, 255), 0, 255));
             break;
         case 5:
-            faceColor.setHue( ofWrap(faceColor.getHue() + ofWrap(offset, 0, 255), 0, 255) );
+            liveFaceColor.setHue( ofWrap(liveFaceColor.getHue() + ofWrap(offset, 0, 255), 0, 255) );
             break;
     }
     if ( colorMode != 5 ){
-        faceColor.setSaturation(150);
-        faceColor.setBrightness(250);
+        liveFaceColor.setSaturation(150);
+        liveFaceColor.setBrightness(250);
     }
     
     ofPushMatrix();
@@ -216,11 +217,11 @@ void Clock::draw(){
         cr *= (i+1);
         
         float mult = numFaces == 1 ? 1.0 : ofMap(i, numFaces-1, 0, 2.0, 1.0);
-        ofColor lc(faceColor);
+        ofColor lc(liveFaceColor);
         float hue = ofWrap(lc.getHue() * mult + sin( ofGetElapsedTimeMillis() * .0001) * 10.0, 0, 255.0f);
         lc.setHue( hue );
         
-        setColor(faceColor);
+        setColor(liveFaceColor);
         //setColor(lc, liveLetterColor, colorAngles[i * 2], colorAngles[i * 2 + 1]);
         // ?
         face.drawWireframe();
@@ -259,6 +260,7 @@ void Clock::draw(){
     }
     ofPopMatrix();
     
+    // animate
     if ( ofGetElapsedTimeMillis() - lastFroze > 2000 && bAnimating ){
         bool b = false;
         float m = numFaces == 1 ? 1 : .5;
@@ -282,6 +284,9 @@ void Clock::draw(){
                 }
             }
         //}
+        
+        liveFaceColor.lerp(faceColor, val);
+        
         bLetter = false;
     } else if ( bLetter ) {
         // hax
@@ -295,7 +300,7 @@ void Clock::draw(){
     }
     
     // reset face color
-    if ( colorMode == 5 ) faceColor = faceColorGood;
+    //if ( colorMode == 5 ) liveFaceColor = faceColorGood;
 }
 
 //--------------------------------------------------------------
@@ -507,7 +512,7 @@ void Clock::rotateTo( int mx, int my ){
 }
 
 //--------------------------------------------------------------
-void Clock::magnet( int mx, int my ){
+void Clock::magnet( int mx, int my, ofColor color ){
     ofVec2f m(mx,my);
     float dist = distance(m);
     m -= *this;
@@ -527,6 +532,7 @@ void Clock::magnet( int mx, int my ){
         vel.x += 10.0;
         offset += ofMap(dist, 0, 200, 10, 0, true);
         offset = ofClamp(offset, 0, 150);
+        if ( fabs(dist) < radius * 4 ) liveFaceColor.set(color);
         lastFroze = ofGetElapsedTimeMillis() - ofMap(dist, 0, 1000, 1000, 0, true);
     }
 }
@@ -859,9 +865,9 @@ void Clocks::loadLetters(){
 
 
 //--------------------------------------------------------------
-void Clocks::magnet( float x, float y ){
+void Clocks::magnet( float x, float y, ofColor color ){
     for ( auto & c : clocks ){
-        c.magnet(x,y);
+        c.magnet(x,y,color);
     }
 }
 
@@ -941,7 +947,7 @@ void Clocks::mouseDragged(ofMouseEventArgs & e ){
     if ( guiVisible ) return;
     for ( auto & c : clocks ){
         //        if ( c.bAnimating )
-        if ( !bPreciseDraw ) c.magnet(x,y);
+        if ( !bPreciseDraw ) c.magnet(x,y,ofColor(255));
         //c.onMouseDragged(x, y);
     }
     

@@ -85,8 +85,9 @@ void testApp::setup(){
     }
     
     float sc = texW / 1024.0;
-    float clockRadius = 32 * sc;
-    clocks.setup(10, 10, ofVec2f(96 * sc, 81 * sc), 108 * sc, 54 * sc, clockRadius );
+    float clockRadius = texW / 10.0 / 3.0;
+    //clocks.setup(10, 10, ofVec2f(96 * sc, 81 * sc), 108 * sc, 54 * sc, clockRadius );
+    clocks.setup(10, 10, ofVec2f(clockRadius * 2.7, clockRadius * 3.1), clockRadius, clockRadius, clockRadius );
     
     ofEnableDepthTest();
     ofEnableSmoothing();
@@ -423,7 +424,7 @@ void testApp::update(){
                             dots[ind].b = gridDrawings[i].color.b * mult;
                         } else {
                             static float mult = texW / 10.0;
-                            clocks.magnet(mult/2.0 + (x * mult), mult + (y * mult));
+                            clocks.magnet(mult/2.0 + (x * mult), mult + (y * mult), gridDrawings[i].color );
                         }
                         
                         if ( mult >= .99 ){
@@ -549,8 +550,8 @@ void testApp::renderClocks(){
 //    ofDisableAlphaBlending();
     ofClear(255);
     ofPushMatrix();
-    ofScale(-1,1);
-    ofTranslate(-type.getWidth(), 0);
+    //ofScale(-1,1);
+    //ofTranslate(-type.getWidth(), 0);
     clocks.draw();
     ofPopMatrix();
     type.end();
@@ -686,8 +687,6 @@ void testApp::onMessage( Spacebrew::Message & m ){
         Json::Reader r;
         r.parse(m.value, val);
         
-        cout << "CHEEL"<<endl;
-        
         // drawing is json array...
         
         GridDrawing d;
@@ -737,7 +736,7 @@ void testApp::onMessage( Spacebrew::Message & m ){
 void testApp::onClientConnect( Spacebrew::Config & c){
     cout << "connect"<<endl;
     spacebrew.sendRange("name", currentName);
-    spacebrew.sendRange("mode", bInteractiveMode ? 1 : 0);
+    spacebrew.sendRange("mode", bInteractiveMode ? 0 : 1);
 }
 
 //--------------------------------------------------------------
