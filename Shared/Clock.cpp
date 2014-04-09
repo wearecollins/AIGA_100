@@ -25,6 +25,7 @@ Clock::Clock(){
     rotMode = 0;
     lastNext = 0;
     colorIndex = 0;
+    lineWidth = 1.0;
     
     bAnimating = true;
 }
@@ -87,11 +88,11 @@ void Clock::update(){
         colorAngles.clear();
         targetAngle.clear();
         for (int i=0; i<numFaces; i++){
-            angles.push_back(0 - 45);
-            angles.push_back(90 - 45);
+            angles.push_back(0);
+            angles.push_back(90);
             
-            targetAngle.push_back(0 - 45);
-            targetAngle.push_back(90 - 45);
+            targetAngle.push_back(0);
+            targetAngle.push_back(90);
             
             colorAngles.push_back(0);
             colorAngles.push_back(0);
@@ -199,7 +200,7 @@ void Clock::draw(){
             liveFaceColor.setHue(ofWrap(ofWrap(offset, 0, 255) + ofMap(y * 10.0 + ofWrap(ofGetElapsedTimeMillis(), 0, ofGetHeight() * 50.0), 0.0, ofGetHeight() * 50.0, 0, 255), 0, 255));
             break;
         case 5:
-            liveFaceColor.setHue( ofWrap(liveFaceColor.getHue() + ofWrap(offset, 0, 255), 0, 255) );
+            //liveFaceColor.setHue( ofWrap(liveFaceColor.getHue() + ofWrap(offset, 0, 255), 0, 255) );
             break;
     }
     if ( colorMode != 5 ){
@@ -238,9 +239,25 @@ void Clock::draw(){
         angles[i * 2 + 1]   = angles[i * 2 + 1] * .9 + targetAngle[i * 2 + 1] * .1;
         
         ofPushMatrix();
-        ofVec2f p1(cr  * .7, cr * .7);
-        p1.rotate(angles[i * 2], ofVec2f(0,0));
-        ofLine(ofVec2f(0,0),p1);
+        ofVec2f o1(0, - lineWidth/2.0);
+        ofVec2f o2(0, + lineWidth/2.0);
+        ofVec2f p1(cr  * .9, 0 - lineWidth/2.0);
+        ofVec2f p2(cr  * .9, 0 + lineWidth/2.0);
+        //o1.rotate(angles[i * 2], ofVec2f(0,0));
+        //o2.rotate(angles[i * 2], ofVec2f(0,0));
+        //p1.rotate(angles[i * 2], ofVec2f(0,0));
+        //p2.rotate(angles[i * 2], ofVec2f(0,0));
+        
+        arm1.clear();
+        arm1.addVertex(o1); arm1.addVertex(o2); arm1.addVertex(p1); arm1.addVertex(p2);
+        arm1.addIndex(0); arm1.addIndex(1); arm1.addIndex(2);
+        arm1.addIndex(2); arm1.addIndex(3); arm1.addIndex(1);
+        
+        ofPushMatrix();
+        ofRotateZ(angles[i * 2]);
+        arm1.draw();
+        ofPopMatrix();
+        //ofLine(ofVec2f(0,0),p1);
         ofPopMatrix();
         
         hue = ofWrap(lc.getHue() * mult + sin( ofGetElapsedTimeMillis() * .0001) * 20.0, 0, 255.0f);
@@ -253,9 +270,29 @@ void Clock::draw(){
         }
         
         ofPushMatrix();
-        ofVec2f p2(cr  * .7, cr * .7);
-        p2.rotate(angles[i * 2 + 1], ofVec2f(0,0));
-        ofLine(ofVec2f(0,0),p2);
+        o1.set(0,-lineWidth/2.0);
+        o2.set(0,+lineWidth/2.0);
+        p1.set(cr  * .9, -lineWidth/2.0);
+        p2.set(cr  * .9, +lineWidth/2.0);
+        
+//        o1.rotate(angles[i * 2 + 1], ofVec2f(0,0));
+//        o2.rotate(angles[i * 2 + 1], ofVec2f(0,0));
+//        p1.rotate(angles[i * 2 + 1], ofVec2f(0,0));
+//        p2.rotate(angles[i * 2 + 1], ofVec2f(0,0));
+//        ofLine(ofVec2f(0,0),p2);
+        
+        arm2.clear();
+        arm2.addVertex(o1); arm2.addVertex(o2); arm2.addVertex(p1); arm2.addVertex(p2);
+        arm2.addIndex(0); arm2.addIndex(1); arm2.addIndex(2);
+        arm2.addIndex(2); arm2.addIndex(3); arm2.addIndex(1);
+        
+        ofPushMatrix();
+        ofRotateZ(angles[i * 2 + 1]);
+        arm2.draw();
+        ofPopMatrix();
+        //ofLine(ofVec2f(0,0),p1);
+        ofPopMatrix();
+        
         ofPopMatrix();
     }
     ofPopMatrix();
@@ -334,17 +371,17 @@ void Clock::reset(){
     bool b = false;
     for ( auto & a : angles ){
         if ( b ){
-            a = 0 - 45;
+            a = 0;// - 45;
         } else {
-            a = 90 - 45;
+            a = 90;// - 45;
         }
         b = !b;
     }
     for ( auto & a : targetAngle ){
         if ( b ){
-            a = 0 - 45;
+            a = 0;// - 45;
         } else {
-            a = 90 - 45;
+            a = 90;// - 45;
         }
         b = !b;
     }
@@ -384,18 +421,18 @@ void Clock::nextRotate(){
     if ( bDoColor ){
         for ( auto & a : colorAngles ){
             if ( b ){
-                a = a1 + 45;
+                a = a1;// + 45;
             } else {
-                a = a2 + 45;
+                a = a2;// + 45;
             }
             b = !b;
         }
     } else {
         for ( auto & a : targetAngle ){
             if ( b ){
-                a = a1 - 45;
+                a = a1;// - 45;
             } else {
-                a = a2 - 45;
+                a = a2;// - 45;
             }
             b = !b;
         }
@@ -458,50 +495,50 @@ void Clock::rotateTo( int mx, int my ){
                 if ( b ){
                     a += 90;
                 }
-                a += 45;
+                //a += 45;
             } else if ( an > 60 && an <= 120 ){
                 a = 180;
                 if ( b ){
                     a += 180;
                 }
-                a += 45;
+                //a += 45;
             } else if ( an > 120 && an <= 150 ){
                 a = 270;
                 if ( b ){
                     a += 90;
                 }
-                a += 45;
+                //a += 45;
                 
             } else if ( an > 150 && an <= 210 ){
                 a = 270;
                 if ( b ){
                     a += 180;
                 }
-                a += 45;
+                //a += 45;
             } else if ( an > 210 && an <= 240 ){
                 a = 360;
                 if ( b ){
                     a += 90;
                 }
-                a += 45;
+                //a += 45;
             } else if ( an > 240 && an <= 300 ){
                 a = 360;
                 if ( b ){
                     a += 180;
                 }
-                a += 45;
+                //a += 45;
             } else if ( an > 300 && an <= 330 ){
                 a = 450;
                 if ( b ){
                     a += 90;
                 }
-                a += 45;
+                //a += 45;
             } else if ( (an > 330 && an <= 390)){// || (an >=0 && an < 30) ){
                 a = 450;
                 if ( b ){
                     a += 180;
                 }
-                a += 45;
+                //a += 45;
             }
             
             
@@ -532,7 +569,13 @@ void Clock::magnet( int mx, int my, ofColor color ){
         vel.x += 10.0;
         offset += ofMap(dist, 0, 200, 10, 0, true);
         offset = ofClamp(offset, 0, 150);
-        if ( fabs(dist) < radius * 4 ) liveFaceColor.set(color);
+        if ( fabs(dist) < radius * 4 ){
+            if ( ofGetElapsedTimeMillis() - lastFroze < 2000 ){
+                liveFaceColor = liveFaceColor * .5 + color * .5;
+            } else {
+                liveFaceColor.set(color);
+            }
+        }
         lastFroze = ofGetElapsedTimeMillis() - ofMap(dist, 0, 1000, 1000, 0, true);
     }
 }
@@ -600,6 +643,7 @@ void Clocks::update( ofEventArgs & e ){
     for ( auto & c : clocks ){
         c.numFaces = numFaces;
         c.colorMode = mode;
+        c.lineWidth = lineWidth;
         if ( i == currentClock ){
             if ( ofGetKeyPressed( OF_KEY_CONTROL ) && ofGetKeyPressed(OF_KEY_SHIFT) ){
                 c.rotateClockTo(currentAngleA, currentAngleB);
@@ -615,7 +659,6 @@ void Clocks::update( ofEventArgs & e ){
 //--------------------------------------------------------------
 void Clocks::draw(){
     ofPushStyle();
-    ofSetLineWidth(lineWidth);
     for ( auto & c : clocks ){
         c.draw();
     }
@@ -843,8 +886,8 @@ void Clocks::loadLetters(){
             
             for ( int i=0; i<settings.getNumTags("clock"); i++){
                 settings.pushTag("clock", i );
-                float a1 = settings.getValue("a1", 0.0);
-                float a2 = settings.getValue("a2", 0.0);
+                float a1 = settings.getValue("a1", 0.0) + 45;
+                float a2 = settings.getValue("a2", 0.0) + 45;
                 letters[s].angles.push_back(vector<float>());
                 letters[s].angles.back().push_back(a1);
                 letters[s].angles.back().push_back(a2);
