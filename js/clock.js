@@ -60,16 +60,11 @@ Clock.prototype.setup = function( x,y, rad, isGL ) {
 		window.clockGeometry = new THREE.CircleGeometry( rad, 32 );
 		window.clocks = [];
 		window.clockCounter = 0;
-		window.clockH = SUD.random(0,1);
-		window.clockS = 1.0;
-		window.clockB = 1.0;
 	}
 	this.radius = rad;
-	this.hsv = {
-		h: window.clockH,
-		s: window.clockS,
-		b: window.clockB
-	}
+	this.grey   = {r:100, g:100, b:100};
+	this.color  = {r:100, g:100, b:100};
+
 	if ( isGL ){
 		this.faceMaterial = new THREE.MeshBasicMaterial({color: 0xFD4F57, overdraw: true});
 		this.face 	= new THREE.Mesh( window.clockGeometry, this.faceMaterial );
@@ -131,7 +126,7 @@ Clock.prototype.getRBGStyle = function() {
 };
 
 Clock.prototype.getRGB = function() {
-	var rgb = HSVtoRGB(this.hsv.h, this.hsv.s, this.hsv.b)
+	var rgb = {r:this.color.r, g:this.color.g, b:this.color.b}
 	rgb.r = Math.round(rgb.r);
 	rgb.g = Math.round(rgb.g);
 	rgb.b = Math.round(rgb.b);
@@ -181,7 +176,9 @@ Clock.prototype.update = function() {
 		this.rotateArmTwoBy(this.vel.x * 1/60.0);
 		this.vel.x = this.vel.x *.9 + .1;
 
-		this.hsv.h = this.hsv.h * .9 + window.clockH * .1;
+		this.color.r = this.color.r * .9 + this.grey.r * .1;
+		this.color.g = this.color.g * .9 + this.grey.g * .1;
+		this.color.b = this.color.b * .9 + this.grey.b * .1;
 	}
 
 	var style = this.getRBGStyle();

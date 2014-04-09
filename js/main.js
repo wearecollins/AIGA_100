@@ -79,10 +79,9 @@ $(document).ready( function() {
 			// todo: set w/h
 			//this.gridCtx 	= this.gridCanvas.getContext('2d');
 
-			this.color = {};
-			this.color.r = SUD.randomInt(0,255);
-			this.color.g = SUD.randomInt(0,255);
-			this.color.b = SUD.randomInt(0,255);
+			this.r = SUD.randomInt(0,255);
+			this.g = SUD.randomInt(0,255);
+			this.b = SUD.randomInt(0,255);
 
 			this.modes = [];
 			this.modes.push("#grid");
@@ -161,22 +160,6 @@ $(document).ready( function() {
 		}	
 
 		//-------------------------------------------------------
-		this.updateAndSendColor = function(x,y){
-			var hue = SUD.clamp(SUD.map(x,0,window.innerWidth, 0, 1.0), 0,1.0);
-			var sat = SUD.clamp(SUD.map(y,0,window.innerHeight, 0, 1.0),0.,1.0);
-
-			var rgb = HSVtoRGB(hue, sat, sat)
-
-			this.r = Math.round(rgb.r);
-			this.g = Math.round(rgb.g);
-			this.b = Math.round(rgb.b);
-
-			sb.send("red", "range", this.r);
-			sb.send("green", "range", this.g);
-			sb.send("blue", "range", this.b);
-		}
-
-		//-------------------------------------------------------
 		this.checkGrid = function(x,y){
 			var w = (this.renderWidth * .8) / 10 * .7;
 			var sp = w * .5;
@@ -246,7 +229,9 @@ $(document).ready( function() {
 						if ( ind != -1 ){
 							this.gridIndices.push(ind);
 							if ( ind != this.lastGrid ){
-								this.meshes[ind].hsv.h += .1;
+								this.meshes[ind].color.r = this.r;
+								this.meshes[ind].color.g = this.g;
+								this.meshes[ind].color.b = this.b;
 							}
 						}
 						this.lastGrid = ind;
@@ -267,7 +252,9 @@ $(document).ready( function() {
 						if ( ind != -1 ){
 							this.gridIndices.push(ind);
 							if ( ind != this.lastGrid ){
-								this.meshes[ind].hsv.h += .1;
+								this.meshes[ind].color.r = this.r;
+								this.meshes[ind].color.g = this.g;
+								this.meshes[ind].color.b = this.b;
 							}
 						}
 						this.lastGrid = ind;
@@ -292,7 +279,7 @@ $(document).ready( function() {
 						this.touchId = -1;
 
 						// send grid obj + color
-						sb.send("grid", "grid", {grid: this.grid, color: this.color, indices:this.gridIndices })
+						sb.send("grid", "grid", {grid: this.grid, color: {r:this.r, g:this.g, b:this.b}, indices:this.gridIndices })
 
 						for ( var i=0; i<this.grid.length; i++){
 							this.grid[i].filled = false;
