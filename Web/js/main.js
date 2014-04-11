@@ -121,7 +121,7 @@ $(document).ready( function() {
 
 			if (isIpad){
 				$("#quotes").addClass("quotesiPad");
-				$("#names").addClass("namesiPad");
+				$(".name").addClass("nameiPad");
 				$("#touch").addClass("touchiPad");
 				$("#release").addClass("touchiPad");
 				$(".quoteInner").addClass("quoteInneriPad");
@@ -145,13 +145,13 @@ $(document).ready( function() {
 			this.scene.add(this.bigCircle);
 
 			var ad1 = document.createElement("div");
-			setLineStyle(ad1, isIpad ? 20 : 10, rad * .8, "#FD4F57");
+			setLineStyle(ad1, isIpad ? 30 : 15, rad * .8, "#FD4F57");
 			ad1.id = "clockArm1";
 			ad1.className = "bigClock";
 			document.getElementById("sud_container").appendChild(ad1);
 
 			var ad2 = document.createElement("div");
-			setLineStyle(ad2, isIpad ? 20 : 10, rad * .8, "#FD4F57");
+			setLineStyle(ad2, isIpad ? 30 : 15, rad * .8, "#FD4F57");
 			ad2.id = "clockArm2";
 			ad2.className = "bigClock";
 			document.getElementById("sud_container").appendChild(ad2);
@@ -355,6 +355,7 @@ $(document).ready( function() {
 				switch( value ){
 					// grid
 					case 0:
+						this.touchId = -1;
 						window.clearTimeout(window.modeTimeout);
 						$("#names").css("opacity", 0);
 						$("#quotes").css("opacity", 0);
@@ -374,6 +375,9 @@ $(document).ready( function() {
 						$("#quotes").css("opacity", 0);
 
 						window.modeTimeout = window.setTimeout(function(){
+							for ( var i=0; i<this.meshes.length; i++){
+								this.meshes[i].mouseReleased();
+							}
 							$("#names").css("opacity", 1);
 							window.modeTimeout = window.setTimeout(function(){
 								console.log("clock");
