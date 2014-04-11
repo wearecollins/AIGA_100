@@ -92,7 +92,7 @@ html, body {
 
 .quotes {
 	font-family: Circular;
-	font-size: 60px;
+	font-size: 40px;
 	color:#FD4F57;
 	opacity: 0;
 	-webkit-transition:opacity .5s ease-in-out;
@@ -112,7 +112,7 @@ html, body {
 .italic {
 	font-family: CircularItalic;
 	font-style: normal;
-	font-size: 60px;
+	font-size: 40px;
 }
 .italiciPad {
 	font-family: CircularItalic;
@@ -151,7 +151,7 @@ html, body {
 	font-size: 20px;
 	width:500px;
 	font-style:"normal";
-	padding-top:10px;
+	padding-top:20px;
 	position: relative;
 	-webkit-transition:top 2s ease-in-out;
 }
