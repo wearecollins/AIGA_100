@@ -81,7 +81,7 @@ $(document).ready( function() {
 			document.getElementById("sud_container").appendChild(bigCircle);
 			this.bigCircle = new THREE.CSS3DObject(bigCircle);
 			this.bigCircle.position.x = this.renderWidth/2.0;
-			this.bigCircle.position.y = this.renderHeight * .7;
+			this.bigCircle.position.y = this.renderWidth/2.0;
 			this.scene.add(this.bigCircle);
 
 			// ortho cam
