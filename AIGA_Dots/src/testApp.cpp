@@ -238,13 +238,15 @@ void testApp::update(){
     }
     
     if (!bInteractiveMode){
+        char k = names[currentName][letterIndex];
+        string ks = ofToString(k);
+        
+        int start = (ks == "w" || ks == "m")? 2 : 3;
+        //int start = ofMap(ofGetElapsedTimeMillis() - letterLastChanged, 0, letterRate, (ks == "w" || ks == "m")? 4 : 6, 0);
+        clocks.setClocks(clocks.letters[ks], start, 3, (ks == "w" || ks == "m")? 6 : 4 );
+        
         if ( ofGetElapsedTimeMillis() - letterLastChanged > letterRate ){
             letterLastChanged = ofGetElapsedTimeMillis();
-            
-            char k = names[currentName][letterIndex];
-            string ks = ofToString(k);
-            
-            clocks.setClocks(clocks.letters[ks], (ks == "w" || ks == "m")? 2 : 3, 3, (ks == "w" || ks == "m")? 6 : 4 );
             
             letterIndex++;
             if ( letterIndex >= names[currentName].length() ){
@@ -411,9 +413,9 @@ void testApp::update(){
                         gridDrawings[i].lastChanged = ofGetElapsedTimeMillis();
                     }
                     
-                    int y = 9 - gridDrawings[i].indices[gridDrawings[i].index] % 10;
+                    int y = gridDrawings[i].indices[gridDrawings[i].index] % 10;
                     int x = floor(gridDrawings[i].indices[gridDrawings[i].index]/10);
-                    int ind = x + y * 10;
+                    int ind = gridDrawings[i].indices[gridDrawings[i].index];//x + y * 10;
                     
                     int indO = gridDrawings[i].indices[gridDrawings[i].index];
                     if ( gridDrawings[i].grid[indO] ){
@@ -423,8 +425,10 @@ void testApp::update(){
                             dots[ind].g = gridDrawings[i].color.g * mult;
                             dots[ind].b = gridDrawings[i].color.b * mult;
                         } else {
-                            static float mult = texW / 10.0;
-                            clocks.magnet(mult/2.0 + (x * mult), mult + (y * mult), gridDrawings[i].color );
+                            //                            static float mult = texW / 10.0;
+                            float clockRadius = texW / 10.0 / 3.0;
+                            ofVec2f v = clocks.clocks[indO];
+                            clocks.magnet(v.x, v.y, gridDrawings[i].color );
                         }
                         
                         if ( mult >= .99 ){

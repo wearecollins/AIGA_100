@@ -569,7 +569,7 @@ void Clock::magnet( int mx, int my, ofColor color ){
         vel.x += 10.0;
         offset += ofMap(dist, 0, 200, 10, 0, true);
         offset = ofClamp(offset, 0, 150);
-        if ( fabs(dist) < radius * 4 ){
+        if ( fabs(dist) < radius * 2 ){
             if ( ofGetElapsedTimeMillis() - lastFroze < 2000 ){
                 liveFaceColor = liveFaceColor * .5 + color * .5;
             } else {
@@ -623,12 +623,13 @@ void Clocks::setup( int gridX, int gridY, ofVec2f spacing, int startX, int start
         }
     }
     
-    setupGui();
     loadLetters();
     
     for ( auto & c : clocks ){
         c.setup();
     }
+    
+    setupGui();
     
     ofAddListener(ofEvents().update, this, &Clocks::update);
     ofAddListener(ofEvents().keyPressed, this, &Clocks::keyPressed);
