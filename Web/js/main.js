@@ -330,6 +330,7 @@ $(document).ready( function() {
 
 						window.modeTimeout = window.setTimeout(function(){
 							$(".threeElement").css("opacity", 1);
+							$("#release").css("opacity", 0);
 						}, 1500);
 
 						break;
