@@ -8,7 +8,7 @@ $(document).ready( function() {
 
 	isIpad = navigator.userAgent.match(/iPad/i) != null;
 
-	console.log(isIpad);
+	console.log("is ipad? "+isIpad);
 
 	app 	= new DemoApp();
 	//var cv = document.getElementById("gridCanvas");
@@ -33,9 +33,7 @@ $(document).ready( function() {
 		this.g = 0;
 		this.b = 0;
 
-		this.rE = 0;
-		this.gE = 0;
-		this.bE = 0;
+		this.meshParams = {};
 
 		this.names = ["sean","noreen","chuck","dana","bob","david","ken","leslie","kyle","michael","stephen","abbott","louise","sylvia","cheryl","alex","chip","michael_m","richard","michael_d","nancye","bill_m","gael","ann"];
 		
@@ -52,7 +50,7 @@ $(document).ready( function() {
 			var w = (this.renderWidth * .8) / 10 * .7;
 			var sp = w * .5;
 			var cx = this.renderWidth / 2.0 - (((w + sp) * 9 )/2.0);
-			var cy = this.renderHeight * .4 - (((w + sp)  * 9) /2.0);
+			var cy = this.renderHeight * .2;// - (((w + sp)  * 9) /2.0);
 
 			for ( var x=0; x<10; x++){
 				for ( var y=0; y<10; y++){
@@ -63,6 +61,12 @@ $(document).ready( function() {
 					this.meshes.push( clock );
 				}
 			}
+
+			// populate mesh param storage obj
+			this.meshParams.radius = w;
+			this.meshParams.spacing = sp;
+			this.meshParams.x = cx;
+			this.meshParams.y = cy;
 
 			// ortho cam
 			this.scene.remove(this.camera);
@@ -105,6 +109,14 @@ $(document).ready( function() {
 			document.getElementById("sud_container").appendChild(releaseDiv);
 			$("#touch").css("opacity", 1);
 
+			if (isIpad){
+				$("#quotes").addClass("quotesiPad");
+				$("#names").addClass("namesiPad");
+				$("#touch").addClass("touchiPad");
+				$("#release").addClass("touchiPad");
+				$(".quoteInner").addClass("quoteInneriPad")
+			}
+
 			this.setupSpacebrew();
 		}
 
@@ -134,11 +146,6 @@ $(document).ready( function() {
 
 		//-------------------------------------------------------
 		this.update = function (){
-			// color update
-			this.rE = this.rE * .75 + this.r * .25;
-			this.gE = this.gE * .75 + this.g * .25;
-			this.bE = this.bE * .75 + this.b * .25;
-
 			for ( var ind in this.meshes ){
 				this.meshes[ind].update();
 			}
@@ -161,17 +168,8 @@ $(document).ready( function() {
 
 		//-------------------------------------------------------
 		this.checkGrid = function(x,y){
-			var w = (this.renderWidth * .8) / 10 * .7;
-			var sp = w * .5;
-			var cx = this.renderWidth / 2.0 - (((w + sp) * 9 )/2.0);
-			var cy = this.renderHeight * .4 - (((w + sp)  * 9) /2.0);
-
 			for ( var i=0; i<this.grid.length; i++){
-				var rx = cx + this.grid[i].x * (w + sp);
-				var ry = cy + this.grid[i].y * (w + sp);
-
-				if ( x <= rx + w/2 && x >= rx - w/2 &&
-					 y <= ry + w/2 && y >= ry - w/2 ){
+				if ( this.meshes[i].mousePressed(x,y)){
 					this.grid[i].filled = true;
 					return i;
 				}
@@ -283,6 +281,10 @@ $(document).ready( function() {
 
 						for ( var i=0; i<this.grid.length; i++){
 							this.grid[i].filled = false;
+						}
+
+						for ( var i=0; i<this.meshes.length; i++){
+							this.meshes[i].mouseReleased();
 						}
 
 						$("#touch").css("opacity", 1);

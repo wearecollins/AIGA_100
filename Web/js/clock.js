@@ -145,6 +145,7 @@ Clock.prototype.magnet = function(mx,my) {
     m = m.sub(p);
     
     if ( (dist) < 20000 ){
+    	this.mouseDown = true;
         var line = p.add( new THREE.Vector2(this.radius, this.radius));
         var a = this.angle(p,m, false);
         var angle = SUD.map(a, -180, 180, 90, 360);
@@ -161,8 +162,8 @@ Clock.prototype.magnet = function(mx,my) {
         // }
         this.vel.x += 10.0;
         if ( isIpad ){
-	        this.hsv.h += SUD.map(dist, 0, 500, .01, 0);
-        	this.hsv.h = SUD.wrap(this.hsv.h, 0, 1.0)
+	        //this.hsv.h += SUD.map(dist, 0, 500, .01, 0);
+        	//this.hsv.h = SUD.wrap(this.hsv.h, 0, 1.0)
         }
         //offset += ofMap(dist, 0, 200, 10, 0, true);
         //offset = ofClamp(offset, 0, 150);
@@ -171,7 +172,7 @@ Clock.prototype.magnet = function(mx,my) {
 }
 
 Clock.prototype.update = function() {
-	if ( new Date() - this.lastFroze > 1000 ){
+	if ( new Date() - this.lastFroze > 1000 && !this.mouseDown ){
 		this.rotateArmOneBy(this.vel.x);
 		this.rotateArmTwoBy(this.vel.x * 1/60.0);
 		this.vel.x = this.vel.x *.9 + .1;
@@ -188,6 +189,15 @@ Clock.prototype.update = function() {
 
 	this.lastStyle = this.getRBGStyle();
 };
+
+Clock.prototype.mousePressed = function(x,y) {
+	this.mouseDown = x <= this.position.x + this.radius && x >= this.position.x - this.radius && y <= this.position.y + this.radius && y >= this.position.y - this.radius;
+	return this.mouseDown;
+};
+
+Clock.prototype.mouseReleased = function(){
+	this.mouseDown = false;
+}
 
 Clock.prototype.setFaceStyle = function(style) {
 	this.face.element.style.backgroundColor = style;
