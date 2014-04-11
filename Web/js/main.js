@@ -129,6 +129,8 @@ $(document).ready( function() {
 				$(".italic").addClass("italiciPad");
 			}
 
+			$('.quoteInner').widowFix();
+
 			this.setupSpacebrew();
 		}
 
