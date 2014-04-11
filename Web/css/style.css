@@ -20,11 +20,7 @@ html, body {
 	font-weight: bold;
 }
 
-em {
-	font-family: CircularItalic;
-	font-style: normal;
-	font-size: 20px;
-}
+
 .threeElement {
 	opacity: 1;
 	-webkit-transition:opacity .5s ease-in-out;
@@ -110,6 +106,17 @@ em {
 
 .quotesiPad {
 	font-family: Circular;
+	font-size: 60px;
+}
+
+.italic {
+	font-family: CircularItalic;
+	font-style: normal;
+	font-size: 20px;
+}
+.italiciPad {
+	font-family: CircularItalic;
+	font-style: normal;
 	font-size: 60px;
 }
 

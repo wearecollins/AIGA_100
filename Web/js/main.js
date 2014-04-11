@@ -126,6 +126,7 @@ $(document).ready( function() {
 				$("#release").addClass("touchiPad");
 				$(".quoteInner").addClass("quoteInneriPad");
 				$(".quoteName").addClass("quoteNameiPad");
+				$(".italic").addClass("italiciPad");
 			}
 
 			this.setupSpacebrew();
