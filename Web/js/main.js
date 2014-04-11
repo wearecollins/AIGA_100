@@ -53,7 +53,7 @@ $(document).ready( function() {
 			var w = (this.renderWidth * .8) / 10 * .7;
 			var sp = w * .5;
 			var cx = this.renderWidth / 2.0 - (((w + sp) * 9 )/2.0);
-			var cy = this.renderHeight * .2;// - (((w + sp)  * 9) /2.0);
+			var cy = cx;// - (((w + sp)  * 9) /2.0);
 
 			// build clocks + storage
 			for ( var x=0; x<10; x++){
