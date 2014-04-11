@@ -114,7 +114,8 @@ $(document).ready( function() {
 				$("#names").addClass("namesiPad");
 				$("#touch").addClass("touchiPad");
 				$("#release").addClass("touchiPad");
-				$(".quoteInner").addClass("quoteInneriPad")
+				$(".quoteInner").addClass("quoteInneriPad");
+				$(".quoteName").addClass("quoteNameiPad");
 			}
 
 			this.setupSpacebrew();
@@ -301,6 +302,7 @@ $(document).ready( function() {
 		//-------------------------------------------------------
 		this.onRangeMessage = function( name, value ){
 			if ( name == "mode" ){
+				if ( this.mode == value ) return;
 				this.mode = value;
 				switch( value ){
 					// grid

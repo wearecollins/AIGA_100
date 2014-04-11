@@ -10,7 +10,6 @@
 
 @font-face {
 	font-family: Relative;
-	font-style:"normal";
 	src:url("../fonts/Relative-10Pitch.ttf");
 }
 
@@ -114,7 +113,7 @@ em {
 	position: absolute;
 	height: 100%;
 	display: -webkit-box;
-	-webkit-box-orient: horizontal;
+	-webkit-box-orient: vertical;
 	-webkit-box-pack: center;
 	-webkit-box-align: center;
 }
@@ -123,6 +122,20 @@ em {
 	width:500px;
 }
 .quoteInneriPad {
+	width:800px;
+}
+
+.quoteName {
+	font-family: Relative;
+	font-size: 20px;
+	width:500px;
+	font-style:"normal";
+	padding-top:10px;
+}
+
+.quoteNameiPad {
+	font-size: 30px;
+	padding-top:20px;
 	width:800px;
 }
 
