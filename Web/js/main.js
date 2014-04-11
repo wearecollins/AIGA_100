@@ -12,8 +12,8 @@ $(document).ready( function() {
 
 	app 	= new DemoApp();
 	//var cv = document.getElementById("gridCanvas");
-	app.renderWidth = isIpad ? 2048 : 640;
-	app.renderHeight = isIpad ? 1536 : 1136;
+	app.renderWidth = isIpad ? 1536 : 640;
+	app.renderHeight = isIpad ? 1856 : 1136;
 	// cv.width = width;
 	// cv.height = height;
 	app.begin({canvasId:"gridCanvas", renderType: "css3d", width: app.renderWidth, height: app.renderHeight });
