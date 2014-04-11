@@ -35,6 +35,9 @@ $(document).ready( function() {
 
 		this.meshParams = {};
 
+		/** */
+		this.bigCircle = null;
+
 		this.names = ["sean","noreen","chuck","dana","bob","david","ken","leslie","kyle","michael","stephen","abbott","louise","sylvia","cheryl","alex","chip","michael_m","richard","michael_d","nancye","bill_m","gael","ann"];
 		
 		//-------------------------------------------------------
@@ -52,6 +55,7 @@ $(document).ready( function() {
 			var cx = this.renderWidth / 2.0 - (((w + sp) * 9 )/2.0);
 			var cy = this.renderHeight * .2;// - (((w + sp)  * 9) /2.0);
 
+			// build clocks + storage
 			for ( var x=0; x<10; x++){
 				for ( var y=0; y<10; y++){
 					this.grid.push({x: x, y: y, filled: false });
@@ -67,6 +71,18 @@ $(document).ready( function() {
 			this.meshParams.spacing = sp;
 			this.meshParams.x = cx;
 			this.meshParams.y = cy;
+
+			// "big clock"
+				
+			var bigCircle = document.createElement("div");
+			setCircleStyle(bigCircle, this.renderWidth * .8 / 2.0, true, 20, "#FD4F57");
+			bigCircle.id = "bigclock_visual";
+			bigCircle.className = "bigClock";
+			document.getElementById("sud_container").appendChild(bigCircle);
+			this.bigCircle = new THREE.CSS3DObject(bigCircle);
+			this.bigCircle.position.x = this.renderWidth/2.0;
+			this.bigCircle.position.y = this.renderHeight * .7;
+			this.scene.add(this.bigCircle);
 
 			// ortho cam
 			this.scene.remove(this.camera);
@@ -96,12 +112,12 @@ $(document).ready( function() {
 
 			// add "touch" div
 			var touchDiv = document.createElement("div");
-			touchDiv.className = "touch";
+			touchDiv.className = "threeElement touch";
 			touchDiv.id = "touch";
 			touchDiv.innerHTML = "Touch";
 
 			var releaseDiv = document.createElement("div");
-			releaseDiv.className = "touch";
+			releaseDiv.className = "threeElement touch";
 			releaseDiv.id = "release";
 			releaseDiv.innerHTML = "Release";
 
@@ -310,10 +326,10 @@ $(document).ready( function() {
 						window.clearTimeout(window.modeTimeout);
 						$("#names").css("opacity", 0);
 						$("#quotes").css("opacity", 0);
-						$("#bigClock").css("opacity", 0);
+						$(".bigClock").css("opacity", 0);
 
 						window.modeTimeout = window.setTimeout(function(){
-							$("#sud_container").css("opacity", 1);
+							$(".threeElement").css("opacity", 1);
 						}, 1500);
 
 						break;
@@ -321,7 +337,7 @@ $(document).ready( function() {
 					// quotes
 					case 1:
 						window.clearTimeout(window.modeTimeout);
-						$("#sud_container").css("opacity", 0);
+						$(".threeElement").css("opacity", 0);
 						$("#quotes").css("opacity", 0);
 
 						window.modeTimeout = window.setTimeout(function(){
@@ -329,13 +345,13 @@ $(document).ready( function() {
 							window.modeTimeout = window.setTimeout(function(){
 								console.log("clock");
 								$("#names").css("opacity", 0);
-								$("#bigClock").css("opacity", 1);
+								$(".bigClock").css("opacity", 1);
 
 								window.modeTimeout = window.setTimeout(function(){
 									console.log("quote");
-									$("#bigClock").css("opacity", 0);
+									$(".bigClock").css("opacity", 0);
 									$("#quotes").css("opacity", 1);
-								}, 1500 );
+								}, 3000 );
 							}, 2000 );
 						}, 1500 );
 						break;

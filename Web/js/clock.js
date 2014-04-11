@@ -1,8 +1,13 @@
-function setCircleStyle( object, rad ){
+function setCircleStyle( object, rad, border, borderWidth, borderColor ){
 	object.style.height = rad * 2  +"px";
 	object.style.width = rad * 2 +"px";
 	object.style["-moz-border-radius"] = rad + "px";
 	object.style["-webkit-border-radius"] = rad + "px";
+	if ( border ){
+		object.style.border = borderWidth +"px solid "+borderColor;
+		object.style["-moz-border-radius"] = rad + borderWidth + "px";
+		object.style["-webkit-border-radius"] = rad + borderWidth + "px";
+	}
 	// object.style.position = "relative";
 }
 
@@ -85,20 +90,23 @@ Clock.prototype.setup = function( x,y, rad, isGL ) {
 		
 		// create div, set style, append to body
 		var div = document.createElement("div");
-		setCircleStyle(div, rad);
+		setCircleStyle(div, rad, false);
 		div.style.backgroundColor = this.getRBGStyle();
 		div.id = "clock_"+window.clockCounter;
+		div.className = "threeElement";
 		document.getElementById("sud_container").appendChild(div);
 		this.face = new THREE.CSS3DObject(div)
 
 		var ad1 = document.createElement("div");
 		setLineStyle(ad1, isIpad ? 6 : 3, rad, "#fff");
 		ad1.id = "arm1_"+window.clockCounter;
+		ad1.className = "threeElement";
 		document.getElementById("sud_container").appendChild(ad1);
 
 		var ad2 = document.createElement("div");
 		setLineStyle(ad2, isIpad ? 6 : 3, rad, "#fff");
 		ad2.id = "arm1_"+window.clockCounter;
+		ad2.className = "threeElement";
 		document.getElementById("sud_container").appendChild(ad2);
 
 		this.armOne = new THREE.CSS3DObject(ad1);

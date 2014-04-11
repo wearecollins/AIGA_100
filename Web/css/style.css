@@ -25,6 +25,10 @@ em {
 	font-style: normal;
 	font-size: 20px;
 }
+.threeElement {
+	opacity: 1;
+	-webkit-transition:opacity .5s ease-in-out;
+}
 
 .touch {
 	color:#FD4F57;
@@ -61,6 +65,13 @@ em {
 	height: 100%;
 	text-align:center; /* center horizontally */
     vertical-align:middle; /* center vertically */
+}
+
+.bigClock {
+	opacity: 0;
+	-webkit-transition:opacity .5s ease-in-out;
+	position: absolute;
+	z-index: 100;
 }
 
 .name {
