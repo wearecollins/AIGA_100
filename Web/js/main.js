@@ -392,6 +392,16 @@ $(document).ready( function() {
 									console.log("quote");
 									$(".bigClock").css("opacity", 0);
 									$("#quotes").css("opacity", 1);
+									window.textTimeout = window.setTimeout(function(){
+										var $q  = $("#quote_"+this.names[this.nameIndex]);
+										var $qa = $q.find(".quoteInner");
+										var $qn = $q.find(".quoteName");
+										if ( $qa.height() > $q.height()){
+											$qa.css("top", ($q.height() - $qa.height()- 100) +"px")
+											$qn.css("top", ($q.height() - $qa.height()- 100) +"px")
+										}
+										
+									}.bind(this), 5000);
 								}.bind(this), 3000 );
 							}.bind(this), 2000 );
 						}.bind(this), 1500 );
