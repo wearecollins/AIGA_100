@@ -69,7 +69,7 @@ em {
 
 .bigClock {
 	opacity: 0;
-	-webkit-transition:opacity .5s ease-in-out;
+	-webkit-transition:opacity .5s ease-in-out, -webkit-transform 1s ease-in-out;
 	position: absolute;
 	z-index: 100;
 }

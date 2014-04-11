@@ -38,8 +38,10 @@ $(document).ready( function() {
 		/** */
 		this.bigCircle = null;
 
+		this.nameIndex = 0;
 		this.names = ["sean","noreen","chuck","dana","bob","david","ken","leslie","kyle","michael","stephen","abbott","louise","sylvia","cheryl","alex","chip","michael_m","richard","michael_d","nancye","bill_m","gael","ann"];
-		
+		this.years = [1979, 1982, 1981, 1968, 1977, 1980, 1971, 1975, 1985, 1964, 1978, 1980, 1973, 1976, 1980, 1970, 1986, 1976, 1957, 1968, 1971, 1965, 1975, 1957]
+
 		//-------------------------------------------------------
 		this.setup = function (){
 			//this.unregisterMouseEvents();
@@ -74,15 +76,7 @@ $(document).ready( function() {
 
 			// "big clock"
 				
-			var bigCircle = document.createElement("div");
-			setCircleStyle(bigCircle, this.renderWidth * .8 / 2.0, true, 20, "#FD4F57");
-			bigCircle.id = "bigclock_visual";
-			bigCircle.className = "bigClock";
-			document.getElementById("sud_container").appendChild(bigCircle);
-			this.bigCircle = new THREE.CSS3DObject(bigCircle);
-			this.bigCircle.position.x = this.renderWidth/2.0;
-			this.bigCircle.position.y = this.renderWidth/2.0;
-			this.scene.add(this.bigCircle);
+			this.createBigClock();
 
 			// ortho cam
 			this.scene.remove(this.camera);
@@ -135,6 +129,37 @@ $(document).ready( function() {
 			}
 
 			this.setupSpacebrew();
+		}
+
+		//-------------------------------------------------------
+		this.createBigClock = function(){
+			var bigCircle = document.createElement("div");
+			var rad = this.renderWidth * .8 / 2.0;
+			setCircleStyle(bigCircle, rad, true, isIpad ? 40 : 20, "#FD4F57");
+			bigCircle.id = "bigclock_visual";
+			bigCircle.className = "bigClock";
+			document.getElementById("sud_container").appendChild(bigCircle);
+			this.bigCircle = new THREE.CSS3DObject(bigCircle);
+			this.bigCircle.position.x = this.renderWidth/2.0;
+			this.bigCircle.position.y = this.renderHeight/2.0;
+			this.scene.add(this.bigCircle);
+
+			var ad1 = document.createElement("div");
+			setLineStyle(ad1, isIpad ? 20 : 10, rad * .8, "#FD4F57");
+			ad1.id = "clockArm1";
+			ad1.className = "bigClock";
+			document.getElementById("sud_container").appendChild(ad1);
+
+			var ad2 = document.createElement("div");
+			setLineStyle(ad2, isIpad ? 20 : 10, rad * .8, "#FD4F57");
+			ad2.id = "clockArm2";
+			ad2.className = "bigClock";
+			document.getElementById("sud_container").appendChild(ad2);
+
+			this.armOne = new THREE.CSS3DObject(ad1);
+			this.armTwo = new THREE.CSS3DObject(ad2);
+			this.bigCircle.add(this.armOne);
+			this.bigCircle.add(this.armTwo);
 		}
 
 		//-------------------------------------------------------
@@ -192,6 +217,13 @@ $(document).ready( function() {
 				}
 			}
 			return -1;
+		}
+
+		this.rotateBigClockTo = function(deg1, deg2){
+			this.armOne.rotation.z = SUD.degToRad(180 + deg1);
+			this.armTwo.rotation.z = SUD.degToRad(180 + deg2);
+
+			// to-do: make sure rotation is always positive!!!
 		}
 
 		//-------------------------------------------------------
@@ -347,19 +379,21 @@ $(document).ready( function() {
 								console.log("clock");
 								$("#names").css("opacity", 0);
 								$(".bigClock").css("opacity", 1);
+								this.rotateBigClockTo(0, (2014 - this.years[this.nameIndex])/100*360);
 
 								window.modeTimeout = window.setTimeout(function(){
 									console.log("quote");
 									$(".bigClock").css("opacity", 0);
 									$("#quotes").css("opacity", 1);
-								}, 3000 );
-							}, 2000 );
-						}, 1500 );
+								}.bind(this), 3000 );
+							}.bind(this), 2000 );
+						}.bind(this), 1500 );
 						break;
 				}
 			}else if ( name == "name" ){
-				console.log( this.names[value]);
+				// console.log( this.names[value]);
 				if ( value < 24 ){
+					this.nameIndex = value;
 					this.showName(this.names[value]);
 				}
 			}

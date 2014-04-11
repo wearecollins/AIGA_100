@@ -98,13 +98,13 @@ Clock.prototype.setup = function( x,y, rad, isGL ) {
 		this.face = new THREE.CSS3DObject(div)
 
 		var ad1 = document.createElement("div");
-		setLineStyle(ad1, isIpad ? 6 : 3, rad, "#fff");
+		setLineStyle(ad1, isIpad ? 6 : 3, rad* .8, "#fff");
 		ad1.id = "arm1_"+window.clockCounter;
 		ad1.className = "threeElement";
 		document.getElementById("sud_container").appendChild(ad1);
 
 		var ad2 = document.createElement("div");
-		setLineStyle(ad2, isIpad ? 6 : 3, rad, "#fff");
+		setLineStyle(ad2, isIpad ? 6 : 3, rad* .8, "#fff");
 		ad2.id = "arm1_"+window.clockCounter;
 		ad2.className = "threeElement";
 		document.getElementById("sud_container").appendChild(ad2);
