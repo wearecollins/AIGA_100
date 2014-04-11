@@ -48,7 +48,7 @@ em {
 }
 
 .touchiPad {
-	font-size: 120px;
+	font-size: 180px;
 	bottom: 100px;
 }
 
@@ -110,7 +110,7 @@ em {
 
 .quotesiPad {
 	font-family: Circular;
-	font-size: 40px;
+	font-size: 60px;
 }
 
 .quote {
@@ -133,7 +133,7 @@ em {
 	width:500px;
 }
 .quoteInneriPad {
-	width:800px;
+	width:1800px;
 }
 
 .quoteName {
@@ -145,7 +145,7 @@ em {
 }
 
 .quoteNameiPad {
-	font-size: 30px;
+	font-size: 60px;
 	padding-top:20px;
 	width:800px;
 }
