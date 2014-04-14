@@ -39,13 +39,13 @@ html, body {
 	-webkit-box-pack: center;
 	-webkit-box-align: center;
 	position: absolute;
-	bottom: 170px;
+	bottom: 130px;
 	left: 0px;
 }
 
 .touchiPad {
 	font-size: 150px;
-	bottom: 100px;
+	bottom: 120px;
 }
 
 #names {

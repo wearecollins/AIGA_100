@@ -93,9 +93,11 @@ $(document).ready( function() {
 			// todo: set w/h
 			//this.gridCtx 	= this.gridCanvas.getContext('2d');
 
-			this.r = SUD.randomInt(0,255);
-			this.g = SUD.randomInt(0,255);
-			this.b = SUD.randomInt(0,255);
+			var rgb = HSVtoRGB(SUD.random(0,1), .7, .9);
+
+			this.r = rgb.r;
+			this.g = rgb.g;
+			this.b = rgb.b;
 
 			this.modes = [];
 			this.modes.push("#grid");

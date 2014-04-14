@@ -38,8 +38,8 @@ bool bCameraMouse = false;
 // mode + name switcher
 bool bChangeModes       = true;
 bool bInteractiveMode   = true;
-int interactiveDuration = 60 * 1000;
-int nameDuration        = 60 * 1000;
+int interactiveDuration = 30 * 1000;
+int nameDuration        = 20 * 1000;
 int lastChanged         = 0;
 int currentName         = 0;
 int numNames            = 24;
