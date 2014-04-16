@@ -152,8 +152,10 @@ void testApp::setup(){
     screen.allocate(ofGetWidth(), ofGetHeight());
     
     // setup mapamok
+    string model = ((ofxUITextInput*) gui->getWidget("model"))->getTextString();
+    cout <<"LOADING "<<model<<endl;
     mapamok.loadSettings("mapamok.xml");
-    mapamok.loadMesh(((ofxUITextInput*) gui->getWidget("model"))->getTextString(), texW, texH);
+    mapamok.loadMesh(model, texW, texH);
     mapamok.drawMode = DRAW_FACES;
     mapamok.useLights = false;
     
