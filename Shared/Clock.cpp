@@ -43,7 +43,7 @@ void Clock::setup(){
     liveFaceColor.set(255, 0, 0);
     
     // build face mesh
-    float res = 30;
+    float res = 100;
     float inc = (float) 360.0 / res;
     
     int i = 0;
@@ -142,7 +142,7 @@ void Clock::setColor( ofColor facec, ofColor letterc, int startAngle, int endAng
     int sAngleWrap = ofWrap(startAngle, 0, 450);
     int eAngleWrap = ofWrap(endAngle, 0, 450);
     
-    float res = 30;
+    float res = 100;
     float inc = (float) 360.0 / res;
     int indA = sAngleWrap / inc;
     int indB = eAngleWrap / inc;
@@ -950,31 +950,52 @@ void Clocks::loadLetters(){
     }
     ofxXmlSettings settings;
     
+    vector<float> ca1Vec;
+    vector<float> ca2Vec;
+    
+    int ind = 0;
+    
     for ( string s : alphabet ){
         if ( settings.load("letters/" + s +".xml")){
             letters[s] = Letter();
             
-            int ind = 0;
             
             for ( int i=0; i<settings.getNumTags("clock"); i++){
                 settings.pushTag("clock", i );
-                float a1 = settings.getValue("a1", 0.0) + 45;
-                float a2 = settings.getValue("a2", 0.0) + 45;
+                float a1 = settings.getValue("a1", 0.0) + (s == "a" ? 45 : 0);
+                float a2 = settings.getValue("a2", 0.0) + (s == "a" ? 45 : 0);
                 letters[s].angles.push_back(vector<float>());
                 letters[s].angles.back().push_back(a1);
                 letters[s].angles.back().push_back(a2);
                 
-                float ca1 = settings.getValue("ca1", 0.0);
-                float ca2 = settings.getValue("ca2", 0.0);
-                letters[s].colorAngles.push_back(vector<float>());
-                letters[s].colorAngles.back().push_back(ca1);
-                letters[s].colorAngles.back().push_back(ca2);
+                //if ( s == "a" ){
+                    float ca1 = settings.getValue("ca1", 0.0);
+                    float ca2 = settings.getValue("ca2", 0.0);
+                    letters[s].colorAngles.push_back(vector<float>());
+                if ( ind > 2 ){
+                    swap(ca1, ca2);
+                }
+                    letters[s].colorAngles.back().push_back(ca1);
+                    letters[s].colorAngles.back().push_back(ca2);
+                    ca1Vec.push_back(ca1);
+                    ca2Vec.push_back(ca2);
+                /*} else {
+                    letters[s].colorAngles.push_back(vector<float>());
+                    if ( ca1Vec.size() > i ){
+                        letters[s].colorAngles.back().push_back(ca1Vec[i]);
+                        letters[s].colorAngles.back().push_back(ca2Vec[i]);
+                    } else {
+                        letters[s].colorAngles.back().push_back(ca1Vec[ca1Vec.size()-1]);
+                        letters[s].colorAngles.back().push_back(ca2Vec[ca1Vec.size()-1]);
+                    }
+                }*/
                 
                 settings.popTag();
             }
         } else {
             cout <<"beef: "<< s << endl;
         }
+        ind++;
     }
 }
 
