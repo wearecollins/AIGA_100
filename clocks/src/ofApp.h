@@ -4,6 +4,7 @@
 #include "ofxUI.h"
 #include "ofxXmlSettings.h"
 #include "Clock.h"
+#include "ClockMode.h"
 
 class ofApp : public ofBaseApp{
 
@@ -23,4 +24,5 @@ class ofApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
     
         Clocks clocks;
+        ClockMode cm;
 };

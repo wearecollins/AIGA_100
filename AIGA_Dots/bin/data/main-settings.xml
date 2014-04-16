@@ -1,22 +1,7 @@
 <Widget>
-    <Kind>2</Kind>
-    <Name>Map Chip</Name>
-    <Value>0</Value>
-</Widget>
-<Widget>
     <Kind>42</Kind>
     <Name>Mode</Name>
     <Value>3</Value>
-</Widget>
-<Widget>
-    <Kind>2</Kind>
-    <Name>Show Rendering</Name>
-    <Value>0</Value>
-</Widget>
-<Widget>
-    <Kind>2</Kind>
-    <Name>Show Pattern</Name>
-    <Value>0</Value>
 </Widget>
 <Widget>
     <Kind>2</Kind>

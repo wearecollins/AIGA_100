@@ -6,6 +6,8 @@
 //
 //
 
+#pragma once
+
 #include "ofMain.h"
 #include "ofxUI.h"
 #include "ofxXmlSettings.h"
@@ -50,6 +52,7 @@ public:
     void draw();
     
     void rotateClockTo ( float angleA, float angleB );
+    void rotateClockBy ( float angleA, float angleB );
     void rotateColorTo ( float angleA, float angleB );
     void reset();
     
@@ -68,7 +71,9 @@ public:
     void onMouseReleased( int mx, int my );
     
     void rotateTo( int mx, int my );
-    void magnet( int mx, int my, ofColor color );
+    
+    float pointTo( int mx, int my );
+    void magnet( int mx, int my, ofColor color, int freezeTime=1000 );
     
 protected:
     ofMesh face, ticks, arm1, arm2;
@@ -129,7 +134,7 @@ public:
      * @param {int}                     offsetX
      * @param {int}                     offsetY
      */
-    void setClocks( Letter letter, int offsetX, int offsetY, int letterWidth = 4 );
+    void setClocks( Letter letter, int offsetX, int offsetY, int letterWidth = 4, float colorWeight = 1.0 );
     void setFaceColors( ofColor color, int hueVariance = 0, bool bArm = false );
     void setLetterColors( ofColor color, int hueVariance = 0 );
     void setNonLetterFaceColors( ofColor color, int hueVariance = 0, bool bArm = false );
@@ -141,7 +146,8 @@ public:
     void loadLetters();
     
     // override events
-    void magnet( float attractX, float attractY, ofColor color );
+    void magnet( float attractX, float attractY, ofColor color, int freezeTime=1000 );
+    void pointTo( float attractX, float attractY );
     
     // Key && Mouse events
     
@@ -149,6 +155,9 @@ public:
     void mouseDragged(ofMouseEventArgs & e);
     void mousePressed(ofMouseEventArgs & e);
     void mouseReleased(ofMouseEventArgs & e);
+    
+    // gui props
+    ofColor faceColor, letterColor, armColor;
     
 };
 

@@ -1,30 +1,30 @@
 <Widget>
     <Kind>28</Kind>
     <Name>arm color</Name>
-    <XValue>0.618749976</XValue>
-    <YValue>0.937500000</YValue>
-    <RColor>242</RColor>
-    <GColor>246</GColor>
-    <BColor>255</BColor>
+    <XValue>0.675000012</XValue>
+    <YValue>0.174999997</YValue>
+    <RColor>54</RColor>
+    <GColor>56</GColor>
+    <BColor>251</BColor>
     <AColor>255</AColor>
 </Widget>
 <Widget>
     <Kind>4</Kind>
     <Name>arm saturation</Name>
-    <Value>255.000000000</Value>
+    <Value>23.906250000</Value>
 </Widget>
 <Widget>
     <Kind>4</Kind>
     <Name>arm brightness</Name>
-    <Value>42.500000000</Value>
+    <Value>209.843750000</Value>
 </Widget>
 <Widget>
     <Kind>28</Kind>
     <Name>letterArmColor</Name>
-    <XValue>0.649999976</XValue>
-    <YValue>0.068750001</YValue>
-    <RColor>22</RColor>
-    <GColor>53</GColor>
+    <XValue>0.756250024</XValue>
+    <YValue>0.043749999</YValue>
+    <RColor>145</RColor>
+    <GColor>39</GColor>
     <BColor>251</BColor>
     <AColor>255</AColor>
 </Widget>

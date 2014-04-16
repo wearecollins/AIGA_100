@@ -2,7 +2,10 @@
 
 #include "ofMain.h"
 #include "Constants.h"
+#define USE_SPACEBREW
 #include "Clock.h"
+#include "ClockMode.h"
+
 #include "ofxUI.h"
 #include "ofxSpacebrew.h"
 #include "ofxMapamok.h"
@@ -57,6 +60,9 @@ class testApp : public ofBaseApp{
     
         // clock faces
         Clocks clocks;
+    
+        // clock mode switcher
+        ClockMode clockManager;
     
         ofLight simpleLight;
         ofEasyCam camera;

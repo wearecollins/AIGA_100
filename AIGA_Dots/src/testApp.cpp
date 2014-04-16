@@ -1,12 +1,5 @@
 #include "testApp.h"
 
-int realX, realY;
-int circleRes = 20;
-float circleInt = 360.0 / circleRes;
-ofVec2f dims;
-
-float scale = 1.0;
-
 bool bRenderClocks = true;
 bool bRenderMapamok = true;
 
@@ -18,41 +11,16 @@ int messageTimeout      = 2000;
 bool bNeedToSend        = false;
 
 // swipe counter
-int lastSwipeChanged    = 0;
 int swipeChangeTimer    = 30;
 float maxDrawingAge     = 60 * 5;
 
-int r = 255;
-int g = 255;
-int b = 255;
-
 float texW = 1024;
 float texH = 1024;
-
-// mode + name switcher
-bool bChangeModes       = true;
-bool bInteractiveMode   = true;
-int interactiveDuration = 30 * 1000;
-int nameDuration        = 20 * 1000;
-int lastChanged         = 0;
-int currentName         = 0;
-int numNames            = 24;
-string names[] = {"sean ","noreen ","chuck ","dana ","bob ","david ","ken ","leslie ",
-                "kyle ","michael ","stephen ","abbott ","louise ","sylvia ","cheryl ",
-                "alex ","chip ","michael ","richard ","michael ","nancye ","bill ",
-                "gael ","ann "};
-
-// play out letters
-int letterIndex         = 0;
-int letterRate          = 2000;
-int letterLastChanged   = 0;
 
 //--------------------------------------------------------------
 void testApp::setup(){
     ofSetFrameRate(60);
     ofBackground(0);
-    realX = ofGetWidth()/2.0 - (gridSize/2.0 * spacing) + spacing/2.0;
-    realY = ofGetHeight()/2.0 - (gridSize/2.0 * spacing) + spacing/2.0;
     
     font.loadFont("circular/CircularStd-Bold.otf", dotWidth * 1.7 );
     
@@ -70,13 +38,6 @@ void testApp::setup(){
     
     //ofSetTextureWrap(GL_MIRRORED_REPEAT,GL_MIRRORED_REPEAT);
     //ofDisableArbTex();
-    
-    camera.setDistance(1000);
-    camera.move(-150, 0, -200);
-    camera.disableMouseInput();
-    simpleLight.enable();
-    simpleLight.setPosition(ofGetWidth(), ofGetHeight(), 1);
-    simpleLight.setPointLight();
     
     currentMode = MODE_INTERACTIVE_GRID;
     
@@ -111,6 +72,9 @@ void testApp::setup(){
     ofAddListener(spacebrew.onOpenEvent, this, &testApp::onOpen);
     ofAddListener(spacebrew.onClientConnectEvent, this, &testApp::onClientConnect);
     
+    // setup clock mgr
+    clockManager.setup(spacebrew, clocks);
+    
     // can i remove this?
     screen.allocate(ofGetWidth(), ofGetHeight());
     
@@ -127,122 +91,42 @@ void testApp::setup(){
 
 //--------------------------------------------------------------
 void testApp::update(){
-    // auto-rate changer
-    if ( bChangeModes ){
-        
-        // interactive to quote
-        if (bInteractiveMode){
-            if ( ofGetElapsedTimeMillis() - lastChanged > interactiveDuration){
-                lastChanged = ofGetElapsedTimeMillis();
-                bInteractiveMode = false;
-                currentName++;
-                if ( currentName >= numNames ){
-                    currentName = 0;
+    clockManager.update();
+
+    if ( gridDrawings.size() != 0 ){
+        // first update indices
+        for ( int i=0; i<gridDrawings.size(); i++){
+            if ( ofGetElapsedTimeMillis() - gridDrawings[i].lastChanged > swipeChangeTimer ){
+                gridDrawings[i].index++;
+                if (  gridDrawings[i].index >= gridDrawings[i].indices.size() ){
+                    //                        gridDrawings[i].index = 0;
+                    gridDrawings[i].age = 1000;
+                    continue;
                 }
-                spacebrew.sendRange("name", currentName);
-                spacebrew.sendRange("mode", 1);
-                letterIndex = 0;
-                letterLastChanged = ofGetElapsedTimeMillis();
-                cout<<"name mode"<<endl;
+                gridDrawings[i].lastChanged = ofGetElapsedTimeMillis();
             }
+            
+            int y = gridDrawings[i].indices[gridDrawings[i].index] % 10;
+            int x = floor(gridDrawings[i].indices[gridDrawings[i].index]/10);
+            int ind = gridDrawings[i].indices[gridDrawings[i].index];//x + y * 10;
+            
+            int indO = gridDrawings[i].indices[gridDrawings[i].index];
+            if ( gridDrawings[i].grid[indO] ){
+                float mult =(float) (maxDrawingAge-gridDrawings[i].age) / maxDrawingAge;
+                //                            static float mult = texW / 10.0;
+                float clockRadius = texW / 10.0 / 3.0;
+                ofVec2f v = clocks.clocks[indO];
+                clocks.magnet(v.x, v.y, gridDrawings[i].color );
+            }
+            gridDrawings[i].age++;
+        }
         
-        // quote to interactive
-        } else {
-            if ( ofGetElapsedTimeMillis() - lastChanged > nameDuration && letterIndex == 0){
-                lastChanged = ofGetElapsedTimeMillis();
-                bInteractiveMode = true;
-                spacebrew.sendRange("mode", 0);
-                letterIndex = 0;
-                letterLastChanged = ofGetElapsedTimeMillis();
-                cout<<"interactive mode"<<endl;
+        
+        for ( int i=gridDrawings.size()-1; i>=0; i--){
+            if ( gridDrawings[i].age >= maxDrawingAge ){
+                gridDrawings.erase(gridDrawings.begin() + i);
             }
         }
-    }
-    
-    if (!bInteractiveMode){
-        char k = names[currentName][letterIndex];
-        string ks = ofToString(k);
-        
-        int start = (ks == "w" || ks == "m")? 2 : 3;
-        //int start = ofMap(ofGetElapsedTimeMillis() - letterLastChanged, 0, letterRate, (ks == "w" || ks == "m")? 4 : 6, 0);
-        clocks.setClocks(clocks.letters[ks], start, 3, (ks == "w" || ks == "m")? 6 : 4 );
-        
-        if ( ofGetElapsedTimeMillis() - letterLastChanged > letterRate ){
-            letterLastChanged = ofGetElapsedTimeMillis();
-            
-            letterIndex++;
-            if ( letterIndex >= names[currentName].length() ){
-                letterIndex = 0;
-            }
-        }
-    }
-    
-    // do change this!
-    if ( lastMode != currentMode ){
-        int sendMode = 0;
-        if ( currentMode == MODE_INTERACTIVE_GRID ) sendMode = 0;
-        else if ( currentMode == MODE_INTERACTIVE_SWIPE ) sendMode = 1;
-        else if ( currentMode == MODE_INTERACTIVE_TEXT ) sendMode = 2;
-        spacebrew.sendRange("mode", sendMode);
-        lastMode = currentMode;
-    }
-    
-    switch (currentMode) {
-        case MODE_DATA:
-            break;
-            
-        case MODE_VIDEO:
-            break;
-            
-        case MODE_INTERACTIVE_COLOR:
-            break;
-            
-        case MODE_INTERACTIVE_SWIPE:
-            break;
-            
-        case MODE_INTERACTIVE_GRID:
-            if ( gridDrawings.size() != 0 ){
-                // first update indices
-                for ( int i=0; i<gridDrawings.size(); i++){
-                    if ( ofGetElapsedTimeMillis() - gridDrawings[i].lastChanged > swipeChangeTimer ){
-                        gridDrawings[i].index++;
-                        if (  gridDrawings[i].index >= gridDrawings[i].indices.size() ){
-                            //                        gridDrawings[i].index = 0;
-                            gridDrawings[i].age = 1000;
-                            continue;
-                        }
-                        gridDrawings[i].lastChanged = ofGetElapsedTimeMillis();
-                    }
-                    
-                    int y = gridDrawings[i].indices[gridDrawings[i].index] % 10;
-                    int x = floor(gridDrawings[i].indices[gridDrawings[i].index]/10);
-                    int ind = gridDrawings[i].indices[gridDrawings[i].index];//x + y * 10;
-                    
-                    int indO = gridDrawings[i].indices[gridDrawings[i].index];
-                    if ( gridDrawings[i].grid[indO] ){
-                        float mult =(float) (maxDrawingAge-gridDrawings[i].age) / maxDrawingAge;
-                        //                            static float mult = texW / 10.0;
-                        float clockRadius = texW / 10.0 / 3.0;
-                        ofVec2f v = clocks.clocks[indO];
-                        clocks.magnet(v.x, v.y, gridDrawings[i].color );
-                    }
-                    gridDrawings[i].age++;
-                }
-                
-                
-                for ( int i=gridDrawings.size()-1; i>=0; i--){
-                    if ( gridDrawings[i].age >= maxDrawingAge ){
-                        gridDrawings.erase(gridDrawings.begin() + i);
-                    }
-                }
-            }
-            break;
-            
-        case MODE_INTERACTIVE_TEXT:
-            break;
-            
-        default:
-            break;
     }
     
     if ( bRenderMapamok ){
@@ -278,10 +162,6 @@ void testApp::renderText(){
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
     if ( key == ' ' ){
-    } else if ( key == '='){
-        scale += .1;
-    } else if ( key == '-'){
-        scale -= .1;
     } else if ( key == 'g' ){
         gui->toggleVisible();
     } else if ( key == 's' ){
@@ -403,8 +283,8 @@ void testApp::onMessage( Spacebrew::Message & m ){
 //--------------------------------------------------------------
 void testApp::onClientConnect( Spacebrew::Config & c){
     cout << "connect"<<endl;
-    spacebrew.sendRange("name", currentName);
-    spacebrew.sendRange("mode", bInteractiveMode ? 0 : 1);
+    spacebrew.sendRange("name", clockManager.getCurrentName());
+    spacebrew.sendRange("mode", clockManager.isInteractive() ? 0 : 1);
 }
 
 //--------------------------------------------------------------

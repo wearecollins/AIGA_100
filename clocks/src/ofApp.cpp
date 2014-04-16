@@ -12,6 +12,7 @@ void ofApp::setup(){
     ofEnableAlphaBlending();
     
     clocks.setup(10,10,60, 100, 100, 25);
+    cm.setup(NULL, &clocks);
 }
 
 int last = 0;
@@ -19,6 +20,7 @@ int ind = 0;
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    cm.update();
 }
 
 //--------------------------------------------------------------

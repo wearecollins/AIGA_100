@@ -1,31 +1,31 @@
 <Widget>
     <Kind>28</Kind>
     <Name>color</Name>
-    <XValue>0.850000024</XValue>
-    <YValue>0.037500001</YValue>
-    <RColor>252</RColor>
-    <GColor>37</GColor>
-    <BColor>220</BColor>
+    <XValue>0.731249988</XValue>
+    <YValue>1.000000000</YValue>
+    <RColor>237</RColor>
+    <GColor>237</GColor>
+    <BColor>237</BColor>
     <AColor>255</AColor>
 </Widget>
 <Widget>
     <Kind>4</Kind>
     <Name>Face saturation</Name>
-    <Value>231.093750000</Value>
+    <Value>35.859375000</Value>
 </Widget>
 <Widget>
     <Kind>4</Kind>
     <Name>Face brightness</Name>
-    <Value>170.000000000</Value>
+    <Value>255.000000000</Value>
 </Widget>
 <Widget>
     <Kind>28</Kind>
     <Name>letterColor</Name>
-    <XValue>0.668749988</XValue>
-    <YValue>0.981249988</YValue>
-    <RColor>254</RColor>
-    <GColor>253</GColor>
-    <BColor>255</BColor>
+    <XValue>0.949999988</XValue>
+    <YValue>0.043749999</YValue>
+    <RColor>252</RColor>
+    <GColor>20</GColor>
+    <BColor>71</BColor>
     <AColor>255</AColor>
 </Widget>
 <Widget>
@@ -46,5 +46,5 @@
 <Widget>
     <Kind>4</Kind>
     <Name>hueVariance</Name>
-    <Value>11.953125000</Value>
+    <Value>42.500000000</Value>
 </Widget>

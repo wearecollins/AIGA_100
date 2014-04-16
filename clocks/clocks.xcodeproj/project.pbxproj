@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		01930D3118FF061800336158 /* ClockMode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 01930D2F18FF061800336158 /* ClockMode.cpp */; };
 		01B1B97118EF54AF00BA943F /* Clock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 01B1B96F18EF54AF00BA943F /* Clock.cpp */; };
 		04C82720B149CE576B8CBB06 /* ofxUIToggle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 48CCCEA0C681DE8B4945111B /* ofxUIToggle.cpp */; };
 		084025DA517D8329301FE1B6 /* ofxUIEventArgs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A8896AC3BECAAA504E3828F4 /* ofxUIEventArgs.cpp */; };
@@ -110,6 +111,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		01930D2F18FF061800336158 /* ClockMode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ClockMode.cpp; sourceTree = "<group>"; };
+		01930D3018FF061800336158 /* ClockMode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClockMode.h; sourceTree = "<group>"; };
 		01B1B96F18EF54AF00BA943F /* Clock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Clock.cpp; sourceTree = "<group>"; };
 		01B1B97018EF54AF00BA943F /* Clock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Clock.h; sourceTree = "<group>"; };
 		01DCC0911400F9ACF5B65578 /* ofxXmlSettings.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxXmlSettings.h; path = ../../../addons/ofxXmlSettings/src/ofxXmlSettings.h; sourceTree = SOURCE_ROOT; };
@@ -273,6 +276,8 @@
 			children = (
 				01B1B96F18EF54AF00BA943F /* Clock.cpp */,
 				01B1B97018EF54AF00BA943F /* Clock.h */,
+				01930D2F18FF061800336158 /* ClockMode.cpp */,
+				01930D3018FF061800336158 /* ClockMode.h */,
 			);
 			name = Shared;
 			path = ../../Shared;
@@ -636,6 +641,7 @@
 				43BADBB2FE0F17D34B57A705 /* ofxUIScrollableCanvas.cpp in Sources */,
 				740A58CBFDFE578C83A349AF /* ofxUISlider.cpp in Sources */,
 				ADE7C2AFC51E3F7E5E389026 /* ofxUISortableList.cpp in Sources */,
+				01930D3118FF061800336158 /* ClockMode.cpp in Sources */,
 				BFEFCE32DAFE10A8EB519F6C /* ofxUISpacer.cpp in Sources */,
 				52AFF80A869790144ACCC9BA /* ofxUISpectrum.cpp in Sources */,
 				1DAAC3FB4B98B08AE63F4687 /* ofxUISuperCanvas.cpp in Sources */,
