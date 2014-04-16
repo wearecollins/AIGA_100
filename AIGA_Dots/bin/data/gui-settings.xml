@@ -1,31 +1,31 @@
 <Widget>
     <Kind>28</Kind>
     <Name>color</Name>
-    <XValue>0.693750024</XValue>
-    <YValue>0.962499976</YValue>
-    <RColor>250</RColor>
-    <GColor>248</GColor>
-    <BColor>255</BColor>
+    <XValue>0.949999988</XValue>
+    <YValue>0.037500001</YValue>
+    <RColor>252</RColor>
+    <GColor>19</GColor>
+    <BColor>71</BColor>
     <AColor>255</AColor>
 </Widget>
 <Widget>
     <Kind>4</Kind>
     <Name>Face saturation</Name>
-    <Value>19.921875000</Value>
+    <Value>183.281250000</Value>
 </Widget>
 <Widget>
     <Kind>4</Kind>
     <Name>Face brightness</Name>
-    <Value>245.703125000</Value>
+    <Value>116.875000000</Value>
 </Widget>
 <Widget>
     <Kind>28</Kind>
     <Name>letterColor</Name>
-    <XValue>0.956250012</XValue>
-    <YValue>0.031250000</YValue>
-    <RColor>252</RColor>
-    <GColor>18</GColor>
-    <BColor>63</BColor>
+    <XValue>0.524999976</XValue>
+    <YValue>0.956250012</YValue>
+    <RColor>247</RColor>
+    <GColor>254</GColor>
+    <BColor>255</BColor>
     <AColor>255</AColor>
 </Widget>
 <Widget>

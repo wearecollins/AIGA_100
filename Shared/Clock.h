@@ -23,6 +23,7 @@ public:
     bool bColorFace;
     int lastFroze;
     float lineWidth;
+    bool bColorLetterFace;
     
     // test
     int colorIndex;
@@ -70,7 +71,7 @@ public:
     void magnet( int mx, int my, ofColor color );
     
 protected:
-    ofMesh face, arm1, arm2;
+    ofMesh face, ticks, arm1, arm2;
 };
 
 /**

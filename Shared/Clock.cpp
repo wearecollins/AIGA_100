@@ -30,15 +30,20 @@ Clock::Clock(){
     bAnimating = true;
 }
 
+ofVec2f getCircleVec( float angle, float rad ){
+    float x = cos( ofDegToRad(angle) ) * rad;
+    float y = -sin( ofDegToRad(angle)) * rad;
+    return ofVec2f(x,y);
+}
+
 //--------------------------------------------------------------
 void Clock::setup(){
     ofSetCircleResolution(300);
-    ofSetLineWidth(3.0);
     faceColor.set(255,0,0);
     liveFaceColor.set(255, 0, 0);
     
     // build face mesh
-    float res = 300;
+    float res = 30;
     float inc = (float) 360.0 / res;
     
     int i = 0;
@@ -47,31 +52,47 @@ void Clock::setup(){
     ofVec2f center(0,0);
     ofFloatColor color;
     color.set( liveFaceColor.r / 255.0, liveFaceColor.g / 255.0, liveFaceColor.b / 255.0 );
+    
+    ticks.setMode(OF_PRIMITIVE_LINES);
+    
     for ( float a = 0; a < 360.0; a+= inc ){
-        ofVec2f vec;
-        vec.x = cos( ofDegToRad(a) ) * radius;
-        vec.y = -sin( ofDegToRad(a)) * radius;
-        face.addVertex(vec);
+        face.addVertex(getCircleVec(a, radius));
+        face.addIndex(i);
+        face.addColor(color);
+        i++;
         
-        ofVec2f vec2;
-        vec2.x = cos( ofDegToRad(a + inc) ) * radius;
-        vec2.y = -sin( ofDegToRad(a + inc)) * radius;
-        face.addVertex(vec);
+        face.addVertex( getCircleVec(a + inc, radius) );
+        face.addIndex(i);
+        face.addColor(color);
+        i++;
         
         face.addVertex(center);
+        face.addIndex(i);
+        face.addColor(color);
+        i++;
+    }
+    
+    i = 0;
+    
+    for ( float a = 0; a < 360.0; a+= 15 ){
+        ticks.addVertex( getCircleVec(a, radius * .9) );
+        ticks.addIndex(i);
+        ticks.addColor( ofFloatColor::black );
+        i++;
+        
+        float mult = .85;
+        if ( (int) a % 90 == 0 ) {
+            mult = .7;
+        }
+        
+        ticks.addVertex( getCircleVec(a, radius * mult) );
+        ticks.addIndex(i);
+        ticks.addColor( ofFloatColor::black );
+        i++;
+        
     }
     
     colorIndex = face.getNumVertices()-1;
-    
-    for (int i=0; i<face.getNumVertices(); i += 3){
-        face.addIndex(i);
-        face.addIndex(i + 1);
-        face.addIndex(i + 2);
-        
-        face.addColor(color);
-        face.addColor(color);
-        face.addColor(color);
-    }
 }
 
 //--------------------------------------------------------------
@@ -222,17 +243,20 @@ void Clock::draw(){
         float hue = ofWrap(lc.getHue() * mult + sin( ofGetElapsedTimeMillis() * .0001) * 10.0, 0, 255.0f);
         lc.setHue( hue );
         
-        setColor(liveFaceColor);
-        //setColor(lc, liveLetterColor, colorAngles[i * 2], colorAngles[i * 2 + 1]);
-        // ?
-        face.drawWireframe();
-        //ofCircle(0,0,r);
+        if ( !bColorLetterFace ) setColor(liveFaceColor);
+        else setColor(lc, liveLetterColor, colorAngles[i * 2], colorAngles[i * 2 + 1]);
+        
+        face.draw();
+        
+        ticks.draw();
         
         if ( bColorFace ){
             ofSetColor(liveLetterColor);
         } else {
             ofSetColor(lc);
         }
+        
+        // ticks
         
         // ease angles
         angles[i * 2]       = angles[i * 2] * .9 + targetAngle[i * 2] * .1;
@@ -314,7 +338,8 @@ void Clock::draw(){
         
         //if ( colorAngles[0] != colorAngles[1] ){
             float val = ofMap((ofGetElapsedTimeMillis() - lastFroze)-2000, 0, 1500, 0, 1.0, true);
-            liveLetterColor.lerp(armColor, val);
+            if (!bColorLetterFace) liveLetterColor.lerp(armColor, val);
+            else liveLetterColor.lerp(faceColor, val);
             if (val >= 1.0 ){
                 for ( auto & a : colorAngles ){
                     a = 0;
@@ -645,6 +670,7 @@ void Clocks::update( ofEventArgs & e ){
         c.numFaces = numFaces;
         c.colorMode = mode;
         c.lineWidth = lineWidth;
+        c.bColorLetterFace = bColorTextSeparately;
         if ( i == currentClock ){
             if ( ofGetKeyPressed( OF_KEY_CONTROL ) && ofGetKeyPressed(OF_KEY_SHIFT) ){
                 c.rotateClockTo(currentAngleA, currentAngleB);
@@ -726,8 +752,8 @@ void Clocks::onGui( ofxUIEventArgs &e ){
         ofColor c(s->getColor());
         c.setSaturation(sat->getScaledValue());
         c.setBrightness(b->getScaledValue());
-        if ( bColorTextSeparately ) setNonLetterFaceColors(c, hueVariance);
-        else setFaceColors(c, hueVariance);
+        
+        setFaceColors(c, hueVariance);
         
     } else if ( e.getName() == "letterColor"){
         ofxUIImageSampler * s = (ofxUIImageSampler*) e.widget;
@@ -744,13 +770,11 @@ void Clocks::onGui( ofxUIEventArgs &e ){
         
         cout << "arm? "<<c<<endl;
         
-        if ( bColorTextSeparately ) setNonLetterFaceColors(c, hueVariance, true);
-        else setFaceColors(c, hueVariance, true);
+        setFaceColors(c, hueVariance, true);
         
     } else if ( e.getName() == "letterArmColor" ){
         ofxUIImageSampler * s = (ofxUIImageSampler*) e.widget;
-        if ( bColorTextSeparately ) setLetterFaceColors(s->getColor(), hueVariance, true);
-        else setFaceColors(s->getColor(), hueVariance, true);
+        setFaceColors(s->getColor(), hueVariance, true);
     } else if ( e.getName() == "Face brightness" ){
         for ( auto & c : clocks ){
             c.faceColor.setBrightness(e.getSlider()->getScaledValue());
@@ -773,16 +797,14 @@ void Clocks::onGui( ofxUIEventArgs &e ){
         ofxUIImageSampler * s = (ofxUIImageSampler*) gui2->getWidget("letterArmColor");
         ofColor c = s->getColor();
         c.setBrightness(e.getSlider()->getScaledValue());
-        if ( bColorTextSeparately ) setLetterFaceColors(s->getColor(), hueVariance, true);
-        else setFaceColors(s->getColor(), hueVariance, true);
+        setFaceColors(s->getColor(), hueVariance, true);
         
     } else if ( e.getName() == "letter arm saturation" ){
         
         ofxUIImageSampler * s = (ofxUIImageSampler*) gui2->getWidget("letterArmColor");
         ofColor c = s->getColor();
         c.setSaturation(e.getSlider()->getScaledValue());
-        if ( bColorTextSeparately ) setLetterFaceColors(s->getColor(), hueVariance, true);
-        else setFaceColors(s->getColor(), hueVariance, true);
+        setFaceColors(s->getColor(), hueVariance, true);
     }
 }
 

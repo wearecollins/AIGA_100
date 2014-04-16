@@ -38,3 +38,8 @@
     <Name>Map Far</Name>
     <Value>10000.000000000</Value>
 </Widget>
+<Widget>
+    <Kind>12</Kind>
+    <Name>model</Name>
+    <Value>model_30.dae</Value>
+</Widget>
