@@ -29,8 +29,8 @@ int r = 255;
 int g = 255;
 int b = 255;
 
-float texW = 2048;
-float texH = 2048;
+float texW = 1024;
+float texH = 1024;
 
 // camera mouse
 bool bCameraMouse = false;
@@ -87,7 +87,7 @@ void testApp::setup(){
     float sc = texW / 1024.0;
     float clockRadius = texW / 10.0 / 3.0;
     //clocks.setup(10, 10, ofVec2f(96 * sc, 81 * sc), 108 * sc, 54 * sc, clockRadius );
-    clocks.setup(10, 10, ofVec2f(clockRadius * 2.7, clockRadius * 3.1), clockRadius, clockRadius, clockRadius );
+    clocks.setup(10, 10, ofVec2f(clockRadius * 2.7, clockRadius * 3.13), clockRadius - 2, clockRadius + 2, clockRadius );
     
     ofEnableDepthTest();
     ofEnableSmoothing();
@@ -124,6 +124,7 @@ void testApp::setup(){
     gui->addToggle("Use mapping", &bRenderMapamok);
     gui->addSlider("Map Near", 0, 100.0, &mapamok.near);
     gui->addSlider("Map Far", 0, 10000, &mapamok.far);
+    gui->addTextInput("model", "model.dae");
     
     // clock gui
     gui->loadSettings("main-settings.xml");
@@ -152,7 +153,7 @@ void testApp::setup(){
     
     // setup mapamok
     mapamok.loadSettings("mapamok.xml");
-    mapamok.loadMesh("model.dae", texW, texH);
+    mapamok.loadMesh(((ofxUITextInput*) gui->getWidget("model"))->getTextString(), texW, texH);
     mapamok.drawMode = DRAW_FACES;
     mapamok.useLights = false;
     
@@ -228,8 +229,9 @@ void testApp::update(){
     }
     
     if ( !type.isAllocated() ){
+        
         // render pattern
-        type.allocate(texW, texH);
+        type.allocate(texW, texH, GL_RGB, 2);
         renderClocks();
     }
     
@@ -486,6 +488,8 @@ void testApp::update(){
     if ( bRenderMapamok ){
         mapamok.update();
     }
+    
+    ofSetWindowTitle(ofToString(ofGetFrameRate(), 3));
 }
 
 //--------------------------------------------------------------
