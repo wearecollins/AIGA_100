@@ -2,7 +2,6 @@
 
 #include "ofMain.h"
 #include "Constants.h"
-#include "Dot.h"
 #include "Clock.h"
 #include "ofxUI.h"
 #include "ofxSpacebrew.h"
@@ -49,8 +48,6 @@ class testApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
         void gotMessage(ofMessage msg);
-    
-        vector<Dot> dots;
     
         // PROJECTION MAPPING
         ofxMapaMok mapamok;
