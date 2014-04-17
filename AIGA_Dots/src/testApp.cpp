@@ -14,8 +14,8 @@ bool bNeedToSend        = false;
 int swipeChangeTimer    = 30;
 float maxDrawingAge     = 60 * 5;
 
-float texW = 1024;
-float texH = 1024;
+float texW = 2048;
+float texH = 2048;
 
 //--------------------------------------------------------------
 void testApp::setup(){
@@ -25,9 +25,10 @@ void testApp::setup(){
     font.loadFont("circular/CircularStd-Bold.otf", dotWidth * 1.7 );
     
     float sc = texW / 1024.0;
-    float clockRadius = texW / 10.0 / 3.0;
+    float clockRadius = texW / 10.0 / 2.5;
     //clocks.setup(10, 10, ofVec2f(96 * sc, 81 * sc), 108 * sc, 54 * sc, clockRadius );
-    clocks.setup(10, 10, ofVec2f(clockRadius * 2.7, clockRadius * 3.13), clockRadius - 2, clockRadius + 2, clockRadius );
+    float w = clockRadius * 2.0;
+    clocks.setup(10, 10, ofVec3f( w * 1.287, w * 1.1, w * 1.234 ), clockRadius-2, clockRadius-2, clockRadius );
     
     // setup clock FBO
     type.allocate(texW, texH, GL_RGB, 2);

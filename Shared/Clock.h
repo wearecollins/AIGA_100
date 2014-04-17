@@ -41,7 +41,7 @@ public:
     
     ofVec2f vel;
     
-    ofColor faceColor, liveFaceColor, liveLetterColor, letterColor, armColor;
+    ofColor faceColor, liveFaceColor, liveLetterColor, letterColor, armColor, liveArmColor;
     void setColor( ofColor c );
     void setColor( ofColor facec, ofColor letterc, int startAngle, int endAngle );
     
@@ -111,7 +111,7 @@ public:
     Clocks();
     ~Clocks();
     
-    void setup( int gridX, int gridY, ofVec2f spacing, int startX = 100, int startY = 100, int radius = 25, float radiusMult = .9 );
+    void setup( int gridX, int gridY, ofVec3f spacing, int startX = 100, int startY = 100, int radius = 25, float radiusMult = .9 );
     void setup( int gridX, int gridY, int spacing, int startX = 100, int startY = 100, int radius = 25, float radiusMult = .9 );
 
     void update( ofEventArgs & e );

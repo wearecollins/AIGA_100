@@ -10,8 +10,10 @@ void ofApp::setup(){
     ofBackground(255);
     ofEnableSmoothing();
     ofEnableAlphaBlending();
-    
-    clocks.setup(10,10,60, 100, 100, 25);
+    float rad = 25;
+    float w = rad * 2.0;
+//    int gridX, int gridY, ofVec3f spacing, int startX, int startY, int radius, float radiusMult
+    clocks.setup(10, 10, ofVec3f( w * 1.5, w * 6.0/5.0, w * 1.5 ), 100, 100, rad);
     cm.setup(NULL, &clocks);
 }
 

@@ -17,6 +17,7 @@
 
 enum AnimationMode {
     MODE_NORMAL = 0,
+    MODE_WAVE,
     MODE_NOISE,
     MODE_SIN,
     MODE_YEARS,
@@ -24,6 +25,12 @@ enum AnimationMode {
     MODE_ARROW
 };
 
+struct Timer {
+    int delay = 1000;
+    int lastTriggered = 0;
+    bool bLoop = true;
+    bool bTriggered = false;
+};
 
 #ifndef USE_SPACEBREW
 namespace Spacebrew {
@@ -49,6 +56,8 @@ public:
     
 protected:
     
+    void resetAnimation( AnimationMode mode );
+    
     bool bChangeModes;
     bool bInteractiveMode;
     int interactiveDuration;
@@ -66,7 +75,8 @@ protected:
     int letterRate;
     int letterLastChanged;
     
-    vector<string> names;
+    vector<string>  names;
+    vector<Timer>   delays;
     
     Clocks * clocks;
     Spacebrew::Connection * spacebrew;

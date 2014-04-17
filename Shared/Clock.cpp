@@ -125,19 +125,29 @@ void Clock::update(){
 void Clock::setColor( ofColor c ){
     ofFloatColor color(c.r/255.0, c.g/255.0, c.b/255.0, c.a/255.0f);
     
-    for (int i=colorIndex; i>colorIndex-colorIncrement; i--){
+    for ( int i=0; i<face.getNumColors(); i+=3){
+        face.setColor(i, color);
+        face.setColor(i + 1, color);
+        face.setColor(i + 2, ofColor(255));
+    }
+    
+    /*for (int i=colorIndex; i>colorIndex-colorIncrement; i--){
         face.setColor(i, color);
     }
     colorIndex -= colorIncrement;
     if ( colorIndex < colorIncrement - 1 ){
         colorIndex = face.getNumVertices()-1;
-    }
+    }*/
 }
 
 //--------------------------------------------------------------
 void Clock::setColor( ofColor facec, ofColor letterc, int startAngle, int endAngle ){
     ofFloatColor colorF(facec.r/255.0, facec.g/255.0, facec.b/255.0, facec.a/255.0f);
+    ofFloatColor colorFB(colorF);
+    colorFB.setHue(colorFB.getHue() * 1.1);
     ofFloatColor colorL(letterc.r/255.0, letterc.g/255.0, letterc.b/255.0, letterc.a/255.0f);
+    ofFloatColor colorLB(colorF);
+    colorLB.setHue(colorLB.getHue() * 1.1);
     
     int sAngleWrap = ofWrap(startAngle, 0, 450);
     int eAngleWrap = ofWrap(endAngle, 0, 450);
@@ -162,37 +172,37 @@ void Clock::setColor( ofColor facec, ofColor letterc, int startAngle, int endAng
         for (int i=0; i<indA * 3; i += 3){
             face.setColor(i, colorF);
             face.setColor(i + 1, colorF);
-            face.setColor(i + 2, colorF);
+            face.setColor(i + 2, colorFB);
         }
         
         for (int i=indA * 3; i<indB * 3; i++){
             face.setColor(i, colorL);
             face.setColor(i + 1, colorL);
-            face.setColor(i + 2, colorL);
+            face.setColor(i + 2, colorLB);
         }
         
         for (int i=indB * 3; i<face.getNumVertices(); i += 3){
             face.setColor(i, colorF);
             face.setColor(i + 1, colorF);
-            face.setColor(i + 2, colorF);
+            face.setColor(i + 2, colorFB);
         }
     } else {
         for (int i=0; i<indB * 3; i += 3){
             face.setColor(i, colorL);
             face.setColor(i + 1, colorL);
-            face.setColor(i + 2, colorL);
+            face.setColor(i + 2, colorLB);
         }
         
         for (int i=indB * 3; i<indA * 3; i++){
             face.setColor(i, colorF);
             face.setColor(i + 1, colorF);
-            face.setColor(i + 2, colorF);
+            face.setColor(i + 2, colorFB);
         }
         
         for (int i=indA * 3; i<face.getNumVertices(); i += 3){
             face.setColor(i, colorL);
             face.setColor(i + 1, colorL);
-            face.setColor(i + 2, colorL);
+            face.setColor(i + 2, colorLB);
         }
     }
 }
@@ -276,9 +286,9 @@ void Clock::draw(){
         
         
         ofFloatColor fc;
-        fc.r = armColor.r/255.0f;
-        fc.g = armColor.g/255.0f;
-        fc.b = armColor.b/255.0f;
+        fc.r = liveArmColor.r/255.0f;
+        fc.g = liveArmColor.g/255.0f;
+        fc.b = liveArmColor.b/255.0f;
         
         arm1.clear();
         arm1.addVertex(o1); arm1.addVertex(o2); arm1.addVertex(p1); arm1.addVertex(p2);
@@ -347,14 +357,17 @@ void Clock::draw(){
         b = false;
         
         //if ( colorAngles[0] != colorAngles[1] ){
-            float val = ofMap((ofGetElapsedTimeMillis() - lastFroze)-2000, 0, 1500, 0, 1.0, true);
-            if (!bColorLetterFace) liveLetterColor.lerp(armColor, val);
-            else liveLetterColor.lerp(faceColor, val);
-            if (val >= 1.0 ){
-                for ( auto & a : colorAngles ){
-                    a = 0;
-                }
+        float val = ofMap((ofGetElapsedTimeMillis() - lastFroze)-2000, 0, 1500, 0, 1.0, true);
+        if (!bColorLetterFace) liveLetterColor.lerp(armColor, val);
+    
+        liveArmColor.lerp(armColor, val);
+    
+        //else liveLetterColor.lerp(faceColor, val);
+        if (val >= 1.0 ){
+            for ( auto & a : colorAngles ){
+                a = 0;
             }
+        }
         //}
         
         liveFaceColor.lerp(faceColor, val);
@@ -363,7 +376,12 @@ void Clock::draw(){
     } else if ( bLetter ) {
         // hax
         if ( colorAngles[0] != colorAngles[1] ){
-            liveLetterColor.lerp(letterColor, ofMap((ofGetElapsedTimeMillis() - lastFroze), 0, 500, 0, 1.0, true));
+            if ( ofGetElapsedTimeMillis() - lastFroze > 500 ){
+                float v = ofMap((ofGetElapsedTimeMillis() - lastFroze), 500, 1000, 0, 1.0, true);
+                liveLetterColor.lerp(faceColor, v);
+            } else {
+                liveLetterColor.lerp(letterColor, ofMap((ofGetElapsedTimeMillis() - lastFroze), 0, 500, 0, 1.0, true));
+            }
         }
     }
     if ( ofGetElapsedTimeMillis() - lastFroze > 2000 ){
@@ -639,6 +657,7 @@ void Clock::magnet( int mx, int my, ofColor color, int freezeTime ){
         } else {
             liveFaceColor.set(color);
         }
+        liveArmColor.set(255);
     }
     lastFroze = ofGetElapsedTimeMillis() - ofMap(dist, 0, 1000, freezeTime, 0, true);
 }
@@ -675,14 +694,16 @@ void Clocks::setup( int gridX, int gridY, int spacing, int startX, int startY, i
 }
 
 //--------------------------------------------------------------
-void Clocks::setup( int gridX, int gridY, ofVec2f spacing, int startX, int startY, int radius, float radiusMult ){
+void Clocks::setup( int gridX, int gridY, ofVec3f spacing, int startX, int startY, int radius, float radiusMult ){
     for (int x=0; x<gridX; x++){
+        float yInc = startY;
         for (int y=0; y<gridY; y++){
             clocks.push_back(Clock());
             clocks.back().radius = radius;
             clocks.back().liveRadius =  radius * radiusMult;
-            clocks.back().x = startX + x * spacing.x;
-            clocks.back().y = startY + y * spacing.y;
+            clocks.back().x = startX + x * (spacing.x);
+            clocks.back().y = yInc;
+            yInc = clocks.back().y + (y >= 4 ? spacing.z : spacing.y);
         }
     }
     
@@ -852,8 +873,7 @@ void Clocks::onGui( ofxUIEventArgs &e ){
 // METHODS
 //--------------------------------------------------------------
 void Clocks::setClocks( Letter letter, int offsetX, int offsetY, int letterWidth, float colorWeight ){
-    ofColor color(letterColor);
-    color *= colorWeight;
+    ofColor color = (letterColor * colorWeight) + (faceColor * (1.0 - colorWeight));
     
     if ( offsetX >= 10 ) return;
     if ( offsetX + letterWidth >= 10 ) letterWidth = 10 - offsetX;
@@ -962,8 +982,8 @@ void Clocks::loadLetters(){
             
             for ( int i=0; i<settings.getNumTags("clock"); i++){
                 settings.pushTag("clock", i );
-                float a1 = settings.getValue("a1", 0.0) + (s == "a" ? 45 : 0);
-                float a2 = settings.getValue("a2", 0.0) + (s == "a" ? 45 : 0);
+                float a1 = settings.getValue("a1", 0.0) + (ind < 3 ? 45 : 0);
+                float a2 = settings.getValue("a2", 0.0) + (ind < 3 ? 45 : 0);
                 letters[s].angles.push_back(vector<float>());
                 letters[s].angles.back().push_back(a1);
                 letters[s].angles.back().push_back(a2);
@@ -972,9 +992,9 @@ void Clocks::loadLetters(){
                     float ca1 = settings.getValue("ca1", 0.0);
                     float ca2 = settings.getValue("ca2", 0.0);
                     letters[s].colorAngles.push_back(vector<float>());
-                if ( ind > 2 ){
-                    swap(ca1, ca2);
-                }
+                    if ( ind > 2 ){
+                        swap(ca1, ca2);
+                    }
                     letters[s].colorAngles.back().push_back(ca1);
                     letters[s].colorAngles.back().push_back(ca2);
                     ca1Vec.push_back(ca1);
@@ -1083,6 +1103,7 @@ void Clocks::keyPressed( ofKeyEventArgs & e ){
 
 //--------------------------------------------------------------
 void Clocks::mouseDragged(ofMouseEventArgs & e ){
+    if ( !bPreciseDraw ) return;
     int x = e.x;
     int y = e.y;
     int button = e.button;

@@ -19,7 +19,7 @@ ClockMode::ClockMode(){
     letterIndex         = 0;
     letterRate          = 2000;
     letterLastChanged   = 0;
-    animationMode       = MODE_SIN;
+    animationMode       = MODE_ARROW;
     aniDuration         = 3000;
 }
 
@@ -36,6 +36,10 @@ void ClockMode::setup(Spacebrew::Connection * sb, Clocks * c,  string path){
     spacebrew = sb;
     clocks = c;
 
+    for ( auto c : clocks->clocks ){
+        delays.push_back(Timer());
+    }
+    
     ofxXmlSettings settings;
     if ( settings.load(path) ){
         interactiveDuration = settings.getValue("interactiveDuration", interactiveDuration);
@@ -50,6 +54,7 @@ void ClockMode::setup(Spacebrew::Connection * sb, Clocks * c,  string path){
             ofLogVerbose()<<n;
         }
     }
+    resetAnimation( (AnimationMode ) animationMode );
 }
 
 //--------------------------------------------------------------
@@ -89,6 +94,8 @@ void ClockMode::update(){
                 // randomize animation mode
                 animationMode = (AnimationMode) ofRandom(MODE_ARROW + 1);
                 aniLastChanged = ofGetElapsedTimeMillis();
+                
+                resetAnimation( (AnimationMode) animationMode );
             }
         }
     }
@@ -105,8 +112,8 @@ void ClockMode::update(){
             char k = names[currentName][i];
             string ks = ofToString(k);
 //            letterIndex;
-            cout << "set "<<ks<<":"<<((i+4) - letterIndex)<<endl;
-            float weight = letterIndex == i ? 1.0 : .6;
+            //cout << "set "<<ks<<":"<<((i+4) - letterIndex)<<endl;
+            float weight = letterIndex == i ? 1.0 : .3;
             clocks->setClocks(clocks->letters[ks], ind, 3, (ks == "w" || ks == "m")? 6 : 4, weight);
             ind += (ks == "w" || ks == "m")? 6 : 4;
         }
@@ -136,33 +143,46 @@ void ClockMode::update(){
                     }
                     break;
                     
+                case MODE_WAVE:
                 case MODE_EXPLODE:
                     if ( ofGetElapsedTimeMillis() - aniLastChanged > aniDuration ){
                         aniLastChanged = ofGetElapsedTimeMillis();
-                        ofVec2f p(ofRandom(ofGetWidth()), ofRandom(ofGetHeight()));
                         
+                        resetAnimation( (AnimationMode) animationMode );
+                    } else {
+                        int index = 0;
                         for ( auto & c : clocks->clocks ){
-                            c.magnet(p.x, p.y, c.faceColor, 500);
-                            //float d = p.distance(c);
-                            //float v = ofMap(d, 0, ofGetWidth(), 1.0, 0.0, true);
-                            //c.rotateClockTo(v * 360, (v * 360) + 180);
-                            //c.vel.x += v * 100;
+                            if ( ofGetElapsedTimeMillis() - delays[index].lastTriggered <= delays[index].delay ){
+                                //cout << delays[index].delay << endl;
+                                //c.rotateClockTo(0,180);
+                                c.vel.x = 0;
+                                c.lastFroze = ofGetElapsedTimeMillis();
+                            } else {
+                                if ( !delays[index].bTriggered ){
+                                    delays[index].bTriggered = true;
+                                    c.vel.x = 100;
+                                } else {
+                                    c.vel.x = c.vel.x * .9 + 5 * .1;
+                                }
+                                c.lastFroze = ofGetElapsedTimeMillis() - 1500;
+                            }
+                            index++;
                         }
-                        cout << "explod" << endl;
                     }
                     break;
                     
                 case MODE_ARROW:
-                    break;
-                    
                 case MODE_YEARS:
+                    if ( ofGetElapsedTimeMillis() - aniLastChanged > aniDuration ){
+                        aniLastChanged = ofGetElapsedTimeMillis();
+                        resetAnimation( (AnimationMode) animationMode );
+                    }
                     break;
                     
                 case MODE_SIN:
                     for ( auto & c : clocks->clocks ){
-                        float offsetX = sin( ofGetElapsedTimeMillis() * .001 );
-                        float offsetY = cos( ofGetElapsedTimeMillis() * .002 );
-                        c.rotateClockBy( ofSignedNoise((c.x + offsetX) ) * 5.0, ofSignedNoise((c.x + offsetY) ) * 5.0);// * (c.y/ofGetHeight() + offsetY), 0);
+                        c.rotateClockTo( sin(c.x / ofGetWidth() + ofGetElapsedTimeMillis() * .0001 ) * 360,
+                                         sin(c.x/ ofGetWidth()  + ofGetElapsedTimeMillis() * .0001 ) * 360 + 180 );
                     }
                     break;
                     
@@ -170,6 +190,69 @@ void ClockMode::update(){
                     break;
             }
         }
+    }
+}
+
+void ClockMode::resetAnimation( AnimationMode mode ){
+    int index = 0;
+    ofVec2f p(ofRandom(ofGetWidth()), ofRandom(ofGetHeight()));
+    float min = ofRandom(50, 500);
+    float max = ofRandom(min, 2000);
+    switch (animationMode) {
+        case MODE_NORMAL:
+            // shhhh
+            break;
+            
+        case MODE_WAVE:
+            for ( auto & c : clocks->clocks ){
+                delays[index].lastTriggered = ofGetElapsedTimeMillis();
+                delays[index].delay = ofMap(c.x, 0, ofGetWidth(), min, max, true);
+                delays[index].bTriggered = false;
+                index++;
+            }
+            break;
+            
+        case MODE_NOISE:
+            break;
+            
+        case MODE_EXPLODE:
+            for ( auto & c : clocks->clocks ){
+                delays[index].lastTriggered = ofGetElapsedTimeMillis();
+                delays[index].delay = ofMap(fabs(p.distance(c)), 0, ofGetWidth(), 500, 2000, true);
+                delays[index].bTriggered = false;
+                index++;
+            }
+            break;
+            
+        case MODE_ARROW:
+            for ( auto & c : clocks->clocks ){
+                int x = (float) index / 10.0f;
+                int y = index % 10;
+                float angle = (float) ( y )  / 10.0 * 360.0f;
+                c.rotateClockTo( -90, angle-90 );
+                c.vel.x = 0;
+                c.lastFroze = ofGetElapsedTimeMillis() + aniDuration / 2.0;
+                index++;
+            }
+            break;
+            
+        case MODE_YEARS:
+            for ( auto & c : clocks->clocks ){
+                int x = (float) index / 10.0f;
+                int y = index % 10;
+                float angle = (float) ( x + y * 10 )  / 100.0 * 360.0f;
+                c.rotateClockTo( -90, angle-90 );
+                c.vel.x = 0;
+                c.lastFroze = ofGetElapsedTimeMillis() + aniDuration / 2.0;
+                index++;
+            }
+            break;
+            
+        case MODE_SIN:
+            break;
+            
+        default:
+            break;
     }
 }
 
