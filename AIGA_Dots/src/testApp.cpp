@@ -141,6 +141,8 @@ void testApp::update(){
 void testApp::draw(){
     renderClocks();
     mapamok.draw( &type.getTextureReference() );
+    
+    clocks.drawGui();
 }
 
 //--------------------------------------------------------------

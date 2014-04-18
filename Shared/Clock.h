@@ -116,6 +116,7 @@ public:
 
     void update( ofEventArgs & e );
     void draw();
+    void drawGui();
     
     // GUI
     ofImage colorImage;
@@ -157,7 +158,11 @@ public:
     void mouseReleased(ofMouseEventArgs & e);
     
     // gui props
-    ofColor faceColor, letterColor, armColor;
+    int hueTweenStarted;
+    float huePosition, hueSpeed, hueDirection;
+    float faceHueMax, faceHueMin, armHueMax, armHueMin, letterHueMax, letterHueMin;
+    float faceSat, faceBright, armSat, armBright, letterSat, letterBright;
+    ofColor faceColorTop, faceColorBottom, letterColor, armColor;
     
 };
 

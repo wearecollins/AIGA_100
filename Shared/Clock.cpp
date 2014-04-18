@@ -261,6 +261,15 @@ void Clock::draw(){
         
         face.draw();
         
+        ofFloatColor fc;
+        fc.r = liveArmColor.r/255.0f;
+        fc.g = liveArmColor.g/255.0f;
+        fc.b = liveArmColor.b/255.0f;
+        
+        for ( auto & c : ticks.getColors() ){
+            c.set(fc);
+        }
+        
         ticks.draw();
         
 //        if ( bColorFace ){
@@ -284,12 +293,6 @@ void Clock::draw(){
         //o2.rotate(angles[i * 2], ofVec2f(0,0));
         //p1.rotate(angles[i * 2], ofVec2f(0,0));
         //p2.rotate(angles[i * 2], ofVec2f(0,0));
-        
-        
-        ofFloatColor fc;
-        fc.r = liveArmColor.r/255.0f;
-        fc.g = liveArmColor.g/255.0f;
-        fc.b = liveArmColor.b/255.0f;
         
         arm1.clear();
         arm1.addVertex(o1); arm1.addVertex(o2); arm1.addVertex(p1); arm1.addVertex(p2);
@@ -360,8 +363,9 @@ void Clock::draw(){
         //if ( colorAngles[0] != colorAngles[1] ){
         float val = ofMap((ofGetElapsedTimeMillis() - lastFroze)-2000, 0, 1500, 0, 1.0, true);
         if (!bColorLetterFace) liveLetterColor.lerp(armColor, val);
+        else liveLetterColor.lerp(faceColor, val);
     
-        liveArmColor.lerp(armColor, val);
+//        liveArmColor.lerp(armColor, val);
     
         //else liveLetterColor.lerp(faceColor, val);
         if (val >= 1.0 ){
@@ -370,8 +374,6 @@ void Clock::draw(){
             }
         }
         //}
-        
-        liveFaceColor.lerp(faceColor, val);
         
         bLetter = false;
     } else if ( bLetter ) {
@@ -385,10 +387,14 @@ void Clock::draw(){
             }
         }
     }
+    
     if ( ofGetElapsedTimeMillis() - lastFroze > 2000 ){
         vel.x = vel.x * .9 + 1 * .1;
         offset = offset * .9;
     }
+    
+    liveFaceColor = liveFaceColor * .9 + faceColor * .1;
+    liveArmColor = liveArmColor * .9 + armColor * .1;
     
     // reset face color
     //if ( colorMode == 5 ) liveFaceColor = faceColorGood;
@@ -658,7 +664,7 @@ void Clock::magnet( int mx, int my, ofColor color, int freezeTime ){
         } else {
             liveFaceColor.set(color);
         }
-        liveArmColor.set(255);
+        liveArmColor = liveArmColor * .8 + ofColor(255) * .2;
     }
     lastFroze = ofGetElapsedTimeMillis() - ofMap(dist, 0, 1000, freezeTime, 0, true);
 }
@@ -678,6 +684,9 @@ Clocks::Clocks(){
     hueVariance = 0;
     guiVisible = false;
     bColorTextSeparately = false;
+    huePosition = 0;
+    hueSpeed = 0; // how long it takes to get from min to max
+    hueDirection = 1;
 }
 
 //--------------------------------------------------------------
@@ -725,12 +734,44 @@ void Clocks::setup( int gridX, int gridY, ofVec3f spacing, int startX, int start
 
 //--------------------------------------------------------------
 void Clocks::update( ofEventArgs & e ){
+    float min = hueDirection == 1 ? 0 : 1;
+    float max = hueDirection == 1 ? 1 : 0;
+    huePosition = ofMap(ofGetElapsedTimeMillis() - hueTweenStarted, 0, hueSpeed, min, max, true);
+    if ( ofGetElapsedTimeMillis() - hueTweenStarted >= hueSpeed ){
+        hueTweenStarted = ofGetElapsedTimeMillis();
+        hueDirection *= -1;
+    }
+    faceColorTop.setHue(ofMap(huePosition, 0.0, 1.0, faceHueMin, faceHueMax, true));
+    faceColorTop.setSaturation(faceSat);
+    faceColorTop.setBrightness(faceBright);
+    
+    faceColorBottom.setHue(ofMap(ofWrap(huePosition + hueVariance, 0, 1), 0.0, 1.0, faceHueMin, faceHueMax, true));
+    faceColorBottom.setSaturation(faceSat);
+    faceColorBottom.setBrightness(faceBright);
+    
+    armColor.setHue( ofMap(huePosition, 0.0, 1.0, armHueMin, armHueMax) );
+    armColor.setSaturation(armSat);
+    armColor.setBrightness(armBright);
+    
+    letterColor.setHue( ofMap(huePosition, 0.0, 1.0, letterHueMin, letterHueMax) );
+    letterColor.setSaturation(letterSat);
+    letterColor.setBrightness(letterBright);
+    
     int i = 0;
     for ( auto & c : clocks ){
         c.numFaces = numFaces;
         c.colorMode = mode;
         c.lineWidth = lineWidth;
         c.bColorLetterFace = bColorTextSeparately;
+        
+        ofColor color(faceColorTop);
+        float y = (i % 10) / 10.0;
+        color.lerp(faceColorBottom, y);
+        
+        c.faceColor.set(color);
+        c.armColor.set(armColor);
+        c.letterColor.set(letterColor);
+        
         if ( i == currentClock ){
             if ( ofGetKeyPressed( OF_KEY_CONTROL ) && ofGetKeyPressed(OF_KEY_SHIFT) ){
                 c.rotateClockTo(currentAngleA, currentAngleB);
@@ -752,6 +793,53 @@ void Clocks::draw(){
     ofPopStyle();
 }
 
+//--------------------------------------------------------------
+void Clocks::drawGui(){
+    if ( gui->isVisible() ){
+        ofPushStyle();
+        
+        static ofColor t(255);
+        static ofColor b(255);
+        static ofColor at(255);
+        static ofColor ab(255);
+        static ofColor lt(255);
+        static ofColor lb(255);
+        
+        t.setHue(faceHueMin); t.setBrightness(faceBright); t.setSaturation(faceSat);
+        b.setHue(faceHueMax); b.setBrightness(faceBright); b.setSaturation(faceSat);
+        
+        at.setHue(armHueMin); at.setBrightness(armBright); at.setSaturation(armSat);
+        ab.setHue(armHueMax); ab.setBrightness(armBright); ab.setSaturation(armSat);
+        
+        lt.setHue(letterHueMin); lt.setBrightness(letterBright); lt.setSaturation(letterSat);
+        lb.setHue(letterHueMax); lb.setBrightness(letterBright); lb.setSaturation(letterSat);
+        
+        float x = ofGetWidth()/4.0; float y = 0; float h = 20;
+        
+        ofSetColor(t);
+        ofRect(x, y, h, h);
+        ofSetColor(b);
+        y += h;
+        ofRect(x, y, h, h);
+        y += h;
+        
+        ofSetColor(at);
+        ofRect(x, y, h, h);
+        ofSetColor(ab);
+        y += h;
+        ofRect(x, y, h, h);
+        y += h;
+        
+        ofSetColor(lt);
+        ofRect(x, y, h, h);
+        ofSetColor(lb);
+        y += h;
+        ofRect(x, y, h, h);
+        y += h;
+        ofPopStyle();
+    }
+}
+
 // GUI
 
 //--------------------------------------------------------------
@@ -762,17 +850,27 @@ void Clocks::setupGui(){
     gui->setTriggerWidgetsUponLoad(true);
     gui->toggleVisible();
     
-    gui->addLabel("Face color");
-    gui->addImageSampler("color", &colorImage, ofGetWidth() * .2, ofGetWidth() * .2);
-    gui->addSlider("Face saturation", 0, 255, 0.0);
-    gui->addSlider("Face brightness", 0, 255, 0.0);
-    gui->addLabel("Letters face color");
-    gui->addImageSampler("letterColor", &colorImage, ofGetWidth() * .2, ofGetWidth() * .2);
+//    gui->addImageSampler("color", &colorImage, ofGetWidth() * .2, ofGetWidth() * .2);
+    //gui->addImageSampler("letterColor", &colorImage, ofGetWidth() * .2, ofGetWidth() * .2);
+    gui->addRangeSlider("Face hue", 0.0, 255, &faceHueMin, &faceHueMax);
+    gui->addSlider("Face saturation", 0, 255, &faceSat);
+    gui->addSlider("Face brightness", 0, 255, &faceBright);
+    
+    gui->addSlider("Hue speed", 1, 5 * 60 * 1000, &hueSpeed);
+    gui->addSlider("Hue pos", 0.0, 1.0, &huePosition);
+    gui->addSlider("hueVariance", 0.0, 1.0, &hueVariance);
+    
+    gui->addRangeSlider("Arm hue", 0.0, 255, &armHueMin, &armHueMax);
+    gui->addSlider("arm saturation", 0, 255, &armSat);
+    gui->addSlider("arm brightness", 0, 255, &armBright);
+    
+    gui->addRangeSlider("Letter hue", 0.0, 255, &letterHueMin, &letterHueMax);
+    gui->addSlider("Letter saturation", 0, 255, &letterSat);
+    gui->addSlider("Letter brightness", 0, 255, &letterBright);
     
     gui->addIntSlider("numFaces", 1, 25, &numFaces);
     gui->addIntSlider("color mode", 0, 5, &mode);
     gui->addSlider("lineWidth", 1.0, 30.0, &lineWidth);
-    gui->addSlider("hueVariance", 0.0, 255., &hueVariance);
     
     gui2 = new ofxUICanvas(ofGetWidth() / 2.0,0,ofGetWidth() / 4.0, ofGetHeight() );
     gui2->setTriggerWidgetsUponLoad(true);
@@ -780,16 +878,6 @@ void Clocks::setupGui(){
     ofAddListener(gui2->newGUIEvent, this, &Clocks::onGui );
     
     gui2->toggleVisible();
-    gui2->addLabel("Arm color");
-    gui2->addImageSampler("arm color", &colorImage, ofGetWidth() * .2, ofGetWidth() * .2);
-    
-    gui2->addSlider("arm saturation", 0, 255, 0.0);
-    gui2->addSlider("arm brightness", 0, 255, 0.0);
-    
-    gui2->addLabel("Letters arm color");
-    gui2->addImageSampler("letterArmColor", &colorImage, ofGetWidth() * .2, ofGetWidth() * .2);
-    gui2->addSlider("letter arm saturation", 0, 255, 0.0);
-    gui2->addSlider("letter arm brightness", 0, 255, 0.0);
     
     gui2->addToggle("magnet or draw", &bPreciseDraw);
     gui2->addToggle("Color text area separately", &bColorTextSeparately);
@@ -805,76 +893,26 @@ void Clocks::setupGui(){
 
 //--------------------------------------------------------------
 void Clocks::onGui( ofxUIEventArgs &e ){
-    if ( e.getName() == "color"){
-        ofxUIImageSampler * s = (ofxUIImageSampler*) e.widget;
-        ofxUISlider * b = (ofxUISlider*) gui->getWidget("Face brightness");
-        ofxUISlider * sat = (ofxUISlider*) gui->getWidget("Face saturation");
-        ofColor c(s->getColor());
-        c.setSaturation(sat->getScaledValue());
-        c.setBrightness(b->getScaledValue());
-        
-        setFaceColors(c, hueVariance);
-        faceColor.set(s->getColor());
-        
+    if ( e.getName() == "Face hue"){
+    } else if ( e.getName() == "Hue speed"){
+        hueTweenStarted = ofGetElapsedTimeMillis();
+        huePosition = 0.0;
+        hueDirection = 1;
     } else if ( e.getName() == "letterColor"){
-        ofxUIImageSampler * s = (ofxUIImageSampler*) e.widget;
-        setLetterColors(s->getColor(), hueVariance);
-        letterColor.set(s->getColor());
-        
     } else if ( e.getName() == "arm color"){
-        ofxUIImageSampler * s = (ofxUIImageSampler*) e.widget;
-        
-        ofxUISlider * b = (ofxUISlider*) gui2->getWidget("arm saturation");
-        ofxUISlider * sat = (ofxUISlider*) gui2->getWidget("arm brightness");
-        ofColor c(s->getColor());
-        c.setSaturation(sat->getScaledValue());
-        c.setBrightness(b->getScaledValue());
-        
-        cout << "arm? "<<c<<endl;
-        
-        setFaceColors(c, hueVariance, true);
-        armColor.set(s->getColor());
-        
     } else if ( e.getName() == "letterArmColor" ){
-        ofxUIImageSampler * s = (ofxUIImageSampler*) e.widget;
-        setFaceColors(s->getColor(), hueVariance, true);
     } else if ( e.getName() == "Face brightness" ){
-        for ( auto & c : clocks ){
-            c.faceColor.setBrightness(e.getSlider()->getScaledValue());
-        }
     } else if ( e.getName() == "Face saturation" ){
-        for ( auto & c : clocks ){
-            c.faceColor.setSaturation(e.getSlider()->getScaledValue());
-        }
     } else if ( e.getName() == "arm brightness" ){
-        for ( auto & c : clocks ){
-            c.armColor.setBrightness(e.getSlider()->getScaledValue());
-        }
     } else if ( e.getName() == "arm saturation" ){
-        
-        for ( auto & c : clocks ){
-            c.armColor.setSaturation(e.getSlider()->getScaledValue());
-        }
     } else if ( e.getName() == "letter arm brightness" ){
-        
-        ofxUIImageSampler * s = (ofxUIImageSampler*) gui2->getWidget("letterArmColor");
-        ofColor c = s->getColor();
-        c.setBrightness(e.getSlider()->getScaledValue());
-        setFaceColors(s->getColor(), hueVariance, true);
-        
     } else if ( e.getName() == "letter arm saturation" ){
-        
-        ofxUIImageSampler * s = (ofxUIImageSampler*) gui2->getWidget("letterArmColor");
-        ofColor c = s->getColor();
-        c.setSaturation(e.getSlider()->getScaledValue());
-        setFaceColors(s->getColor(), hueVariance, true);
     }
 }
 
 // METHODS
 //--------------------------------------------------------------
 void Clocks::setClocks( Letter letter, int offsetX, int offsetY, int letterWidth, float colorWeight ){
-    ofColor color = (letterColor * colorWeight) + (faceColor * (1.0 - colorWeight));
     
     if ( offsetX >= 10 ) return;
     if ( offsetX + letterWidth >= 10 ) letterWidth = 10 - offsetX;
@@ -883,6 +921,8 @@ void Clocks::setClocks( Letter letter, int offsetX, int offsetY, int letterWidth
             if ( x >= 0 ){
                 int ind = (y - offsetY) + (x - offsetX) * clockLetterHeight;
                 int cind = y + x * 10.0;
+                ofColor color = (letterColor * colorWeight) + (clocks[cind].faceColor * (1.0 - colorWeight));
+                if ( !clocks[cind].bLetter ) clocks[cind].liveLetterColor.set(clocks[cind].faceColor);
                 clocks[cind].letterColor.set(color);
                 clocks[cind].rotateClockTo( letter.angles[ind][0], letter.angles[ind][1]);
                 //clocks[cind].setColor( clocks[cind].faceColor, clocks[cind].letterColor, letter.colorAngles[ind][0], letter.colorAngles[ind][1] );

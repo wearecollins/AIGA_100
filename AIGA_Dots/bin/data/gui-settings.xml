@@ -1,32 +1,65 @@
 <Widget>
-    <Kind>28</Kind>
-    <Name>color</Name>
-    <XValue>0.562500000</XValue>
-    <YValue>0.056249999</YValue>
-    <RColor>32</RColor>
-    <GColor>168</GColor>
-    <BColor>252</BColor>
-    <AColor>255</AColor>
+    <Kind>6</Kind>
+    <Name>Face hue</Name>
+    <HighValue>213.828125000</HighValue>
+    <LowValue>11.953125000</LowValue>
 </Widget>
 <Widget>
     <Kind>4</Kind>
     <Name>Face saturation</Name>
-    <Value>221.796875000</Value>
+    <Value>122.187500000</Value>
 </Widget>
 <Widget>
     <Kind>4</Kind>
     <Name>Face brightness</Name>
+    <Value>221.796875000</Value>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>Hue speed</Name>
+    <Value>35938.378906250</Value>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>Hue pos</Name>
+    <Value>0.018114340</Value>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>hueVariance</Name>
+    <Value>0.276041657</Value>
+</Widget>
+<Widget>
+    <Kind>6</Kind>
+    <Name>Arm hue</Name>
+    <HighValue>212.500000000</HighValue>
+    <LowValue>11.953125000</LowValue>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>arm saturation</Name>
     <Value>255.000000000</Value>
 </Widget>
 <Widget>
-    <Kind>28</Kind>
-    <Name>letterColor</Name>
-    <XValue>0.174999997</XValue>
-    <YValue>0.993749976</YValue>
-    <RColor>250</RColor>
-    <GColor>250</GColor>
-    <BColor>250</BColor>
-    <AColor>255</AColor>
+    <Kind>4</Kind>
+    <Name>arm brightness</Name>
+    <Value>87.656250000</Value>
+</Widget>
+<Widget>
+    <Kind>6</Kind>
+    <Name>Letter hue</Name>
+    <HighValue>200.546890259</HighValue>
+    <LowValue>30.546875000</LowValue>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>Letter saturation</Name>
+    <Value>22.578125000</Value>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>Letter brightness</Name>
+    <Value>255.000000000</Value>
 </Widget>
 <Widget>
     <Kind>42</Kind>
@@ -41,10 +74,5 @@
 <Widget>
     <Kind>4</Kind>
     <Name>lineWidth</Name>
-    <Value>4.322916508</Value>
-</Widget>
-<Widget>
-    <Kind>4</Kind>
-    <Name>hueVariance</Name>
-    <Value>10.625000000</Value>
+    <Value>6.135416508</Value>
 </Widget>
