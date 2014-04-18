@@ -39,13 +39,13 @@ html, body {
 	-webkit-box-pack: center;
 	-webkit-box-align: center;
 	position: absolute;
-	bottom: 130px;
-	left: 0px;
+/*	bottom: 130px;
+	left: 0px;*/
 }
 
 .touchiPad {
 	font-size: 150px;
-	bottom: 120px;
+	/*bottom: 120px;*/
 }
 
 #names {
@@ -172,8 +172,8 @@ html, body {
 	position: absolute;
 	top:0px;
 	left:0px;
-	width: 100%;
-	height:100%;
+	/*width: 100%;
+	height:100%;*/
 	z-index: 100;
 }
 
