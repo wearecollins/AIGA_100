@@ -141,13 +141,14 @@ void Clock::setColor( ofColor c ){
 }
 
 //--------------------------------------------------------------
-void Clock::setColor( ofColor facec, ofColor letterc, int startAngle, int endAngle ){
+void Clock::setColor( ofColor facec, ofColor letterc, int startAngle, int endAngle, bool bGradient ){
     ofFloatColor colorF(facec.r/255.0, facec.g/255.0, facec.b/255.0, facec.a/255.0f);
     ofFloatColor colorFB(colorF);
-    colorFB.setHue(colorFB.getHue() * 1.1);
+    colorFB.setHue(colorFB.getHue() + (bGradient ? .1 : .0));
+    
     ofFloatColor colorL(letterc.r/255.0, letterc.g/255.0, letterc.b/255.0, letterc.a/255.0f);
-    ofFloatColor colorLB(colorF);
-    colorLB.setHue(colorLB.getHue() * 1.1);
+    ofFloatColor colorLB(colorL);
+    //colorLB.setHue(colorLB.getHue() + (bGradient ? .1 : .0));
     
     int sAngleWrap = ofWrap(startAngle, 0, 450);
     int eAngleWrap = ofWrap(endAngle, 0, 450);
@@ -255,7 +256,7 @@ void Clock::draw(){
         
         if ( !bColorLetterFace ) setColor(liveFaceColor);
         else {
-            setColor(liveFaceColor, liveLetterColor, colorAngles[i * 2], colorAngles[i * 2 + 1]);
+            setColor(liveFaceColor, liveLetterColor, colorAngles[i * 2], colorAngles[i * 2 + 1], !bLetter);
         }
         
         face.draw();

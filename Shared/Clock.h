@@ -43,7 +43,7 @@ public:
     
     ofColor faceColor, liveFaceColor, liveLetterColor, letterColor, armColor, liveArmColor;
     void setColor( ofColor c );
-    void setColor( ofColor facec, ofColor letterc, int startAngle, int endAngle );
+    void setColor( ofColor facec, ofColor letterc, int startAngle, int endAngle, bool bGradient = true );
     
     Clock();
     
