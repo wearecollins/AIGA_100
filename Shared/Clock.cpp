@@ -20,6 +20,7 @@ Clock::Clock(){
     bColorFace = true;
     bMouseDown = false;
     bLetter = false;
+    bInteracted = false;
     bDoColor = false;
     lastFroze = 0;
     rotMode = 0;
@@ -249,11 +250,6 @@ void Clock::draw(){
         float cr = (float) liveRadius / numFaces;
         cr *= (i+1);
         
-        float mult = numFaces == 1 ? 1.0 : ofMap(i, numFaces-1, 0, 2.0, 1.0);
-        ofColor lc(liveFaceColor);
-        float hue = ofWrap(lc.getHue() * mult + sin( ofGetElapsedTimeMillis() * .0001) * 10.0, 0, 255.0f);
-        lc.setHue( hue );
-        
         if ( !bColorLetterFace ) setColor(liveFaceColor);
         else {
             setColor(liveFaceColor, liveLetterColor, colorAngles[i * 2], colorAngles[i * 2 + 1], !bLetter);
@@ -272,12 +268,6 @@ void Clock::draw(){
         
         ticks.draw();
         
-//        if ( bColorFace ){
-//            ofSetColor(liveLetterColor);
-//        } else {
-//            ofSetColor(lc);
-//        }
-        
         // ticks
         
         // ease angles
@@ -285,48 +275,33 @@ void Clock::draw(){
         angles[i * 2 + 1]   = angles[i * 2 + 1] * .9 + targetAngle[i * 2 + 1] * .1;
         
         ofPushMatrix();
-        ofVec2f o1(0, - lineWidth/2.0);
-        ofVec2f o2(0, + lineWidth/2.0);
-        ofVec2f p1(cr  * .9, 0 - lineWidth/2.0);
-        ofVec2f p2(cr  * .9, 0 + lineWidth/2.0);
-        //o1.rotate(angles[i * 2], ofVec2f(0,0));
-        //o2.rotate(angles[i * 2], ofVec2f(0,0));
-        //p1.rotate(angles[i * 2], ofVec2f(0,0));
-        //p2.rotate(angles[i * 2], ofVec2f(0,0));
-        
-        arm1.clear();
-        arm1.addVertex(o1); arm1.addVertex(o2); arm1.addVertex(p1); arm1.addVertex(p2);
-        arm1.addColor(fc); arm1.addColor(fc); arm1.addColor(fc); arm1.addColor(fc);
-        arm1.addIndex(0); arm1.addIndex(1); arm1.addIndex(2);
-        arm1.addIndex(2); arm1.addIndex(3); arm1.addIndex(1);
-        
-        ofPushMatrix();
-        ofRotateZ(angles[i * 2]);
-        arm1.draw();
+            ofVec2f o1(0, - lineWidth/2.0);
+            ofVec2f o2(0, + lineWidth/2.0);
+            ofVec2f p1(cr  * .9, 0 - lineWidth/2.0);
+            ofVec2f p2(cr  * .9, 0 + lineWidth/2.0);
+            //o1.rotate(angles[i * 2], ofVec2f(0,0));
+            //o2.rotate(angles[i * 2], ofVec2f(0,0));
+            //p1.rotate(angles[i * 2], ofVec2f(0,0));
+            //p2.rotate(angles[i * 2], ofVec2f(0,0));
+            
+            arm1.clear();
+            arm1.addVertex(o1); arm1.addVertex(o2); arm1.addVertex(p1); arm1.addVertex(p2);
+            arm1.addColor(fc); arm1.addColor(fc); arm1.addColor(fc); arm1.addColor(fc);
+            arm1.addIndex(0); arm1.addIndex(1); arm1.addIndex(2);
+            arm1.addIndex(2); arm1.addIndex(3); arm1.addIndex(1);
+            
+            ofPushMatrix(); {
+                ofRotateZ(angles[i * 2]);
+                arm1.draw();
+            } ofPopMatrix();
         ofPopMatrix();
-        //ofLine(ofVec2f(0,0),p1);
-        ofPopMatrix();
-        
-        hue = ofWrap(lc.getHue() * mult + sin( ofGetElapsedTimeMillis() * .0001) * 20.0, 0, 255.0f);
-        lc.setHue( hue );
-        
-//        if ( bColorFace ){
-//            ofSetColor(liveLetterColor);
-//        } else {
-//            ofSetColor(lc);
-//        }
+
         
         ofPushMatrix();
         o1.set(0,-lineWidth/2.0);
         o2.set(0,+lineWidth/2.0);
         p1.set(cr  * .9, -lineWidth/2.0);
         p2.set(cr  * .9, +lineWidth/2.0);
-        
-//        o1.rotate(angles[i * 2 + 1], ofVec2f(0,0));
-//        o2.rotate(angles[i * 2 + 1], ofVec2f(0,0));
-//        p1.rotate(angles[i * 2 + 1], ofVec2f(0,0));
-//        p2.rotate(angles[i * 2 + 1], ofVec2f(0,0));
-//        ofLine(ofVec2f(0,0),p2);
         
         arm2.clear();
         arm2.addVertex(o1); arm2.addVertex(o2); arm2.addVertex(p1); arm2.addVertex(p2);
@@ -347,6 +322,9 @@ void Clock::draw(){
     
     // animate
     if ( ofGetElapsedTimeMillis() - lastFroze > 1500 && bAnimating ){
+        bInteracted = false;
+        currentColors.clear();
+        
         bool b = false;
         float m = numFaces == 1 ? 1 : .5;
         for ( auto & a : targetAngle ){
@@ -361,17 +339,14 @@ void Clock::draw(){
         b = false;
         
         //if ( colorAngles[0] != colorAngles[1] ){
-        float val = ofMap((ofGetElapsedTimeMillis() - lastFroze)-2000, 0, 1500, 0, 1.0, true);
-        if (!bColorLetterFace) liveLetterColor.lerp(armColor, val);
-        else liveLetterColor.lerp(faceColor, val);
+        //float val = ofMap((ofGetElapsedTimeMillis() - lastFroze)-2000, 0, 1500, 0, 1.0, true);
+        liveLetterColor = liveLetterColor * .8 + faceColor * .2;
     
 //        liveArmColor.lerp(armColor, val);
     
         //else liveLetterColor.lerp(faceColor, val);
-        if (val >= 1.0 ){
-            for ( auto & a : colorAngles ){
-                a = 0;
-            }
+        for ( auto & a : colorAngles ){
+            a = a * .7;
         }
         //}
         
@@ -380,8 +355,7 @@ void Clock::draw(){
         // hax
         if ( colorAngles[0] != colorAngles[1] ){
             if ( ofGetElapsedTimeMillis() - lastFroze > 500 ){
-                float v = ofMap((ofGetElapsedTimeMillis() - lastFroze), 500, 1000, 0, 1.0, true);
-                liveLetterColor.lerp(faceColor, v);
+                liveLetterColor = liveLetterColor * .8 + faceColor * .2;
             } else {
                 liveLetterColor.lerp(letterColor, ofMap((ofGetElapsedTimeMillis() - lastFroze), 0, 500, 0, 1.0, true));
             }
@@ -393,7 +367,9 @@ void Clock::draw(){
         offset = offset * .9;
     }
     
-    liveFaceColor = liveFaceColor * .9 + faceColor * .1;
+    if ( !bInteracted ) liveFaceColor = liveFaceColor * .9 + faceColor * .1;
+    else liveFaceColor = liveFaceColor * .999 + faceColor * .001;
+    
     liveArmColor = liveArmColor * .9 + armColor * .1;
     
     // reset face color
@@ -655,18 +631,46 @@ float Clock::pointTo( int mx, int my ){
 
 //--------------------------------------------------------------
 void Clock::magnet( int mx, int my, ofColor color, int freezeTime ){
-    float dist = pointTo(mx, my);
+    ofVec2f m(mx,my);
+    float dist = distance(m);
+    m -= *this;
     
+    //if ( (dist) < 20000 ){
+    ofVec2f line = *this + ofVec2f(liveRadius  * .5, liveRadius * .5);
+    bool b = false;
+    int mult = 1.0;
+    for ( auto & a : targetAngle ){
+        a = ofMap(angle(m), -180, 180, 0, 360) * mult;// + 135;
+        if ( b ){
+            a += 180;
+            //mult += 2.0;
+        }
+        b = !b;
+    }
+    vel.x += 10.0;
+    offset += ofMap(dist, 0, 200, 10, 0, true);
+    offset = ofClamp(offset, 0, 150);
+    
+    bool bHasColor = false;
     if ( fabs(dist) < radius * 2 ){
-        if ( ofGetElapsedTimeMillis() - lastFroze <= 1500 ){
-            liveFaceColor = liveFaceColor * .5 + color * .5;
-            cout << "mixing colors!" << endl;
+        bHasColor = currentColors.size() == 0 ? false : (currentColors.back() == color);
+        
+        if ( !bHasColor ){
+            ofColor sum;
+            ofColor avg;
+            for ( auto c : currentColors ) liveFaceColor += c;
+            avg.set(sum);
+            if ( currentColors.size() > 0 ) avg /= currentColors.size();
+            //liveFaceColor.set(sum); //liveFaceColor + color;
         } else {
             liveFaceColor.set(color);
         }
         liveArmColor = liveArmColor * .8 + ofColor(255) * .2;
+        currentColors.push_back(color);
+        bInteracted = true;
     }
-    lastFroze = ofGetElapsedTimeMillis() - ofMap(dist, 0, 1000, freezeTime, 0, true);
+    
+    if ( fabs(dist) < 1000 ) lastFroze = ofGetElapsedTimeMillis() - ofMap(fabs(dist), 0, 500, freezeTime, 0, true);
 }
 
 #pragma mark clocks

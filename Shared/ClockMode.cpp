@@ -198,6 +198,7 @@ void ClockMode::resetAnimation( AnimationMode mode ){
     ofVec2f p(ofRandom(ofGetWidth()), ofRandom(ofGetHeight()));
     float min = ofRandom(50, 500);
     float max = ofRandom(min, 2000);
+    float maxX = clocks->clocks[clocks->clocks.size()-1].x;
     switch (animationMode) {
         case MODE_NORMAL:
             // shhhh
@@ -206,7 +207,7 @@ void ClockMode::resetAnimation( AnimationMode mode ){
         case MODE_WAVE:
             for ( auto & c : clocks->clocks ){
                 delays[index].lastTriggered = ofGetElapsedTimeMillis();
-                delays[index].delay = ofMap(c.x, 0, ofGetWidth(), min, max, true);
+                delays[index].delay = ofMap(c.x, 0, maxX, min, max, true);
                 delays[index].bTriggered = false;
                 index++;
             }
@@ -218,7 +219,7 @@ void ClockMode::resetAnimation( AnimationMode mode ){
         case MODE_EXPLODE:
             for ( auto & c : clocks->clocks ){
                 delays[index].lastTriggered = ofGetElapsedTimeMillis();
-                delays[index].delay = ofMap(fabs(p.distance(c)), 0, ofGetWidth(), 500, 2000, true);
+                delays[index].delay = ofMap(fabs(p.distance(c)), 0, maxX, 500, 2000, true);
                 delays[index].bTriggered = false;
                 index++;
             }

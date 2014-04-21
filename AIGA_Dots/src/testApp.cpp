@@ -94,7 +94,7 @@ void testApp::setup(){
 void testApp::update(){
     clockManager.update();
 
-    if ( gridDrawings.size() != 0 ){
+    if ( gridDrawings.size() != 0 && clockManager.isInteractive() ){
         // first update indices
         for ( int i=0; i<gridDrawings.size(); i++){
             if ( ofGetElapsedTimeMillis() - gridDrawings[i].lastChanged > swipeChangeTimer ){

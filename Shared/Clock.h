@@ -31,9 +31,10 @@ public:
     int colorIndex;
     int colorIncrement;
     
-    bool bAnimating, bLetter;
+    bool bAnimating, bLetter, bInteracted;
     int  rotMode;
     
+    vector<ofColor> currentColors;
     vector<float> angles;
     vector<float> colorAngles;
     vector<float> targetAngle;
