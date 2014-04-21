@@ -52,7 +52,7 @@ $(document).ready( function() {
 			this.meshes = [];
 
 			// setup geom
-			var w = (this.renderWidth * .8) / 10 * .7;
+			var w = (this.renderWidth * .75) / 10 * .7;
 			var sp = w * .5;
 			var cx = this.renderWidth / 2.0 - (((w + sp) * 9 )/2.0);
 			var cy = cx * 2.0;// - (((w + sp)  * 9) /2.0);
