@@ -124,6 +124,9 @@ $(document).ready( function() {
 			if (isIpad){
 				$("#quotes").addClass("quotesiPad");
 				$(".name").addClass("nameiPad");
+				$(".quoteBigName").addClass("nameiPad");
+				$("#quoteContainer").addClass("quoteContaineriPad");
+				$(".quote").addClass("quoteiPad");
 				$("#touch").addClass("touchiPad");
 				$("#release").addClass("touchiPad");
 				$(".quoteInner").addClass("quoteInneriPad");
@@ -421,9 +424,11 @@ $(document).ready( function() {
 
 		this.showName = function(name){
 			$( "#names" ).children().css( "visibility", "hidden" );
-			$( "#quotes" ).children().css( "visibility", "hidden" );
+			$( "#quoteContainer" ).children().css( "visibility", "hidden" );
+			$( "#nameContainer" ).children().css( "visibility", "hidden" );
 			$("#name_"+name).css("visibility", "visible");
 			$("#quote_"+name).css("visibility", "visible");
+			$("#quoteBigName_"+name).css("visibility", "visible");
 		}
 
 		this.showHide = function( show ) {

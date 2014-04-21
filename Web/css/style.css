@@ -86,6 +86,27 @@ html, body {
 	position: absolute;
 }
 
+.quoteBigName {
+	color:#FD4F57;
+	visibility: hidden;
+	font-size: 90px;
+	margin: 0 auto;
+	width:100%;
+	display: -webkit-box;
+	-webkit-box-orient: horizontal;
+	-webkit-box-pack: center;
+	-webkit-box-align: center;
+	position: absolute;
+}
+
+#quoteContainer {
+	height:700px;
+}
+
+#quoteContaineriPad {
+	height: 1620px;
+}
+
 .nameiPad {
 	font-size: 180px;
 }
@@ -129,12 +150,16 @@ html, body {
 	margin: 0 auto;
 	width:100%;
 	position: absolute;
-	height: 90%;
+	height: 700px;
 	display: -webkit-box;
 	-webkit-box-orient: vertical;
 	-webkit-box-pack: center;
 	-webkit-box-align: center;
 	overflow: hidden;	
+}
+
+.quoteiPad {
+	height:1620px;
 }
 
 .quoteInner {
