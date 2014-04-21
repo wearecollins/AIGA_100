@@ -7,22 +7,22 @@
 <Widget>
     <Kind>4</Kind>
     <Name>Face saturation</Name>
-    <Value>91.640625000</Value>
+    <Value>185.937500000</Value>
 </Widget>
 <Widget>
     <Kind>4</Kind>
     <Name>Face brightness</Name>
-    <Value>132.812500000</Value>
+    <Value>151.406250000</Value>
 </Widget>
 <Widget>
     <Kind>4</Kind>
     <Name>Hue speed</Name>
-    <Value>35938.378906250</Value>
+    <Value>39063.367187500</Value>
 </Widget>
 <Widget>
     <Kind>4</Kind>
     <Name>Hue pos</Name>
-    <Value>0.518888175</Value>
+    <Value>0.503848016</Value>
 </Widget>
 <Widget>
     <Kind>4</Kind>
@@ -74,5 +74,5 @@
 <Widget>
     <Kind>4</Kind>
     <Name>lineWidth</Name>
-    <Value>6.135416508</Value>
+    <Value>9.458333015</Value>
 </Widget>
