@@ -99,11 +99,11 @@ html, body {
 	position: absolute;
 }
 
-#quoteContainer {
+.quoteContainer {
 	height:700px;
 }
 
-#quoteContaineriPad {
+.quoteContaineriPad {
 	height: 1620px;
 }
 
