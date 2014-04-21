@@ -70,6 +70,26 @@ html, body {
 	z-index: 100;
 }
 
+.clockYear {
+	opacity: 0;
+	-webkit-transition:opacity .5s ease-in-out, -webkit-transform 1s ease-in-out;
+	position: absolute;
+	z-index: 100;
+	color:#FD4F57;
+	font-size: 90px;
+	width:100%;
+	height: 200px;
+	display: -webkit-box;
+	-webkit-box-orient: horizontal;
+	-webkit-box-pack: center;
+	-webkit-box-align: center;
+	position: absolute;
+}
+
+.clockYeariPad {
+	font-size: 180px;
+}
+
 .name {
 	color:#FD4F57;
 	visibility: hidden;

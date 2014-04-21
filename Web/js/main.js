@@ -17,6 +17,18 @@ $(document).ready( function() {
 	// cv.width = width;
 	// cv.height = height;
 	app.begin({canvasId:"gridCanvas", renderType: "css3d", width: app.renderWidth, height: app.renderHeight });
+
+	window.addEventListener('onorientationchange', function () {
+	    // if (window.orientation == -90) {
+	    //     document.getElementById('orient').className = 'orientright';
+	    // }
+	    // if (window.orientation == 90) {
+	    //     document.getElementById('orient').className = 'orientleft';
+	    // }
+	    // if (window.orientation == 0) {
+	    //     document.getElementById('orient').className = '';
+	    // }
+	}, true);
 });
 
 // ===========================================
@@ -173,6 +185,11 @@ $(document).ready( function() {
 			this.armTwo = new THREE.CSS3DObject(ad2);
 			this.bigCircle.add(this.armOne);
 			this.bigCircle.add(this.armTwo);
+
+			var clockYear = document.createElement("div");
+			clockYear.id = "clockYear";
+			clockYear.className = "clockYear" + (isIpad ? " clockYeariPad" : "");
+			document.getElementById("sud_container").appendChild(clockYear);
 		}
 
 		//-------------------------------------------------------
@@ -373,6 +390,7 @@ $(document).ready( function() {
 						$("#names").css("opacity", 0);
 						$("#quotes").css("opacity", 0);
 						$(".bigClock").css("opacity", 0);
+						$(".clockYear").css("opacity", 0);
 
 						window.modeTimeout = window.setTimeout(function(){
 							$(".threeElement").css("opacity", 1);
@@ -396,11 +414,14 @@ $(document).ready( function() {
 								console.log("clock");
 								$("#names").css("opacity", 0);
 								$(".bigClock").css("opacity", 1);
+								$(".clockYear").html(this.years[this.nameIndex]);
+								$(".clockYear").css("opacity", 1);
 								this.rotateBigClockTo(0, (2014 - this.years[this.nameIndex])/100*360);
 
 								window.modeTimeout = window.setTimeout(function(){
 									console.log("quote");
 									$(".bigClock").css("opacity", 0);
+									$(".clockYear").css("opacity", 0);
 									$("#quotes").css("opacity", 1);
 									this.rotateBigClockTo(0, 0);
 									window.textTimeout = window.setTimeout(function(){
