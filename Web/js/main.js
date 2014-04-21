@@ -132,11 +132,16 @@ $(document).ready( function() {
 				$(".quoteInner").addClass("quoteInneriPad");
 				$(".quoteName").addClass("quoteNameiPad");
 				$(".italic").addClass("italiciPad");
+			} else {
+				var d = document.getElementById("nameContainer");
+				var p = document.getElementById("quotes");
+				p.removeChild(d);
 			}
 
 			$('.quoteInner').widowFix();
 
 			this.setupSpacebrew();
+			
 		}
 
 		//-------------------------------------------------------
@@ -425,10 +430,10 @@ $(document).ready( function() {
 		this.showName = function(name){
 			$( "#names" ).children().css( "visibility", "hidden" );
 			$( "#quoteContainer" ).children().css( "visibility", "hidden" );
-			$( "#nameContainer" ).children().css( "visibility", "hidden" );
+			if (isIpad) $( "#nameContainer" ).children().css( "visibility", "hidden" );
 			$("#name_"+name).css("visibility", "visible");
 			$("#quote_"+name).css("visibility", "visible");
-			$("#quoteBigName_"+name).css("visibility", "visible");
+			if (isIpad) $("#quoteBigName_"+name).css("visibility", "visible");
 		}
 
 		this.showHide = function( show ) {
