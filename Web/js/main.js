@@ -332,7 +332,9 @@ $(document).ready( function() {
 		};
 
 		//-------------------------------------------------------
+		this.last = {x:-1, y:-1}
 		this.onTouchMove = function( id, x,y ){
+			if ( x == this.last.x && y == this.last.y ) return;
 			switch ( this.mode ){
 				case 0:
 					if ( id == this.touchId ){
@@ -342,6 +344,7 @@ $(document).ready( function() {
 				case 2:
 					break;
 			}
+			this.last = {x:x, y:y}
 
 			
 		};
@@ -374,6 +377,7 @@ $(document).ready( function() {
 					break;
 			}
 			this.lastGrid = -1;
+			this.last = {x:-1, y:-1}
 		};
 
 		this.testGrid = function(x,y){

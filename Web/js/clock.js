@@ -158,8 +158,8 @@ Clock.prototype.magnet = function(mx,my, now) {
         var a = this.angle(p,m, false);
         var angle = SUD.map(a, -180, 180, 90, 360);
 
-		this.armOne.rotation.z = angle;
-		this.armTwo.rotation.z = angle + Math.PI;
+		//this.armOne.rotation.z = angle;
+		//this.armTwo.rotation.z = angle + Math.PI;
 
     	this.mouseDown = true;
 		this.animating = false;
