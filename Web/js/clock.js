@@ -150,6 +150,10 @@ Clock.prototype.angle = function(a,b, toDeg){
 }
 
 Clock.prototype.magnet = function(mx,my, now) {
+	if ( !this.mouseDown ){
+		this.armOne.element.style["-webkit-transition"] = "";
+		this.armTwo.element.style["-webkit-transition"] = "";
+	}
 	this.currentMouse.x = mx;
 	this.currentMouse.y = my;
 	this.mouseDown = true;
@@ -181,27 +185,25 @@ Clock.prototype.update = function( time ) {
 		}
 	} else if ( this.mouseDown ) {
 		if ( this.currentMouse.x != -1 ){
-			if ( this.armOne.element.style["-webkit-transition"] != "" ){
-				this.armOne.element.style["-webkit-transition"] = "";
-				this.armTwo.element.style["-webkit-transition"] = "";
-			}
-			var p = new THREE.Vector2(this.position.x, this.position.y);
-			var m = new THREE.Vector2(this.currentMouse.x,this.currentMouse.y);
-		    var dist = p.distanceTo(m);
-		    m = m.sub(p);
-		    
-		    if ( (dist) < 20000 && time - this.lastAnim > 100 ){
-		        var line = p.add( new THREE.Vector2(this.radius, this.radius));
-		        var a = this.angle(p,m, false);
-		        var angle = SUD.map(a, -180, 180, 90, 360);
+			if ( time - this.lastAnim > 100 ){
+				var p = new THREE.Vector2(this.position.x, this.position.y);
+				var m = new THREE.Vector2(this.currentMouse.x,this.currentMouse.y);
+			    var dist = p.distanceTo(m);
+			    m = m.sub(p);
+			    
+			    if ( (dist) < 20000 ){
+			        var line = p.add( new THREE.Vector2(this.radius, this.radius));
+			        var a = this.angle(p,m, false);
+			        var angle = SUD.map(a, -180, 180, 90, 360);
 
-				this.armOne.rotation.z = angle;
-				this.armTwo.rotation.z = angle + Math.PI;
-		        this.vel.x += 10.0;
-		        this.lastAnim = time;
-		    }
-		    this.currentMouse.x = -1;
-    		this.lastFroze = time - SUD.map(dist, 0, 1000, 1000, 0);
+					this.armOne.rotation.z = angle;
+					this.armTwo.rotation.z = angle + Math.PI;
+			        this.vel.x += 10.0;
+			        this.lastAnim = time;
+			    }
+			    this.currentMouse.x = -1;
+	    		this.lastFroze = time - SUD.map(dist, 0, 1000, 1000, 0);
+	    	}
 		}
 	}
 

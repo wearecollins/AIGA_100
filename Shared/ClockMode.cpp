@@ -183,7 +183,7 @@ void ClockMode::update(){
                 char k = names[currentName][letterIndex];
                 string ks = ofToString(k);
                 //float weight = letterIndex == i ? 1.0 : .3;
-                clocks->setClocks(clocks->letters[ks], (ks == "w" || ks == "m")? 4 : 3, 3, (ks == "w" || ks == "m")? 6 : 4, 1.0);
+                clocks->setClocks(clocks->letters[ks], 3, (ks == "w" || ks == "m")? 2 : 3,  (ks == "w" || ks == "m")? 6 : 4, 1.0);
             }
         }
     } else if (mode == STATE_TRANSITION ){
