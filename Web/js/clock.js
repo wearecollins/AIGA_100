@@ -127,6 +127,7 @@ Clock.prototype.setup = function( x,y, rad, isGL ) {
 	this.animating = true;
 	this.vel = new THREE.Vector2(1,0);
 	this.lastFroze = new Date();
+	this.lastAnim = new Date();
 	this.currentMouse = {x:-1, y:-1};
 };
 
@@ -189,7 +190,7 @@ Clock.prototype.update = function( time ) {
 		    var dist = p.distanceTo(m);
 		    m = m.sub(p);
 		    
-		    if ( (dist) < 20000 ){
+		    if ( (dist) < 20000 && time - this.lastAnim > 100 ){
 		        var line = p.add( new THREE.Vector2(this.radius, this.radius));
 		        var a = this.angle(p,m, false);
 		        var angle = SUD.map(a, -180, 180, 90, 360);
@@ -197,6 +198,7 @@ Clock.prototype.update = function( time ) {
 				this.armOne.rotation.z = angle;
 				this.armTwo.rotation.z = angle + Math.PI;
 		        this.vel.x += 10.0;
+		        this.lastAnim = time;
 		    }
 		    this.currentMouse.x = -1;
     		this.lastFroze = time - SUD.map(dist, 0, 1000, 1000, 0);
