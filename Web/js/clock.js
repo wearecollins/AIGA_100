@@ -162,14 +162,6 @@ Clock.prototype.magnet = function(mx,my, now) {
 		//this.armTwo.element.style["-webkit-transition"] = "opacity .5s ease-in-out, -webkit-transform .1s ease-in-out";
 
     	this.mouseDown = true;
-    	if ( this.anTime != null){
-    		clearTimeout(this.anTime);
-		this.anTime = null;
-    	}
-		if ( this.anJam != null){
-			clearTimeout(this.anJam);
-			this.anJam = null;
-		}
 		this.animating = false;
 
         // for ( auto & a : targetAngle ){
@@ -199,8 +191,20 @@ Clock.prototype.update = function( time ) {
 		this.color.b = /*this.color.b * .9 +*/ this.grey.b;// * .1;
 
 		if ( this.animating ){
+			if ( this.armOne.element.style["-webkit-transition"] != "" ){
+				this.armOne.element.style["-webkit-transition"] = "";
+				this.armTwo.element.style["-webkit-transition"] = "";
+				this.vel.x = 1;
+			}
 			this.rotateArmOneBy(this.vel.x);
 			this.rotateArmTwoBy(this.vel.x * 1/60.0);
+		} else {
+			this.armOne.element.style["-webkit-transition"] = "opacity .5s ease-in-out, -webkit-transform 1s ease-in-out";
+			this.armTwo.element.style["-webkit-transition"] = "opacity .5s ease-in-out, -webkit-transform 1s ease-in-out";
+			this.rotateArmOneBy(180);
+			this.rotateArmTwoBy(180 * 1/60.0);
+			this.animating = true;
+			this.lastFroze = time;
 		}
 	}
 
@@ -219,24 +223,6 @@ Clock.prototype.mousePressed = function(x,y) {
 
 Clock.prototype.mouseReleased = function(time){
 	this.mouseDown = false;
-	this.armOne.element.style["-webkit-transition"] = "opacity .5s ease-in-out, -webkit-transform 1s ease-in-out";
-	this.armTwo.element.style["-webkit-transition"] = "opacity .5s ease-in-out, -webkit-transform 1s ease-in-out";
-
-	this.anJam = setTimeout( function a(){ 
-		this.rotateArmOneBy(this.vel.x);
-		this.rotateArmTwoBy(this.vel.x * 1/60.0);
-		this.anJam = null;
-	}.bind(this), (time - this.lastFroze)/10 );
-	
-
-	clearTimeout(this.anTime);
-	this.anTime = setTimeout( function t(){ 
-		this.animating = true;
-		this.armOne.element.style["-webkit-transition"] = "";//opacity .5s ease-in-out, -webkit-transform .01s ease-in-out";
-		this.armTwo.element.style["-webkit-transition"] = "";//"opacity .5s ease-in-out, -webkit-transform .01s ease-in-out";
-		this.vel.x = 1;//this.vel.x *.9 + .1;
-		this.anTime = null;
-	}.bind(this), (time - this.lastFroze)/10 + 1500);
 }
 
 Clock.prototype.setFaceStyle = function(style) {
