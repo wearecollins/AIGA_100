@@ -162,8 +162,14 @@ Clock.prototype.magnet = function(mx,my, now) {
 		//this.armTwo.element.style["-webkit-transition"] = "opacity .5s ease-in-out, -webkit-transform .1s ease-in-out";
 
     	this.mouseDown = true;
-		clearTimeout(this.anTime);
-		clearTimeout(this.anJam);
+    	if ( this.anTime != null){
+    		clearTimeout(this.anTime);
+		this.anTime = null;
+    	}
+		if ( this.anJam != null){
+			clearTimeout(this.anJam);
+			this.anJam = null;
+		}
 		this.animating = false;
 
         // for ( auto & a : targetAngle ){
@@ -219,6 +225,7 @@ Clock.prototype.mouseReleased = function(time){
 	this.anJam = setTimeout( function a(){ 
 		this.rotateArmOneBy(this.vel.x);
 		this.rotateArmTwoBy(this.vel.x * 1/60.0);
+		this.anJam = null;
 	}.bind(this), (time - this.lastFroze)/10 );
 	
 
@@ -228,6 +235,7 @@ Clock.prototype.mouseReleased = function(time){
 		this.armOne.element.style["-webkit-transition"] = "";//opacity .5s ease-in-out, -webkit-transform .01s ease-in-out";
 		this.armTwo.element.style["-webkit-transition"] = "";//"opacity .5s ease-in-out, -webkit-transform .01s ease-in-out";
 		this.vel.x = 1;//this.vel.x *.9 + .1;
+		this.anTime = null;
 	}.bind(this), (time - this.lastFroze)/10 + 1500);
 }
 
