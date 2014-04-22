@@ -242,8 +242,9 @@ $(document).ready( function() {
 		var chunkSize  = 100;
 
 		this.update = function (){
+			var now = new Date();
 			for (var i=chunkIndex; i<chunkIndex + chunkSize; i++){
-				setTimeout( this.meshes[i].update.bind(this.meshes[i]), 0);
+				setTimeout( this.meshes[i].update.bind(this.meshes[i]), 0, now);
 				// meshes[ind].update();
 			}
 			chunkIndex += chunkSize;

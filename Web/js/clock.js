@@ -179,15 +179,15 @@ Clock.prototype.magnet = function(mx,my) {
     }
 }
 
-Clock.prototype.update = function() {
-	if ( new Date() - this.lastFroze > 1000 && !this.mouseDown ){
+Clock.prototype.update = function( time ) {
+	if ( time - this.lastFroze > 1000 && !this.mouseDown ){
 		this.rotateArmOneBy(this.vel.x);
 		this.rotateArmTwoBy(this.vel.x * 1/60.0);
 		this.vel.x = this.vel.x *.9 + .1;
 
-		this.color.r = this.color.r * .9 + this.grey.r * .1;
-		this.color.g = this.color.g * .9 + this.grey.g * .1;
-		this.color.b = this.color.b * .9 + this.grey.b * .1;
+		this.color.r = /*this.color.r * .9 +*/ this.grey.r;// * .1;
+		this.color.g = /*this.color.g * .9 +*/ this.grey.g;// * .1;
+		this.color.b = /*this.color.b * .9 +*/ this.grey.b;// * .1;
 	}
 
 	var style = this.getRBGStyle();
