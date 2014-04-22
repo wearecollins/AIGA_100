@@ -17,6 +17,22 @@ float maxDrawingAge     = 60 * 5;
 float texW = 2048;
 float texH = 2048;
 
+struct {
+    bool operator() (ofVec2f a,ofVec2f b) { return a.x<b.x; }
+} xMax;
+
+struct {
+    bool operator() (ofVec2f a,ofVec2f b) { return a.y<b.y; }
+} yMax;
+
+struct {
+    bool operator() (ofVec2f a,ofVec2f b) { return a.x>b.x; }
+} xMin;
+
+struct {
+    bool operator() (ofVec2f a,ofVec2f b) { return a.y>b.y; }
+} yMin;
+
 //--------------------------------------------------------------
 void testApp::setup(){
     ofSetFrameRate(60);
@@ -86,8 +102,37 @@ void testApp::setup(){
     mapamok.loadMesh(model, texW, texH);
     mapamok.drawMode = DRAW_FACES;
     mapamok.useLights = false;
-    
     ofDisableLighting();
+    
+    /*
+    ofVboMesh & m = mapamok.getObjectMesh();
+    
+    auto it_max_x = max_element(m.getVertices().begin(), m.getVertices().end(), xMax);
+    auto it_max_y = max_element(m.getVertices().begin(), m.getVertices().end(), yMax);
+    auto it_min_x = min_element(m.getVertices().begin(), m.getVertices().end(), xMax);
+    auto it_min_y = min_element(m.getVertices().begin(), m.getVertices().end(), yMax);
+    
+    cout << *it_max_x << endl;
+    cout << *it_max_y << endl;
+    cout << *it_min_x << endl;
+    cout << *it_min_y << endl;
+    
+    float width = (*it_max_x).x - (*it_min_x).x;
+    float height = (*it_max_y).y - (*it_min_y).y;
+    
+    for ( int i=0; i<m.getNumVertices(); i++){
+        ofVec2f v = m.getTexCoord(i);
+        ofVec2f vert = m.getVertex(i);
+        if ( v.x >= 0 ){
+            ofVec2f t(vert);
+            t.x -= (*it_min_x).x;
+            t.y -= (*it_min_y).y;
+            t.x /= width;
+            t.y /= height;
+            m.setTexCoord(i, t);
+        }
+    }
+    */
 }
 
 //--------------------------------------------------------------

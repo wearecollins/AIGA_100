@@ -1,28 +1,54 @@
 <interactiveDuration>30000</interactiveDuration>
 <nameDuration>20000</nameDuration>
 <names>
-	<name>sean</name>
-	<name>noreen</name>
-	<name>chuck</name>
-	<name>dana</name>
-	<name>bob</name>
-	<name>david</name>
-	<name>ken</name>
-	<name>leslie</name>
-	<name>kyle</name>
-	<name>michael</name>
-	<name>stephen</name>
-	<name>abbott</name>
-	<name>louise</name>
-	<name>sylvia</name>
-	<name>cheryl</name>
-	<name>alex</name>
-	<name>chip</name>
-	<name>michael</name>
-	<name>richard</name>
-	<name>michael</name>
-	<name>nancye</name>
-	<name>bill</name>
-	<name>gael</name>
-	<name>ann</name>
+	<name>sean </name>
+	<name>noreen </name>
+	<name>chuck </name>
+	<name>dana </name>
+	<name>bob </name>
+	<name>david </name>
+	<name>ken </name>
+	<name>leslie </name>
+	<name>kyle </name>
+	<name>michael </name>
+	<name>stephen </name>
+	<name>abbott </name>
+	<name>louise </name>
+	<name>sylvia </name>
+	<name>cheryl </name>
+	<name>alex </name>
+	<name>chip </name>
+	<name>michael </name>
+	<name>richard </name>
+	<name>michael </name>
+	<name>nancye </name>
+	<name>bill </name>
+	<name>gael </name>
+	<name>ann </name>
 </names>
+<colors>
+	<color r="51" g="255" b="153" h="0"></color>
+	<color r="204" g="0" b="0" h="255"></color>
+	<color r="255" g="206" b="0" h="0"></color>
+	<color r="153" g="0" b="204" h="255"></color>
+	<color r="255" g="153" b="51" h="0"></color>
+	<color r="255" g="108" b="12" h="255"></color>
+	<color r="255" g="102" b="255" h="0"></color>
+	<color r="102" g="0" b="102" h="255"></color>
+	<color r="204" g="255" b="0" h="0"></color>
+	<color r="247" g="50" b="63" h="255"></color>
+	<color r="0" g="255" b="51" h="0"></color>
+	<color r="0" g="0" b="255" h="255"></color>
+	<color r="0" g="204" b="204" h="0"></color>
+	<color r="255" g="0" b="0" h="255"></color>
+	<color r="255" g="255" b="0" h="0"></color>
+	<color r="255" g="0" b="102" h="255"></color>
+	<color r="255" g="0" b="153" h="0"></color>
+	<color r="0" g="51" b="102" h="255"></color>
+	<color r="211" g="210" b="210" h="0"></color>
+	<color r="102" g="0" b="51" h="255"></color>
+	<color r="0" g="255" b="255" h="0"></color>
+	<color r="51" g="102" b="255" h="255"></color>
+	<color r="0" g="255" b="204" h="0"></color>
+	<color r="0" g="153" b="0" h="255"></color>
+</colors>

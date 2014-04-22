@@ -22,7 +22,7 @@
 <Widget>
     <Kind>4</Kind>
     <Name>Hue pos</Name>
-    <Value>0.503848016</Value>
+    <Value>0.951863647</Value>
 </Widget>
 <Widget>
     <Kind>4</Kind>
@@ -38,12 +38,12 @@
 <Widget>
     <Kind>4</Kind>
     <Name>arm saturation</Name>
-    <Value>255.000000000</Value>
+    <Value>83.671875000</Value>
 </Widget>
 <Widget>
     <Kind>4</Kind>
     <Name>arm brightness</Name>
-    <Value>87.656250000</Value>
+    <Value>231.093750000</Value>
 </Widget>
 <Widget>
     <Kind>6</Kind>

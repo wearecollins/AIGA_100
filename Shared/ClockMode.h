@@ -18,11 +18,20 @@
 enum AnimationMode {
     MODE_NORMAL = 0,
     MODE_WAVE,
+    MODE_RANDOM,
+    MODE_EXPLODE,
+    MODE_ORDERED,
+    MODE_SHADES,
     MODE_NOISE,
     MODE_SIN,
     MODE_YEARS,
-    MODE_EXPLODE,
     MODE_ARROW
+};
+
+enum State {
+    STATE_INTERACTIVE = 0,
+    STATE_TRANSITION,
+    STATE_LETTERS
 };
 
 struct Timer {
@@ -59,7 +68,7 @@ protected:
     void resetAnimation( AnimationMode mode );
     
     bool bChangeModes;
-    bool bInteractiveMode;
+    State mode;
     int interactiveDuration;
     int nameDuration;
     int lastChanged;
@@ -67,7 +76,7 @@ protected:
     int numNames;
     
     // animation vars
-    int animationMode;
+    AnimationMode animationMode, transitionMode;
     int aniLastChanged, aniDuration;
     
     // letters + names
@@ -75,8 +84,13 @@ protected:
     int letterRate;
     int letterLastChanged;
     
-    vector<string>  names;
-    vector<Timer>   delays;
+    vector<string>      names;
+    vector<ofColor>     colors;
+    vector<Timer>       delays;
+    
+    // transition vars
+    ofColor nextColor, nextArmColor;
+    State nextState;
     
     Clocks * clocks;
     Spacebrew::Connection * spacebrew;

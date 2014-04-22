@@ -148,6 +148,8 @@ public:
     void loadLetters();
     
     // override events
+    void setColor( ofColor color );
+    void setArmColor( ofColor color );
     void magnet( float attractX, float attractY, ofColor color, int freezeTime=1000 );
     void pointTo( float attractX, float attractY );
     
@@ -163,6 +165,8 @@ public:
     float huePosition, hueSpeed, hueDirection;
     float faceHueMax, faceHueMin, armHueMax, armHueMin, letterHueMax, letterHueMin;
     float faceSat, faceBright, armSat, armBright, letterSat, letterBright;
+    
+    bool bUseColorFade;
     ofColor faceColorTop, faceColorBottom, letterColor, armColor;
     
 };

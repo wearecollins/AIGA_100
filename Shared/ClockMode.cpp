@@ -11,7 +11,7 @@
 //--------------------------------------------------------------
 ClockMode::ClockMode(){
     bChangeModes       = true;
-    bInteractiveMode   = true;
+    mode                = STATE_INTERACTIVE;
     interactiveDuration = 30 * 1000;
     nameDuration        = 20 * 1000;
     lastChanged         = 0;
@@ -50,11 +50,25 @@ void ClockMode::setup(Spacebrew::Connection * sb, Clocks * c,  string path){
                 names.push_back( settings.getValue("name", "", i) );
             }
         } settings.popTag();
+        
+        settings.pushTag("colors");{
+            int n = settings.getNumTags("color");
+            for (int i=0; i<n; i++){
+                colors.push_back( ofColor() );
+                colors.back().r = settings.getAttribute("color", "r", 255, i);
+                colors.back().g = settings.getAttribute("color", "g", 255, i);
+                colors.back().b = settings.getAttribute("color", "b", 255, i);
+                colors.back().a = settings.getAttribute("color", "h", 255, i);
+            }
+        } settings.popTag();
+        
         for ( auto n : names ){
             ofLogVerbose()<<n;
         }
     }
-    resetAnimation( (AnimationMode ) animationMode );
+    resetAnimation( animationMode );
+    clocks->setColor(ofColor(255));
+    clocks->setArmColor(ofColor(0));
 }
 
 //--------------------------------------------------------------
@@ -66,56 +80,96 @@ void ClockMode::update(){
     if ( bChangeModes ){
         
         // interactive to quote
-        if (bInteractiveMode){
-            if ( ofGetElapsedTimeMillis() - lastChanged > interactiveDuration){
-                lastChanged = ofGetElapsedTimeMillis();
-                bInteractiveMode = false;
-                currentName++;
-                if ( currentName >= numNames ){
-                    currentName = 0;
+        switch (mode) {
+            case STATE_INTERACTIVE:
+                
+                if ( ofGetElapsedTimeMillis() - lastChanged > interactiveDuration){
+                    lastChanged = ofGetElapsedTimeMillis();
+                    mode = STATE_TRANSITION;
+                    nextState = STATE_LETTERS;
+                    
+                    currentName++;
+                    if ( currentName >= numNames ){
+                        currentName = 0;
+                    }
+                    if ( spacebrew != NULL ) spacebrew->sendRange("name", currentName);
+                    if ( spacebrew != NULL ) spacebrew->sendRange("mode", 1);
+                    
+                    letterIndex = 0;
+                    ofLogVerbose()<<"name mode";
+                    
+                    // transition to color
+                    nextColor = ofColor(colors[currentName].r, colors[currentName].g, colors[currentName].b);
+                    nextArmColor = ofColor(colors[currentName].a);
+                    //clocks->setColor( ofColor(colors[currentName].r, colors[currentName].g, colors[currentName].b) );
+                    //clocks->setArmColor(ofColor(colors[currentName].a));
+                    
+                    // setup transition
+                    transitionMode =  (AnimationMode) floor(ofRandom(1, MODE_NOISE));
+                    resetAnimation( transitionMode );
                 }
-                if ( spacebrew != NULL ) spacebrew->sendRange("name", currentName);
-                if ( spacebrew != NULL ) spacebrew->sendRange("mode", 1);
-                letterIndex = 0;
-                letterLastChanged = ofGetElapsedTimeMillis();
-                ofLogVerbose()<<"name mode";
-            }
-            
-            // quote to interactive
-        } else {
-            if ( ofGetElapsedTimeMillis() - lastChanged > nameDuration && letterIndex == 0){
-                lastChanged = ofGetElapsedTimeMillis();
-                bInteractiveMode = true;
-                if ( spacebrew != NULL ) spacebrew->sendRange("mode", 0);
-                letterIndex = 0;
-                letterLastChanged = ofGetElapsedTimeMillis();
-                cout<<"interactive mode"<<endl;
+                break;
                 
-                // randomize animation mode
-                animationMode = (AnimationMode) ofRandom(MODE_ARROW + 1);
-                aniLastChanged = ofGetElapsedTimeMillis();
+            case STATE_TRANSITION:
+                break;
                 
-                resetAnimation( (AnimationMode) animationMode );
-            }
+            case STATE_LETTERS:
+                if ( ofGetElapsedTimeMillis() - lastChanged > nameDuration && letterIndex == 0 ){
+                    lastChanged = ofGetElapsedTimeMillis();
+                    mode = STATE_TRANSITION;
+                    nextState = STATE_INTERACTIVE;
+                    
+                    if ( spacebrew != NULL ) spacebrew->sendRange("mode", 0);
+                    letterIndex = 0;
+                    letterLastChanged = ofGetElapsedTimeMillis();
+                    ofLogVerbose()<<"interactive mode"<<endl;
+                    
+                    // randomize animation mode
+                    animationMode = (AnimationMode) ofRandom(MODE_ARROW + 1);
+                    aniLastChanged = ofGetElapsedTimeMillis();
+                    
+                    resetAnimation( animationMode );
+                    
+                    // transition to white/black
+                    nextColor       = ofColor(255);
+                    nextArmColor    = ofColor(0);
+                    //clocks->setColor(ofColor(255));
+                    //clocks->setArmColor(ofColor(0));
+                    
+                    // setup transition
+                    transitionMode =  (AnimationMode) floor(ofRandom(1, MODE_NOISE));
+                    resetAnimation( transitionMode );
+                }
+                break;
+                
+            default:
+                break;
         }
     }
     
-    if (!bInteractiveMode){
+    
+    static bool threeLetter = false;
+    
+    // letter switching
+    if ( mode == STATE_LETTERS ){
         char c = names[currentName][letterIndex];
         string kz = ofToString(c);
         
         int w = (kz == "w" || kz == "m")? 6 : 4;
         
-        //int start = ofMap(ofGetElapsedTimeMillis() - letterLastChanged, 0, letterRate, (ks == "w" || ks == "m")? 4 : 6, 0);
-        int ind = 3 - letterIndex * w;
-        for (int i=0; i<names[currentName].length(); i++){
-            char k = names[currentName][i];
-            string ks = ofToString(k);
-//            letterIndex;
-            //cout << "set "<<ks<<":"<<((i+4) - letterIndex)<<endl;
-            float weight = letterIndex == i ? 1.0 : .3;
-            clocks->setClocks(clocks->letters[ks], ind, 3, (ks == "w" || ks == "m")? 6 : 4, weight);
-            ind += (ks == "w" || ks == "m")? 6 : 4;
+        if ( threeLetter ){
+            
+            //int start = ofMap(ofGetElapsedTimeMillis() - letterLastChanged, 0, letterRate, (ks == "w" || ks == "m")? 4 : 6, 0);
+            int ind = 3 - letterIndex * w;
+            for (int i=0; i<names[currentName].length(); i++){
+                char k = names[currentName][i];
+                string ks = ofToString(k);
+    //            letterIndex;
+                //cout << "set "<<ks<<":"<<((i+4) - letterIndex)<<endl;
+                float weight = letterIndex == i ? 1.0 : .3;
+                clocks->setClocks(clocks->letters[ks], ind, 3, (ks == "w" || ks == "m")? 3 : 4, weight);
+                ind += (ks == "w" || ks == "m")? 6 : 4;
+            }
         }
         if ( ofGetElapsedTimeMillis() - letterLastChanged > letterRate ){
             letterLastChanged = ofGetElapsedTimeMillis();
@@ -124,11 +178,56 @@ void ClockMode::update(){
             if ( letterIndex >= names[currentName].length() ){
                 letterIndex = 0;
             }
-        }
-    } else {
-        if ( clocks->clocks[0].bAnimating ){
-            // start changing ambient animations
             
+            if ( !threeLetter && (ofGetElapsedTimeMillis() - lastChanged < nameDuration || letterIndex != 0) ){
+                char k = names[currentName][letterIndex];
+                string ks = ofToString(k);
+                //float weight = letterIndex == i ? 1.0 : .3;
+                clocks->setClocks(clocks->letters[ks], (ks == "w" || ks == "m")? 4 : 3, 3, (ks == "w" || ks == "m")? 6 : 4, 1.0);
+            }
+        }
+    } else if (mode == STATE_TRANSITION ){
+        int index = 0;
+        int triggered = 0;
+        
+        for ( auto & c : clocks->clocks ){
+            
+            if ( ofGetElapsedTimeMillis() - delays[index].lastTriggered <= delays[index].delay ){
+                // just chill
+            } else {
+                if ( !delays[index].bTriggered ){
+                    delays[index].bTriggered = true;
+                    c.vel.x = 100;
+                    c.faceColor.set(nextColor);
+                    c.armColor.set(nextArmColor);
+                    
+                    triggered++;
+                } else {
+                    triggered++;
+                }
+            }
+            index++;
+        }
+        
+        // CHANGE STATES
+        if ( triggered == clocks->clocks.size() ){
+            mode = nextState;
+            
+            if ( nextState == STATE_LETTERS ){
+                letterLastChanged = ofGetElapsedTimeMillis();
+                if ( !threeLetter ){
+                    char k = names[currentName][letterIndex];
+                    string ks = ofToString(k);
+                    //float weight = letterIndex == i ? 1.0 : .3;
+                    clocks->setClocks(clocks->letters[ks], (ks == "w" || ks == "m")? 4 : 3, 3, (ks == "w" || ks == "m")? 6 : 4, 1.0);
+                }
+            }
+        }
+        
+    } else if (mode == STATE_INTERACTIVE ){
+        if ( clocks->clocks[0].bAnimating ){
+            
+            // start changing ambient animations
             switch (animationMode) {
                 case MODE_NORMAL:
                     // shhhh
@@ -199,15 +298,56 @@ void ClockMode::resetAnimation( AnimationMode mode ){
     float min = ofRandom(50, 500);
     float max = ofRandom(min, 2000);
     float maxX = clocks->clocks[clocks->clocks.size()-1].x;
-    switch (animationMode) {
+    float maxY = clocks->clocks[clocks->clocks.size()-1].y;
+    int dir = floor( ofRandom(4));
+    bool bFlip = false;
+    
+    switch (mode) {
         case MODE_NORMAL:
             // shhhh
+            break;
+            
+        case MODE_RANDOM:
+            for ( auto & c : clocks->clocks ){
+                delays[index].lastTriggered = ofGetElapsedTimeMillis();
+                delays[index].delay = ofRandom(min, max);
+                delays[index].bTriggered = false;
+                index++;
+            }
             break;
             
         case MODE_WAVE:
             for ( auto & c : clocks->clocks ){
                 delays[index].lastTriggered = ofGetElapsedTimeMillis();
-                delays[index].delay = ofMap(c.x, 0, maxX, min, max, true);
+                float val = 0;
+                float minIn = 0; float maxIn = 0;
+                float minOut = 0; float maxOut = 0;
+                switch (dir) {
+                    case 0:
+                        val = c.x;
+                        minIn = 0; maxIn = maxX;
+                        minOut = min; maxOut = max;
+                        break;
+                        
+                    case 1:
+                        val = c.x;
+                        minIn = 0; maxIn = maxX;
+                        minOut = max; maxOut = min;
+                        break;
+                        
+                    case 2:
+                        val = c.y;
+                        minIn = 0; maxIn = maxY;
+                        minOut = min; maxOut = max;
+                        break;
+                        
+                    case 3:
+                        val = c.y;
+                        minIn = 0; maxIn = maxY;
+                        minOut = max; maxOut = min;
+                        break;
+                }
+                delays[index].delay = ofMap(val, minIn, maxIn, minOut, maxOut, true);
                 delays[index].bTriggered = false;
                 index++;
             }
@@ -219,8 +359,52 @@ void ClockMode::resetAnimation( AnimationMode mode ){
         case MODE_EXPLODE:
             for ( auto & c : clocks->clocks ){
                 delays[index].lastTriggered = ofGetElapsedTimeMillis();
-                delays[index].delay = ofMap(fabs(p.distance(c)), 0, maxX, 500, 2000, true);
+                delays[index].delay = ofMap(fabs(p.distance(c)), 0, maxX, min, max, true);
                 delays[index].bTriggered = false;
+                index++;
+            }
+            break;
+        
+        case MODE_ORDERED:
+            for ( auto & c : clocks->clocks ){
+                delays[index].lastTriggered = ofGetElapsedTimeMillis();
+                float minIn = 0; float maxIn = 0;
+                float minOut = 0; float maxOut = 0;
+                int val = index;
+                switch (dir) {
+                    case 0:
+                    case 3:
+                        val = index;
+                        minIn = 0; maxIn = 100;
+                        break;
+                        
+                    case 1:
+                    case 2:
+                        val = index;
+                        minIn = 100; maxIn = 0;
+                        break;
+                }
+                delays[index].delay = ofMap(val, minIn, maxIn, min * 2, max * 2, true);
+                delays[index].bTriggered = false;
+                index++;
+            }
+            break;
+            
+        case MODE_SHADES:
+            for ( auto & c : clocks->clocks ){
+                int x = index % 10;
+                int y = index / 10.0;
+                
+                float minIn = 0; float maxIn = 10;
+                if ( bFlip ){
+                    minIn = 10;
+                    maxIn = 0;
+                }
+                
+                delays[index].lastTriggered = ofGetElapsedTimeMillis();
+                delays[index].delay = ofMap(x, minIn, maxIn, min, max, true);
+                delays[index].bTriggered = false;
+                
                 index++;
             }
             break;
@@ -258,7 +442,7 @@ void ClockMode::resetAnimation( AnimationMode mode ){
 }
 
 bool ClockMode::isInteractive(){
-    return bInteractiveMode;
+    return mode == STATE_INTERACTIVE;
 }
 
 int ClockMode::getCurrentName(){

@@ -40,8 +40,9 @@ ofVec2f getCircleVec( float angle, float rad ){
 //--------------------------------------------------------------
 void Clock::setup(){
     ofSetCircleResolution(300);
-    faceColor.set(255,0,0);
-    liveFaceColor.set(255, 0, 0);
+    faceColor.set(255);
+    liveFaceColor.set(255);
+    armColor.set(0);
     
     // build face mesh
     float res = 100;
@@ -129,7 +130,7 @@ void Clock::setColor( ofColor c ){
     for ( int i=0; i<face.getNumColors(); i+=3){
         face.setColor(i, color);
         face.setColor(i + 1, color);
-        face.setColor(i + 2, ofColor(255));
+        face.setColor(i + 2, color);//ofColor(255));
     }
     
     /*for (int i=colorIndex; i>colorIndex-colorIncrement; i--){
@@ -145,7 +146,7 @@ void Clock::setColor( ofColor c ){
 void Clock::setColor( ofColor facec, ofColor letterc, int startAngle, int endAngle, bool bGradient ){
     ofFloatColor colorF(facec.r/255.0, facec.g/255.0, facec.b/255.0, facec.a/255.0f);
     ofFloatColor colorFB(colorF);
-    colorFB.setHue(colorFB.getHue() + (bGradient ? .1 : .0));
+    //colorFB.setHue(colorFB.getHue() + (bGradient ? .1 : .0));
     
     ofFloatColor colorL(letterc.r/255.0, letterc.g/255.0, letterc.b/255.0, letterc.a/255.0f);
     ofFloatColor colorLB(colorL);
@@ -250,8 +251,9 @@ void Clock::draw(){
         float cr = (float) liveRadius / numFaces;
         cr *= (i+1);
         
-        if ( !bColorLetterFace ) setColor(liveFaceColor);
-        else {
+        if ( !bColorLetterFace ){
+            setColor(liveFaceColor);
+        } else {
             setColor(liveFaceColor, liveLetterColor, colorAngles[i * 2], colorAngles[i * 2 + 1], !bLetter);
         }
         
@@ -262,23 +264,25 @@ void Clock::draw(){
         fc.g = liveArmColor.g/255.0f;
         fc.b = liveArmColor.b/255.0f;
         
-        for ( auto & c : ticks.getColors() ){
+        // ticks
+        /*for ( auto & c : ticks.getColors() ){
             c.set(fc);
         }
         
-        ticks.draw();
+        ticks.draw();*/
         
-        // ticks
         
         // ease angles
         angles[i * 2]       = angles[i * 2] * .9 + targetAngle[i * 2] * .1;
         angles[i * 2 + 1]   = angles[i * 2 + 1] * .9 + targetAngle[i * 2 + 1] * .1;
         
+        static float armMult = 1.0;
+        
         ofPushMatrix();
             ofVec2f o1(0, - lineWidth/2.0);
             ofVec2f o2(0, + lineWidth/2.0);
-            ofVec2f p1(cr  * .9, 0 - lineWidth/2.0);
-            ofVec2f p2(cr  * .9, 0 + lineWidth/2.0);
+            ofVec2f p1(cr  * armMult, 0 - lineWidth/2.0);
+            ofVec2f p2(cr  * armMult, 0 + lineWidth/2.0);
             //o1.rotate(angles[i * 2], ofVec2f(0,0));
             //o2.rotate(angles[i * 2], ofVec2f(0,0));
             //p1.rotate(angles[i * 2], ofVec2f(0,0));
@@ -300,8 +304,8 @@ void Clock::draw(){
         ofPushMatrix();
         o1.set(0,-lineWidth/2.0);
         o2.set(0,+lineWidth/2.0);
-        p1.set(cr  * .9, -lineWidth/2.0);
-        p2.set(cr  * .9, +lineWidth/2.0);
+        p1.set(cr  * armMult, -lineWidth/2.0);
+        p2.set(cr  * armMult, +lineWidth/2.0);
         
         arm2.clear();
         arm2.addVertex(o1); arm2.addVertex(o2); arm2.addVertex(p1); arm2.addVertex(p2);
@@ -688,6 +692,7 @@ Clocks::Clocks(){
     hueVariance = 0;
     guiVisible = false;
     bColorTextSeparately = false;
+    bUseColorFade = false;
     huePosition = 0;
     hueSpeed = 0; // how long it takes to get from min to max
     hueDirection = 1;
@@ -738,28 +743,32 @@ void Clocks::setup( int gridX, int gridY, ofVec3f spacing, int startX, int start
 
 //--------------------------------------------------------------
 void Clocks::update( ofEventArgs & e ){
-    float min = hueDirection == 1 ? 0 : 1;
-    float max = hueDirection == 1 ? 1 : 0;
-    huePosition = ofMap(ofGetElapsedTimeMillis() - hueTweenStarted, 0, hueSpeed, min, max, true);
-    if ( ofGetElapsedTimeMillis() - hueTweenStarted >= hueSpeed ){
-        hueTweenStarted = ofGetElapsedTimeMillis();
-        hueDirection *= -1;
+    if ( bUseColorFade ){
+        float min = hueDirection == 1 ? 0 : 1;
+        float max = hueDirection == 1 ? 1 : 0;
+        huePosition = ofMap(ofGetElapsedTimeMillis() - hueTweenStarted, 0, hueSpeed, min, max, true);
+        if ( ofGetElapsedTimeMillis() - hueTweenStarted >= hueSpeed ){
+            hueTweenStarted = ofGetElapsedTimeMillis();
+            hueDirection *= -1;
+        }
+        faceColorTop.setHue(ofMap(huePosition, 0.0, 1.0, faceHueMin, faceHueMax, true));
+        faceColorTop.setSaturation(faceSat);
+        faceColorTop.setBrightness(faceBright);
+        
+        faceColorBottom.setHue(ofMap(ofWrap(huePosition + hueVariance, 0, 1), 0.0, 1.0, faceHueMin, faceHueMax, true));
+        faceColorBottom.setSaturation(faceSat);
+        faceColorBottom.setBrightness(faceBright);
+        
+        armColor.setHue( ofMap(huePosition, 0.0, 1.0, armHueMin, armHueMax) );
+        armColor.setSaturation(armSat);
+        armColor.setBrightness(armBright);
+        
+        letterColor.setHue( ofMap(huePosition, 0.0, 1.0, letterHueMin, letterHueMax) );
+        letterColor.setSaturation(letterSat);
+        letterColor.setBrightness(letterBright);
+    } else {
+        // don't do anything, color is being set elsewhere!
     }
-    faceColorTop.setHue(ofMap(huePosition, 0.0, 1.0, faceHueMin, faceHueMax, true));
-    faceColorTop.setSaturation(faceSat);
-    faceColorTop.setBrightness(faceBright);
-    
-    faceColorBottom.setHue(ofMap(ofWrap(huePosition + hueVariance, 0, 1), 0.0, 1.0, faceHueMin, faceHueMax, true));
-    faceColorBottom.setSaturation(faceSat);
-    faceColorBottom.setBrightness(faceBright);
-    
-    armColor.setHue( ofMap(huePosition, 0.0, 1.0, armHueMin, armHueMax) );
-    armColor.setSaturation(armSat);
-    armColor.setBrightness(armBright);
-    
-    letterColor.setHue( ofMap(huePosition, 0.0, 1.0, letterHueMin, letterHueMax) );
-    letterColor.setSaturation(letterSat);
-    letterColor.setBrightness(letterBright);
     
     int i = 0;
     for ( auto & c : clocks ){
@@ -769,12 +778,16 @@ void Clocks::update( ofEventArgs & e ){
         c.bColorLetterFace = bColorTextSeparately;
         
         ofColor color(faceColorTop);
-        float y = (i % 10) / 10.0;
-        color.lerp(faceColorBottom, y);
         
-        c.faceColor.set(color);
-        c.armColor.set(armColor);
-        c.letterColor.set(letterColor);
+        if ( bUseColorFade ){
+            float y = (i % 10) / 10.0;
+            color.lerp(faceColorBottom, y);
+            c.faceColor.set(color);
+            c.armColor.set(armColor);
+            c.letterColor.set(letterColor);
+            
+        } else {
+        }
         
         if ( i == currentClock ){
             if ( ofGetKeyPressed( OF_KEY_CONTROL ) && ofGetKeyPressed(OF_KEY_SHIFT) ){
@@ -893,6 +906,16 @@ void Clocks::setupGui(){
     
     gui->loadSettings("gui-settings.xml");
     gui2->loadSettings("gui2-settings.xml");
+}
+
+//--------------------------------------------------------------
+void Clocks::setColor( ofColor color ){
+    faceColorTop.set(color);
+}
+
+//--------------------------------------------------------------
+void Clocks::setArmColor( ofColor color ){
+    armColor.set(color);
 }
 
 //--------------------------------------------------------------

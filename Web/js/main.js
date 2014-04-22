@@ -54,6 +54,33 @@ $(document).ready( function() {
 		this.names = ["sean","noreen","chuck","dana","bob","david","ken","leslie","kyle","michael","stephen","abbott","louise","sylvia","cheryl","alex","chip","michael_m","richard","michael_d","nancye","bill_m","gael","ann"];
 		this.years = [1979, 1982, 1981, 1968, 1977, 1980, 1971, 1975, 1985, 1964, 1978, 1980, 1973, 1976, 1980, 1970, 1986, 1976, 1957, 1968, 1971, 1965, 1975, 1957]
 
+		this.colors = [
+			{ r:51, g:255, b:153, h:0 },
+			{ r:204, g:0, b:0 , h:255 },
+			{ r:255, g:206, b:0 , h:0 },
+			{ r:153, g:0, b:204 , h:255 },
+			{ r:255, g:153, b:51 , h:0 },
+			{ r:255, g:108, b:12 , h:255 },
+			{ r:255, g:102, b:255 , h:0 },
+			{ r:102, g:0, b:102 , h:255 },
+			{ r:204, g:255, b:0 , h:0 },
+			{ r:247, g:50, b:63 , h:255 },
+			{ r:0, g:255, b:51 , h:0 },
+			{ r:0, g:0, b:255 , h:255 },
+			{ r:0, g:204, b:204 , h:0 },
+			{ r:255, g:0, b:0 , h:255 },
+			{ r:255, g:255, b:0 , h:0 },
+			{ r:255, g:0, b:102 , h:255 },
+			{ r:255, g:0, b:153 , h:0 },
+			{ r:0, g:51, b:102 , h:255 },
+			{ r:211, g:210, b:210 , h:0 },
+			{ r:102, g:0, b:51 , h:255 },
+			{ r:0, g:255, b:255 , h:0 },
+			{ r:51, g:102, b:255 , h:255 },
+			{ r:0, g:255, b:204 , h:0 },
+			{ r:0, g:153, b:0 , h:255 }
+		]
+
 		//-------------------------------------------------------
 		this.setup = function (){
 			//this.unregisterMouseEvents();
@@ -136,20 +163,13 @@ $(document).ready( function() {
 			if (isIpad){
 				$("#quotes").addClass("quotesiPad");
 				$(".name").addClass("nameiPad");
-				$(".quoteBigName").addClass("nameiPad");
-				$("#quoteContainer").addClass("quoteContaineriPad");
 				$(".quote").addClass("quoteiPad");
 				$("#touch").addClass("touchiPad");
 				$("#release").addClass("touchiPad");
 				$(".quoteInner").addClass("quoteInneriPad");
 				$(".quoteName").addClass("quoteNameiPad");
 				$(".italic").addClass("italiciPad");
-			} else {
-				var d = document.getElementById("nameContainer");
-				var p = document.getElementById("quotes");
-				p.removeChild(d);
 			}
-
 			$('.quoteInner').widowFix();
 
 			this.setupSpacebrew();
@@ -219,7 +239,8 @@ $(document).ready( function() {
 		//-------------------------------------------------------
 		this.update = function (){
 			for ( var ind in this.meshes ){
-				this.meshes[ind].update();
+				setTimeout( this.meshes[ind].update.bind(this.meshes[ind]), 0);
+				// meshes[ind].update();
 			}
 		}
 
@@ -443,18 +464,19 @@ $(document).ready( function() {
 				// console.log( this.names[value]);
 				if ( value < 24 ){
 					this.nameIndex = value;
-					this.showName(this.names[value]);
+					this.showName( value );
 				}
 			}
 		}
 
-		this.showName = function(name){
+		this.showName = function(val){
+			var name = this.names[val];
 			$( "#names" ).children().css( "visibility", "hidden" );
-			$( "#quoteContainer" ).children().css( "visibility", "hidden" );
-			if (isIpad) $( "#nameContainer" ).children().css( "visibility", "hidden" );
+			$( "#quotes" ).children().css( "visibility", "hidden" );
 			$("#name_"+name).css("visibility", "visible");
 			$("#quote_"+name).css("visibility", "visible");
-			if (isIpad) $("#quoteBigName_"+name).css("visibility", "visible");
+			$("#name_"+name).css("color", "rgb(" + this.colors[val].r +","+ this.colors[val].g +","+ this.colors[val].b + ")");
+			$("#quote_"+name).css("color", "rgb(" + this.colors[val].r +","+ this.colors[val].g +","+ this.colors[val].b + ")");
 		}
 
 		this.showHide = function( show ) {

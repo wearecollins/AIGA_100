@@ -199,7 +199,7 @@ Clock.prototype.update = function() {
 };
 
 Clock.prototype.mousePressed = function(x,y) {
-	this.mouseDown = x <= this.position.x + this.radius && x >= this.position.x - this.radius && y <= this.position.y + this.radius && y >= this.position.y - this.radius;
+	this.mouseDown = x <= this.position.x + this.radius * 2.0 && x >= this.position.x - this.radius * 2.0 && y <= this.position.y + this.radius * 2.0 && y >= this.position.y - this.radius  * 2.0;
 	return this.mouseDown;
 };
 
