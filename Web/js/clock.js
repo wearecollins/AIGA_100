@@ -214,8 +214,8 @@ Clock.prototype.update = function( time ) {
 };
 
 Clock.prototype.mousePressed = function(x,y) {
-	this.mouseDown = x <= this.position.x + this.radius * 2.0 && x >= this.position.x - this.radius * 2.0 && y <= this.position.y + this.radius * 2.0 && y >= this.position.y - this.radius  * 2.0;
-	return this.mouseDown;
+	//this.mouseDown = x <= this.position.x + this.radius * 2.0 && x >= this.position.x - this.radius * 2.0 && y <= this.position.y + this.radius * 2.0 && y >= this.position.y - this.radius  * 2.0;
+	return x <= this.position.x + this.radius * 2.0 && x >= this.position.x - this.radius * 2.0 && y <= this.position.y + this.radius * 2.0 && y >= this.position.y - this.radius  * 2.0;
 };
 
 Clock.prototype.mouseReleased = function(){

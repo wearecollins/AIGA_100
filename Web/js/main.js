@@ -264,13 +264,15 @@ $(document).ready( function() {
 
 		//-------------------------------------------------------
 		this.checkGrid = function(x,y){
+			var index = -1;
 			for ( var i=0; i<this.grid.length; i++){
-				if ( this.meshes[i].mousePressed(x,y)){
+				this.meshes[i].magnet(x,y, this.now);
+				if ( index == -1 && this.meshes[i].mousePressed(x,y)){
 					this.grid[i].filled = true;
-					return i;
+					index = i;
 				}
 			}
-			return -1;
+			return index;
 		}
 
 		this.rotateBigClockTo = function(deg1, deg2){
@@ -385,10 +387,6 @@ $(document).ready( function() {
 				}
 			}	
 			this.lastGrid = ind;
-
-			for ( var ind in this.meshes ){
-				this.meshes[ind].magnet(x,y, this.now);
-			}
 		}
 
 		//-------------------------------------------------------
