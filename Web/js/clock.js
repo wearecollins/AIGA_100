@@ -129,6 +129,8 @@ Clock.prototype.setup = function( x,y, rad, isGL ) {
 	this.lastFroze = new Date();
 	this.lastAnim = new Date();
 	this.currentMouse = {x:-1, y:-1};
+	this.p2 = new THREE.Vector2(this.position.x, this.position.y);
+	this.m = new THREE.Vector2(0,0);
 };
 
 Clock.prototype.getRBGStyle = function() {
@@ -154,8 +156,8 @@ Clock.prototype.magnet = function(mx,my, now) {
 		this.armOne.element.style["-webkit-transition"] = "";
 		this.armTwo.element.style["-webkit-transition"] = "";
 	}
-	this.currentMouse.x = mx;
-	this.currentMouse.y = my;
+	this.m.x = mx;
+	this.m.y = my;
 	this.mouseDown = true;
 	this.animating = false;
 }
@@ -184,15 +186,13 @@ Clock.prototype.update = function( time ) {
 			this.lastFroze = time;
 		}
 	} else if ( this.mouseDown ) {
-		if ( this.currentMouse.x != -1 ){
-			var p = new THREE.Vector2(this.position.x, this.position.y);
-			var m = new THREE.Vector2(this.currentMouse.x,this.currentMouse.y);
-		    var dist = p.distanceTo(m);
-		    m = m.sub(p);
+		if ( this.m.x != -1 ){
+			
+		    var dist = this.p2.distanceTo(this.m);
 		    
 		    if ( (dist) < 20000 && !isIpad){
-		        var line = p.add( new THREE.Vector2(this.radius, this.radius));
-		        var a = this.angle(p,m, false);
+		    	this.m = this.m.sub(this.p2);
+		        var a = this.angle(this.p2, this.m, false);
 		        var angle = SUD.map(a, -180, 180, 90, 360);
 
 				this.armOne.rotation.z = angle;
@@ -200,7 +200,7 @@ Clock.prototype.update = function( time ) {
 		        this.vel.x += 10.0;
 		        this.lastAnim = time;
 		    }
-		    this.currentMouse.x = -1;
+		    this.m.x = -1;
     		this.lastFroze = time - SUD.map(dist, 0, 1000, 1000, 0);
 		}
 	}
