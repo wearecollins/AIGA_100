@@ -167,7 +167,7 @@ void ClockMode::update(){
     //            letterIndex;
                 //cout << "set "<<ks<<":"<<((i+4) - letterIndex)<<endl;
                 float weight = letterIndex == i ? 1.0 : .3;
-                clocks->setClocks(clocks->letters[ks], ind, 3, (ks == "w" || ks == "m")? 3 : 4, weight);
+                clocks->setClocks(clocks->letters[ks], ind, (ks == "w" || ks == "m")? 3 : 4, 3, weight);
                 ind += (ks == "w" || ks == "m")? 6 : 4;
             }
         }
