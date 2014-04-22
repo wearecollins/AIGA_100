@@ -173,6 +173,7 @@ $(document).ready( function() {
 			$('.quoteInner').widowFix();
 
 			this.setupSpacebrew();
+			this.camera.lookAt( this.scene.position );
 			
 		}
 
@@ -264,7 +265,6 @@ $(document).ready( function() {
 				case 1:
 					break;
 			}
-			this.camera.lookAt( this.scene.position );
 			//this.renderer.render( this.scene, this.camera );//, null, true );
 			setTimeout( this.renderer.render.bind(this.renderer.render), 0, this.scene, this.camera );
 		}	
@@ -328,21 +328,7 @@ $(document).ready( function() {
 						$("#release").css("opacity", 1);
 						//this.currentDrawing.push({x:x, y:y});
 						
-						for ( var ind in this.meshes ){
-							this.meshes[ind].magnet(x,y);
-						}
-
-						// are we over any grid squares?
-						var ind = this.checkGrid(x,y);
-						if ( ind != -1 ){
-							this.gridIndices.push(ind);
-							if ( ind != this.lastGrid ){
-								this.meshes[ind].color.r = this.r;
-								this.meshes[ind].color.g = this.g;
-								this.meshes[ind].color.b = this.b;
-							}
-						}
-						this.lastGrid = ind;
+						this.testGrid(x,y);
 					}
 					break;
 				case 2:
@@ -355,21 +341,7 @@ $(document).ready( function() {
 			switch ( this.mode ){
 				case 0:
 					if ( id == this.touchId ){
-						//this.currentDrawing.push({x:x, y:y});
-						var ind = this.checkGrid(x,y);
-						if ( ind != -1 ){
-							this.gridIndices.push(ind);
-							if ( ind != this.lastGrid ){
-								this.meshes[ind].color.r = this.r;
-								this.meshes[ind].color.g = this.g;
-								this.meshes[ind].color.b = this.b;
-							}
-						}
-						this.lastGrid = ind;
-
-						for ( var ind in this.meshes ){
-							this.meshes[ind].magnet(x,y);
-						}
+						this.testGrid(x,y);
 					}
 					break;
 				case 2:
@@ -406,7 +378,25 @@ $(document).ready( function() {
 				case 2:
 					break;
 			}
+			this.lastGrid = -1;
 		};
+
+		this.testGrid = function(x,y){
+			var ind = this.checkGrid(x,y);
+			if ( ind != -1 ){
+				this.gridIndices.push(ind);
+				if ( ind != this.lastGrid ){
+					this.meshes[ind].color.r = this.r;
+					this.meshes[ind].color.g = this.g;
+					this.meshes[ind].color.b = this.b;
+				}
+			}
+			this.lastGrid = ind;
+
+			for ( var ind in this.meshes ){
+				this.meshes[ind].magnet(x,y);
+			}
+		}
 
 		//-------------------------------------------------------
 		this.onRangeMessage = function( name, value ){
