@@ -345,7 +345,6 @@ $(document).ready( function() {
 
 		//-------------------------------------------------------
 		this.onTouchEnd = function( id, x,y ){
-			var now = new Date();
 			switch ( this.mode ){
 				case 0:
 					if ( id == this.touchId ){
@@ -359,7 +358,7 @@ $(document).ready( function() {
 						}
 
 						for ( var i=0; i<this.meshes.length; i++){
-							this.meshes[i].mouseReleased(now);
+							this.meshes[i].mouseReleased();
 						}
 
 						$("#touch").css("opacity", 1);

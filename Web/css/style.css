@@ -26,7 +26,6 @@ html, body {
 }
 
 .arm {
-	-webkit-transition:opacity .5s ease-in-out, -webkit-transform .1s ease-in-out;
 }
 
 .touch {

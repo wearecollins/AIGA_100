@@ -156,10 +156,9 @@ Clock.prototype.magnet = function(mx,my, now) {
         var line = p.add( new THREE.Vector2(this.radius, this.radius));
         var a = this.angle(p,m, false);
         var angle = SUD.map(a, -180, 180, 90, 360);
+
 		this.armOne.rotation.z = angle;
 		this.armTwo.rotation.z = angle + Math.PI;
-		//this.armOne.element.style["-webkit-transition"] = "opacity .5s ease-in-out, -webkit-transform .1s ease-in-out";
-		//this.armTwo.element.style["-webkit-transition"] = "opacity .5s ease-in-out, -webkit-transform .1s ease-in-out";
 
     	this.mouseDown = true;
 		this.animating = false;
@@ -172,11 +171,8 @@ Clock.prototype.magnet = function(mx,my, now) {
         //     }
         //     b = !b;
         // }
-        this.vel.x += 50.0;
-        if ( isIpad ){
-	        //this.hsv.h += SUD.map(dist, 0, 500, .01, 0);
-        	//this.hsv.h = SUD.wrap(this.hsv.h, 0, 1.0)
-        }
+        this.vel.x += 10.0;
+
         //offset += ofMap(dist, 0, 200, 10, 0, true);
         //offset = ofClamp(offset, 0, 150);
         this.lastFroze = now - SUD.map(dist, 0, 1000, 1000, 0);
@@ -213,7 +209,7 @@ Clock.prototype.update = function( time ) {
 		this.face.element.style.backgroundColor = this.getRBGStyle();
 	}
 
-	this.lastStyle = this.getRBGStyle();
+	this.lastStyle = style;
 };
 
 Clock.prototype.mousePressed = function(x,y) {
@@ -221,7 +217,7 @@ Clock.prototype.mousePressed = function(x,y) {
 	return this.mouseDown;
 };
 
-Clock.prototype.mouseReleased = function(time){
+Clock.prototype.mouseReleased = function(){
 	this.mouseDown = false;
 }
 
