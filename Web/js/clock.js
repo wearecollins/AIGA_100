@@ -153,15 +153,17 @@ Clock.prototype.magnet = function(mx,my, now) {
     m = m.sub(p);
     
     if ( (dist) < 20000 ){
-    	this.mouseDown = true;
         var line = p.add( new THREE.Vector2(this.radius, this.radius));
         var a = this.angle(p,m, false);
         var angle = SUD.map(a, -180, 180, 90, 360);
 		this.armOne.rotation.z = angle;
 		this.armTwo.rotation.z = angle + Math.PI;
-		this.armOne.element.style["-webkit-transition"] = "opacity .5s ease-in-out, -webkit-transform .1s ease-in-out";
-		this.armTwo.element.style["-webkit-transition"] = "opacity .5s ease-in-out, -webkit-transform .1s ease-in-out";
+		//this.armOne.element.style["-webkit-transition"] = "opacity .5s ease-in-out, -webkit-transform .1s ease-in-out";
+		//this.armTwo.element.style["-webkit-transition"] = "opacity .5s ease-in-out, -webkit-transform .1s ease-in-out";
+
+    	this.mouseDown = true;
 		clearTimeout(this.anTime);
+		clearTimeout(this.anJam);
 		this.animating = false;
 
         // for ( auto & a : targetAngle ){
