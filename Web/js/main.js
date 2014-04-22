@@ -239,7 +239,7 @@ $(document).ready( function() {
 		//-------------------------------------------------------
 		
 		var chunkIndex = 0;
-		var chunkSize  = 25;
+		var chunkSize  = 100;
 
 		this.update = function (){
 			for (var i=chunkIndex; i<chunkIndex + chunkSize; i++){
@@ -264,7 +264,8 @@ $(document).ready( function() {
 					break;
 			}
 			this.camera.lookAt( this.scene.position );
-			this.renderer.render( this.scene, this.camera );//, null, true );
+			//this.renderer.render( this.scene, this.camera );//, null, true );
+			setTimeout( this.renderer.render.bind(this.renderer.render), 0, this.scene, this.camera );
 		}	
 
 		//-------------------------------------------------------
