@@ -41,12 +41,14 @@ html, body {
 	-webkit-box-pack: center;
 	-webkit-box-align: center;
 	position: absolute;
+	letter-spacing: -4px;
 /*	bottom: 130px;
 	left: 0px;*/
 }
 
 .touchiPad {
 	font-size: 180px;
+	letter-spacing: -8px;
 	/*bottom: 120px;*/
 }
 

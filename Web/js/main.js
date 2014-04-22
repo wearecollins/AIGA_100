@@ -240,9 +240,9 @@ $(document).ready( function() {
 
 		//-------------------------------------------------------
 		this.update = function (){
-			var now = new Date();
+			this.now = new Date();
 			for (var i=0; i<100; i++){
-				this.meshes[i].update(now);
+				this.meshes[i].update(this.now);
 				// meshes[ind].update();
 			}
 		}
@@ -383,12 +383,11 @@ $(document).ready( function() {
 					this.meshes[ind].color.g = this.g;
 					this.meshes[ind].color.b = this.b;
 				}
-			}
+			}	
 			this.lastGrid = ind;
 
-			var now = new Date();
 			for ( var ind in this.meshes ){
-				this.meshes[ind].magnet(x,y, now);
+				this.meshes[ind].magnet(x,y, this.now);
 			}
 		}
 
