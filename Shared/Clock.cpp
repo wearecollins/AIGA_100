@@ -276,7 +276,7 @@ void Clock::draw(){
         angles[i * 2]       = angles[i * 2] * .9 + targetAngle[i * 2] * .1;
         angles[i * 2 + 1]   = angles[i * 2 + 1] * .9 + targetAngle[i * 2 + 1] * .1;
         
-        static float armMult = 1.0;
+        static float armMult = 1.1;
         
         ofPushMatrix();
             ofVec2f o1(0, - lineWidth/2.0);
@@ -660,11 +660,10 @@ void Clock::magnet( int mx, int my, ofColor color, int freezeTime ){
         bHasColor = currentColors.size() == 0 ? false : (currentColors.back() == color);
         
         if ( !bHasColor ){
-            ofColor sum;
+//            ofColor sum;
             ofColor avg;
-            for ( auto c : currentColors ) liveFaceColor += c;
-            avg.set(sum);
-            if ( currentColors.size() > 0 ) avg /= currentColors.size();
+            liveFaceColor += color;
+//            for ( auto c : currentColors ) liveFaceColor += c;
             //liveFaceColor.set(sum); //liveFaceColor + color;
         } else {
             liveFaceColor.set(color);
@@ -713,16 +712,18 @@ void Clocks::setup( int gridX, int gridY, int spacing, int startX, int startY, i
 }
 
 //--------------------------------------------------------------
-void Clocks::setup( int gridX, int gridY, ofVec3f spacing, int startX, int startY, int radius, float radiusMult ){
+void Clocks::setup( int gridX, int gridY, ofVec3f sp, int startX, int startY, int radius, float radiusMult ){
+    
     for (int x=0; x<gridX; x++){
         float yInc = startY;
         for (int y=0; y<gridY; y++){
             clocks.push_back(Clock());
             clocks.back().radius = radius;
             clocks.back().liveRadius =  radius * radiusMult;
-            clocks.back().x = startX + x * (spacing.x);
+            clocks.back().x = startX + x * (sp.x);
             clocks.back().y = yInc;
-            yInc = clocks.back().y + (y >= 4 ? spacing.z : spacing.y);
+            clocks.back().origin.set(clocks.back());
+            yInc = clocks.back().y + (y >= 4 ? sp.z : sp.y);
         }
     }
     
@@ -778,6 +779,11 @@ void Clocks::update( ofEventArgs & e ){
         c.bColorLetterFace = bColorTextSeparately;
         
         ofColor color(faceColorTop);
+        
+        int yIndex = i % 10;
+        
+        c.x = c.origin.x + spacing.x;
+        c.y = c.origin.y + (yIndex <=4 ? spacing.y : spacing.z);
         
         if ( bUseColorFade ){
             float y = (i % 10) / 10.0;
@@ -903,6 +909,9 @@ void Clocks::setupGui(){
     gui2->addIntSlider("Which Clock", 0, 100, &currentClock);
     gui2->addIntSlider("currentAngleA", 0, 360, &currentAngleA);
     gui2->addIntSlider("currentAngleB", 0, 360, &currentAngleB);
+    gui2->addSlider("spacing.x", -25.0, 25.0, &spacing.x);
+    gui2->addSlider("spacing.y", -25.0, 25.0, &spacing.y);
+    gui2->addSlider("spacing.z", -25.0, 25.0, &spacing.z);
     
     gui->loadSettings("gui-settings.xml");
     gui2->loadSettings("gui2-settings.xml");

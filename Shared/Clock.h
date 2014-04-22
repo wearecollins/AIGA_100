@@ -62,7 +62,8 @@ public:
     
     void checkHit( int mx, int my, bool bFlip = false );
     void nextRotate();
-
+    
+    ofVec2f origin;
     ofVec2f lastMouse;
     float lastAngle;
     
@@ -169,5 +170,7 @@ public:
     bool bUseColorFade;
     ofColor faceColorTop, faceColorBottom, letterColor, armColor;
     
+    // spacing
+    ofVec3f spacing;
 };
 

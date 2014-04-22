@@ -23,3 +23,18 @@
     <Name>currentAngleB</Name>
     <Value>0</Value>
 </Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>spacing.x</Name>
+    <Value>1.041665673</Value>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>spacing.y</Name>
+    <Value>3.645834446</Value>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>spacing.z</Name>
+    <Value>3.906250000</Value>
+</Widget>

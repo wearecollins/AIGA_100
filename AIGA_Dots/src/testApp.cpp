@@ -44,7 +44,7 @@ void testApp::setup(){
     float clockRadius = texW / 10.0 / 2.5;
     //clocks.setup(10, 10, ofVec2f(96 * sc, 81 * sc), 108 * sc, 54 * sc, clockRadius );
     float w = clockRadius * 2.0;
-    clocks.setup(10, 10, ofVec3f( w * 1.287, w * 1.1, w * 1.234 ), clockRadius-2, clockRadius-2, clockRadius );
+    clocks.setup(10, 10, ofVec3f( w * 1.287, w * 1.1, w * 1.234 ), clockRadius-2 - 5, clockRadius-2 - 7, clockRadius );
     
     // setup clock FBO
     type.allocate(texW, texH, GL_RGB, 2);
@@ -184,6 +184,11 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
+    if ( mapamok.setupMode == SETUP_NONE ){
+        ofHideCursor();
+    } else {
+        ofShowCursor();
+    }
     renderClocks();
     mapamok.draw( &type.getTextureReference() );
     

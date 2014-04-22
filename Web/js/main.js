@@ -451,7 +451,7 @@ $(document).ready( function() {
 										
 									}.bind(this), 15000);
 								}.bind(this), 5000 );
-							}.bind(this), 15 );
+							}.bind(this), 15000 );
 						}.bind(this), 1500 );
 						break;
 				}
