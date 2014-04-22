@@ -183,7 +183,7 @@ Clock.prototype.update = function( time ) {
 			this.animating = true;
 			this.lastFroze = time;
 		}
-	} else if ( this.mouseDown ) {
+	} else if ( this.mouseDown && !isIpad ) {
 		if ( this.currentMouse.x != -1 ){
 			if ( time - this.lastAnim > 100 ){
 				var p = new THREE.Vector2(this.position.x, this.position.y);
