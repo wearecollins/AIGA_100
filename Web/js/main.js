@@ -449,9 +449,9 @@ $(document).ready( function() {
 											$qn.css("top", ($q.height() - $qa.height()- 100) +"px")
 										}
 										
-									}.bind(this), 5000);
-								}.bind(this), 3000 );
-							}.bind(this), 2000 );
+									}.bind(this), 15000);
+								}.bind(this), 5000 );
+							}.bind(this), 15 );
 						}.bind(this), 1500 );
 						break;
 				}
