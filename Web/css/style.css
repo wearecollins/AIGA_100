@@ -169,12 +169,12 @@ html, body {
 	visibility: hidden;
 	/*font-size: 20px;*/
 	color:#FD4F57;
-	top:5%;
+	top:0px;
 	left:0px;
 	margin: 0 auto;
 	width:100%;
 	position: absolute;
-	height: 90%;
+	/*height: 90%;*/
 	display: -webkit-box;
 	-webkit-box-orient: vertical;
 	-webkit-box-pack: center;

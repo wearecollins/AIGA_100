@@ -14,7 +14,7 @@
 Clock::Clock(){
     numFaces = -1;
     radius = -1;
-    vel.x = 1.0;
+    vel.x = ofRandom(.1, 2.0);
     colorMode = 0;
     offset = 0;
     bColorFace = true;
@@ -662,7 +662,7 @@ void Clock::magnet( int mx, int my, ofColor color, int freezeTime ){
         if ( !bHasColor ){
 //            ofColor sum;
             ofColor avg;
-            liveFaceColor += color;
+            liveFaceColor = liveFaceColor * .5 + color * .5;
 //            for ( auto c : currentColors ) liveFaceColor += c;
             //liveFaceColor.set(sum); //liveFaceColor + color;
         } else {
@@ -957,7 +957,7 @@ void Clocks::setClocks( Letter letter, int offsetX, int offsetY, int letterWidth
             if ( x >= 0 ){
                 int ind = (y - offsetY) + (x - offsetX) * clockLetterHeight;
                 int cind = y + x * 10.0;
-                ofColor color = (letterColor * colorWeight) + (clocks[cind].faceColor * (1.0 - colorWeight));
+                ofColor color = letterColor;
                 if ( !clocks[cind].bLetter ) clocks[cind].liveLetterColor.set(clocks[cind].faceColor);
                 clocks[cind].letterColor.set(color);
                 clocks[cind].rotateClockTo( letter.angles[ind][0], letter.angles[ind][1]);

@@ -12,8 +12,8 @@
 ClockMode::ClockMode(){
     bChangeModes       = true;
     mode                = STATE_INTERACTIVE;
-    interactiveDuration = 30 * 1000;
-    nameDuration        = 20 * 1000;
+    interactiveDuration = 60 * 1000;
+    nameDuration        = 30 * 1000;
     lastChanged         = 0;
     currentName         = 0;
     letterIndex         = 0;
@@ -255,7 +255,7 @@ void ClockMode::update(){
                                 //cout << delays[index].delay << endl;
                                 //c.rotateClockTo(0,180);
                                 c.vel.x = 0;
-                                c.lastFroze = ofGetElapsedTimeMillis();
+                                //c.lastFroze = ofGetElapsedTimeMillis();
                             } else {
                                 if ( !delays[index].bTriggered ){
                                     delays[index].bTriggered = true;
@@ -263,7 +263,7 @@ void ClockMode::update(){
                                 } else {
                                     c.vel.x = c.vel.x * .9 + 5 * .1;
                                 }
-                                c.lastFroze = ofGetElapsedTimeMillis() - 1500;
+                                //c.lastFroze = ofGetElapsedTimeMillis() - 1500;
                             }
                             index++;
                         }
@@ -416,7 +416,7 @@ void ClockMode::resetAnimation( AnimationMode mode ){
                 float angle = (float) ( y )  / 10.0 * 360.0f;
                 c.rotateClockTo( -90, angle-90 );
                 c.vel.x = 0;
-                c.lastFroze = ofGetElapsedTimeMillis() + aniDuration / 2.0;
+                //c.lastFroze = ofGetElapsedTimeMillis() + aniDuration / 2.0;
                 index++;
             }
             break;
@@ -428,7 +428,7 @@ void ClockMode::resetAnimation( AnimationMode mode ){
                 float angle = (float) ( x + y * 10 )  / 100.0 * 360.0f;
                 c.rotateClockTo( -90, angle-90 );
                 c.vel.x = 0;
-                c.lastFroze = ofGetElapsedTimeMillis() + aniDuration / 2.0;
+                //c.lastFroze = ofGetElapsedTimeMillis() + aniDuration / 2.0;
                 index++;
             }
             break;

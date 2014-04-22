@@ -170,7 +170,14 @@ $(document).ready( function() {
 				$(".quoteInner").addClass("quoteInneriPad");
 				$(".quoteName").addClass("quoteNameiPad");
 				$(".italic").addClass("italiciPad");
+			} 
+
+			for (var i=0; i<this.names.length; i++){
+				var img = document.createElement("img");
+				img.src = (isIpad ? "img/ipad" : "img/iphone" ) + "/" + this.names[i] + ".png";
+				document.getElementById("quote_"+this.names[i]).appendChild(img);
 			}
+
 			$('.quoteInner').widowFix();
 
 			this.setupSpacebrew();
