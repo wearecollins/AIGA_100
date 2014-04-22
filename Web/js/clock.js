@@ -127,6 +127,7 @@ Clock.prototype.setup = function( x,y, rad, isGL ) {
 	this.animating = true;
 	this.vel = new THREE.Vector2(1,0);
 	this.lastFroze = new Date();
+	this.currentMouse = {x:-1, y:-1};
 };
 
 Clock.prototype.getRBGStyle = function() {
@@ -148,40 +149,10 @@ Clock.prototype.angle = function(a,b, toDeg){
 }
 
 Clock.prototype.magnet = function(mx,my, now) {
-	if ( this.armOne.element.style["-webkit-transition"] != "" ){
-		this.armOne.element.style["-webkit-transition"] = "";
-		this.armTwo.element.style["-webkit-transition"] = "";
-	}
-	var p = new THREE.Vector2(this.position.x, this.position.y);
-	var m = new THREE.Vector2(mx,my);
-    var dist = p.distanceTo(m);
-    m = m.sub(p);
-    
-    if ( (dist) < 20000 ){
-        var line = p.add( new THREE.Vector2(this.radius, this.radius));
-        var a = this.angle(p,m, false);
-        var angle = SUD.map(a, -180, 180, 90, 360);
-
-		this.armOne.rotation.z = angle;
-		this.armTwo.rotation.z = angle + Math.PI;
-
-    	this.mouseDown = true;
-		this.animating = false;
-
-        // for ( auto & a : targetAngle ){
-        //     a = ofMap(angle(m), -180, 180, 0, 360) * mult;// + 135;
-        //     if ( b ){
-        //         a += 180;
-        //         //mult += 2.0;
-        //     }
-        //     b = !b;
-        // }
-        this.vel.x += 10.0;
-
-        //offset += ofMap(dist, 0, 200, 10, 0, true);
-        //offset = ofClamp(offset, 0, 150);
-        this.lastFroze = now - SUD.map(dist, 0, 1000, 1000, 0);
-    }
+	this.currentMouse.x = mx;
+	this.currentMouse.y = my;
+	this.mouseDown = true;
+	this.animating = false;
 }
 
 Clock.prototype.update = function( time ) {
@@ -206,6 +177,29 @@ Clock.prototype.update = function( time ) {
 			this.rotateArmTwoBy(180 * 1/60.0);
 			this.animating = true;
 			this.lastFroze = time;
+		}
+	} else if ( this.mouseDown ) {
+		if ( this.currentMouse.x != -1 ){
+			if ( this.armOne.element.style["-webkit-transition"] != "" ){
+				this.armOne.element.style["-webkit-transition"] = "";
+				this.armTwo.element.style["-webkit-transition"] = "";
+			}
+			var p = new THREE.Vector2(this.position.x, this.position.y);
+			var m = new THREE.Vector2(this.currentMouse.x,this.currentMouse.y);
+		    var dist = p.distanceTo(m);
+		    m = m.sub(p);
+		    
+		    if ( (dist) < 20000 ){
+		        var line = p.add( new THREE.Vector2(this.radius, this.radius));
+		        var a = this.angle(p,m, false);
+		        var angle = SUD.map(a, -180, 180, 90, 360);
+
+				this.armOne.rotation.z = angle;
+				this.armTwo.rotation.z = angle + Math.PI;
+		        this.vel.x += 10.0;
+		    }
+		    this.currentMouse.x = -1;
+    		this.lastFroze = time - SUD.map(dist, 0, 1000, 1000, 0);
 		}
 	}
 
