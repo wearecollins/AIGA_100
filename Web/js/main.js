@@ -237,10 +237,18 @@ $(document).ready( function() {
 		};
 
 		//-------------------------------------------------------
+		
+		var chunkIndex = 0;
+		var chunkSize  = 25;
+
 		this.update = function (){
-			for ( var ind in this.meshes ){
-				setTimeout( this.meshes[ind].update.bind(this.meshes[ind]), 0);
+			for (var i=chunkIndex; i<chunkIndex + chunkSize; i++){
+				setTimeout( this.meshes[i].update.bind(this.meshes[i]), 0);
 				// meshes[ind].update();
+			}
+			chunkIndex += chunkSize;
+			if ( chunkIndex >=  this.meshes.length ){
+				chunkIndex = 0;
 			}
 		}
 
