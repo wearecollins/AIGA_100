@@ -100,13 +100,13 @@ Clock.prototype.setup = function( x,y, rad, isGL ) {
 		var ad1 = document.createElement("div");
 		setLineStyle(ad1, isIpad ? 5 : 3, rad* .8, "#fff");
 		ad1.id = "arm1_"+window.clockCounter;
-		ad1.className = "threeElement";
+		ad1.className = "threeElement arm";
 		document.getElementById("sud_container").appendChild(ad1);
 
 		var ad2 = document.createElement("div");
 		setLineStyle(ad2, isIpad ? 5 : 3, rad* .8, "#fff");
 		ad2.id = "arm1_"+window.clockCounter;
-		ad2.className = "threeElement";
+		ad2.className = "threeElement arm";
 		document.getElementById("sud_container").appendChild(ad2);
 
 		this.armOne = new THREE.CSS3DObject(ad1);
@@ -123,7 +123,7 @@ Clock.prototype.setup = function( x,y, rad, isGL ) {
 	this.position.y = y;
 
 	window.clocks.push(this);
-	this.animating = false;
+	this.animating = true;
 	this.vel = new THREE.Vector2(1,0);
 	this.lastFroze = new Date();
 };
@@ -146,7 +146,7 @@ Clock.prototype.angle = function(a,b, toDeg){
 	return Math.atan2( a.x*b.y-a.y*b.x, a.x*b.x + a.y*b.y ) * (toDeg ? 180/Math.PI : 1.0);
 }
 
-Clock.prototype.magnet = function(mx,my) {
+Clock.prototype.magnet = function(mx,my, now) {
 	var p = new THREE.Vector2(this.position.x, this.position.y);
 	var m = new THREE.Vector2(mx,my);
     var dist = p.distanceTo(m);
@@ -159,6 +159,10 @@ Clock.prototype.magnet = function(mx,my) {
         var angle = SUD.map(a, -180, 180, 90, 360);
 		this.armOne.rotation.z = angle;
 		this.armTwo.rotation.z = angle + Math.PI;
+		this.armOne.element.style["-webkit-transition"] = "opacity .5s ease-in-out, -webkit-transform .1s ease-in-out";
+		this.armTwo.element.style["-webkit-transition"] = "opacity .5s ease-in-out, -webkit-transform .1s ease-in-out";
+		clearTimeout(this.anTime);
+		this.animating = false;
 
         // for ( auto & a : targetAngle ){
         //     a = ofMap(angle(m), -180, 180, 0, 360) * mult;// + 135;
@@ -168,26 +172,28 @@ Clock.prototype.magnet = function(mx,my) {
         //     }
         //     b = !b;
         // }
-        this.vel.x += 10.0;
+        this.vel.x += 50.0;
         if ( isIpad ){
 	        //this.hsv.h += SUD.map(dist, 0, 500, .01, 0);
         	//this.hsv.h = SUD.wrap(this.hsv.h, 0, 1.0)
         }
         //offset += ofMap(dist, 0, 200, 10, 0, true);
         //offset = ofClamp(offset, 0, 150);
-        this.lastFroze = new Date() - SUD.map(dist, 0, 1000, 1000, 0);
+        this.lastFroze = now - SUD.map(dist, 0, 1000, 1000, 0);
     }
 }
 
 Clock.prototype.update = function( time ) {
 	if ( time - this.lastFroze > 1000 && !this.mouseDown ){
-		this.rotateArmOneBy(this.vel.x);
-		this.rotateArmTwoBy(this.vel.x * 1/60.0);
-		this.vel.x = this.vel.x *.9 + .1;
 
 		this.color.r = /*this.color.r * .9 +*/ this.grey.r;// * .1;
 		this.color.g = /*this.color.g * .9 +*/ this.grey.g;// * .1;
 		this.color.b = /*this.color.b * .9 +*/ this.grey.b;// * .1;
+
+		if ( this.animating ){
+			this.rotateArmOneBy(this.vel.x);
+			this.rotateArmTwoBy(this.vel.x * 1/60.0);
+		}
 	}
 
 	var style = this.getRBGStyle();
@@ -203,8 +209,24 @@ Clock.prototype.mousePressed = function(x,y) {
 	return this.mouseDown;
 };
 
-Clock.prototype.mouseReleased = function(){
+Clock.prototype.mouseReleased = function(time){
 	this.mouseDown = false;
+	this.armOne.element.style["-webkit-transition"] = "opacity .5s ease-in-out, -webkit-transform 1s ease-in-out";
+	this.armTwo.element.style["-webkit-transition"] = "opacity .5s ease-in-out, -webkit-transform 1s ease-in-out";
+
+	this.anJam = setTimeout( function a(){ 
+		this.rotateArmOneBy(this.vel.x);
+		this.rotateArmTwoBy(this.vel.x * 1/60.0);
+	}.bind(this), (time - this.lastFroze)/10 );
+	
+
+	clearTimeout(this.anTime);
+	this.anTime = setTimeout( function t(){ 
+		this.animating = true;
+		this.armOne.element.style["-webkit-transition"] = "";//opacity .5s ease-in-out, -webkit-transform .01s ease-in-out";
+		this.armTwo.element.style["-webkit-transition"] = "";//"opacity .5s ease-in-out, -webkit-transform .01s ease-in-out";
+		this.vel.x = 1;//this.vel.x *.9 + .1;
+	}.bind(this), (time - this.lastFroze)/10 + 1500);
 }
 
 Clock.prototype.setFaceStyle = function(style) {

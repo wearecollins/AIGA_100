@@ -238,19 +238,11 @@ $(document).ready( function() {
 		};
 
 		//-------------------------------------------------------
-		
-		var chunkIndex = 0;
-		var chunkSize  = 100;
-
 		this.update = function (){
 			var now = new Date();
-			for (var i=chunkIndex; i<chunkIndex + chunkSize; i++){
-				setTimeout( this.meshes[i].update.bind(this.meshes[i]), 0, now);
+			for (var i=0; i<100; i++){
+				this.meshes[i].update(now);
 				// meshes[ind].update();
-			}
-			chunkIndex += chunkSize;
-			if ( chunkIndex >=  this.meshes.length ){
-				chunkIndex = 0;
 			}
 		}
 
@@ -266,7 +258,7 @@ $(document).ready( function() {
 					break;
 			}
 			//this.renderer.render( this.scene, this.camera );//, null, true );
-			setTimeout( this.renderer.render.bind(this.renderer.render), 0, this.scene, this.camera );
+			this.renderer.render(this.scene, this.camera );
 		}	
 
 		//-------------------------------------------------------
@@ -353,6 +345,7 @@ $(document).ready( function() {
 
 		//-------------------------------------------------------
 		this.onTouchEnd = function( id, x,y ){
+			var now = new Date();
 			switch ( this.mode ){
 				case 0:
 					if ( id == this.touchId ){
@@ -366,7 +359,7 @@ $(document).ready( function() {
 						}
 
 						for ( var i=0; i<this.meshes.length; i++){
-							this.meshes[i].mouseReleased();
+							this.meshes[i].mouseReleased(now);
 						}
 
 						$("#touch").css("opacity", 1);
@@ -393,8 +386,9 @@ $(document).ready( function() {
 			}
 			this.lastGrid = ind;
 
+			var now = new Date();
 			for ( var ind in this.meshes ){
-				this.meshes[ind].magnet(x,y);
+				this.meshes[ind].magnet(x,y, now);
 			}
 		}
 

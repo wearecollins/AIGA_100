@@ -20,10 +20,13 @@ html, body {
 	font-weight: bold;
 }
 
-
 .threeElement {
 	opacity: 1;
 	-webkit-transition:opacity .5s ease-in-out;
+}
+
+.arm {
+	-webkit-transition:opacity .5s ease-in-out, -webkit-transform .1s ease-in-out;
 }
 
 .touch {
