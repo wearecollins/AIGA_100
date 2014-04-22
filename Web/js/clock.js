@@ -148,6 +148,10 @@ Clock.prototype.angle = function(a,b, toDeg){
 }
 
 Clock.prototype.magnet = function(mx,my, now) {
+	if ( this.armOne.element.style["-webkit-transition"] != "" ){
+		this.armOne.element.style["-webkit-transition"] = "";
+		this.armTwo.element.style["-webkit-transition"] = "";
+	}
 	var p = new THREE.Vector2(this.position.x, this.position.y);
 	var m = new THREE.Vector2(mx,my);
     var dist = p.distanceTo(m);
