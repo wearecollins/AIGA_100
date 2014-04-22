@@ -21,6 +21,7 @@ function setLineStyle ( div, lineWidth, height, color) {
 	line.style.width = lineWidth +"px";
 	line.style.height = height +"px";
 	line.style.backgroundColor = color;
+	return line;
 }
 
 // UTIL!

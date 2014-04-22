@@ -155,6 +155,7 @@ $(document).ready( function() {
 			releaseDiv.className = "threeElement touch";
 			releaseDiv.id = "release";
 			releaseDiv.innerHTML = "Release";
+			releaseDiv.style.color = "rgb(" + this.r +","+ this.g +","+ this.b +")";
 
 			document.getElementById("sud_container").appendChild(touchDiv);
 			document.getElementById("sud_container").appendChild(releaseDiv);
@@ -191,13 +192,13 @@ $(document).ready( function() {
 			this.scene.add(this.bigCircle);
 
 			var ad1 = document.createElement("div");
-			setLineStyle(ad1, isIpad ? 30 : 15, rad * .8, "#FD4F57");
+			ad1.line = setLineStyle(ad1, isIpad ? 30 : 15, rad * .8, "#FD4F57");
 			ad1.id = "clockArm1";
 			ad1.className = "bigClock";
 			document.getElementById("sud_container").appendChild(ad1);
 
 			var ad2 = document.createElement("div");
-			setLineStyle(ad2, isIpad ? 30 : 15, rad * .8, "#FD4F57");
+			ad2.line = setLineStyle(ad2, isIpad ? 30 : 15, rad * .8, "#FD4F57");
 			ad2.id = "clockArm2";
 			ad2.className = "bigClock";
 			document.getElementById("sud_container").appendChild(ad2);
@@ -470,6 +471,11 @@ $(document).ready( function() {
 			$("#quote_"+name).css("visibility", "visible");
 			$("#name_"+name).css("color", "rgb(" + this.colors[val].r +","+ this.colors[val].g +","+ this.colors[val].b + ")");
 			$("#quote_"+name).css("color", "rgb(" + this.colors[val].r +","+ this.colors[val].g +","+ this.colors[val].b + ")");
+			$("#clockYear").css("color", "rgb(" + this.colors[val].r +","+ this.colors[val].g +","+ this.colors[val].b + ")");
+			$("#clockYear").css("color", "rgb(" + this.colors[val].r +","+ this.colors[val].g +","+ this.colors[val].b + ")");
+			document.getElementById("clockArm1").line.style.backgroundColor = "rgb(" + this.colors[val].r +","+ this.colors[val].g +","+ this.colors[val].b + ")";
+			document.getElementById("clockArm2").line.style.backgroundColor = "rgb(" + this.colors[val].r +","+ this.colors[val].g +","+ this.colors[val].b + ")";
+			document.getElementById("bigclock_visual").style.border = "" + (isIpad ? 40 : 20) +"px solid rgb(" + this.colors[val].r +","+ this.colors[val].g +","+ this.colors[val].b + ")";
 		}
 
 		this.showHide = function( show ) {

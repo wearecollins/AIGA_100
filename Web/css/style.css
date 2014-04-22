@@ -16,8 +16,9 @@
 html, body {
 	background-color:#fff;
 	font-size: 50px;
-	font-family: Helvetica;
+	font-family: "Circular";
 	font-weight: bold;
+	letter-spacing: -2px;
 }
 
 .threeElement {
@@ -29,7 +30,7 @@ html, body {
 }
 
 .touch {
-	color:#FD4F57;
+	color:rgb(100,100,100);
 	opacity: 0;
 	-webkit-transition:opacity .25s ease-in-out;
 	font-size: 90px;
@@ -51,7 +52,7 @@ html, body {
 }
 
 #names {
-	font-family: Circular;
+	font-family: "Circular";
 	font-size: 30px;
 	color:#FD4F57;
 	opacity: 0;
@@ -134,7 +135,7 @@ html, body {
 }
 
 .quotes {
-	font-family: Circular;
+	font-family: "Circular";
 	font-size: 40px;
 	color:#FD4F57;
 	opacity: 0;
@@ -148,17 +149,17 @@ html, body {
 }
 
 .quotesiPad {
-	font-family: Circular;
+	font-family: "Circular";
 	font-size: 60px;
 }
 
 .italic {
-	font-family: CircularItalic;
+	font-family: "CircularItalic";
 	font-style: normal;
 	font-size: 40px;
 }
 .italiciPad {
-	font-family: CircularItalic;
+	font-family: "CircularItalic";
 	font-style: normal;
 	font-size: 60px;
 }
@@ -194,7 +195,7 @@ html, body {
 }
 
 .quoteName {
-	font-family: Relative;
+	font-family: "Relative";
 	font-size: 20px;
 	width:500px;
 	font-style:"normal";
