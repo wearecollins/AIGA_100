@@ -217,6 +217,16 @@ $(document).ready( function() {
 			this.bigCircle.position.y = this.renderHeight/2.0;
 			this.scene.add(this.bigCircle);
 
+			// little circle in center
+			// var rad = isIpad ? 15 : 7.5;
+			// setCircleStyle(bigCircle, rad, true, isIpad ? 40 : 20, "#FD4F57");
+			// bigCircle.id = "bigclock_visual";
+			// bigCircle.className = "bigClock";
+			// document.getElementById("sud_container").appendChild(bigCircle);
+			// this.bigCircle = new THREE.CSS3DObject(bigCircle);
+			// this.bigCircle.position.x = this.renderWidth/2.0;
+			// this.bigCircle.position.y = this.renderHeight/2.0;
+
 			var ad1 = document.createElement("div");
 			ad1.line = setLineStyle(ad1, isIpad ? 30 : 15, rad * .8, "#FD4F57");
 			ad1.id = "clockArm1";
@@ -266,6 +276,9 @@ $(document).ready( function() {
 
 		//-------------------------------------------------------
 		this.update = function (){
+			if ( Object.keys(this.touches).length == 0 && this.touchId != -1 ){
+				this.onTouchEnd(this.touchId,-1,-1);
+			}
 			this.now = new Date();
 			for (var i=0; i<100; i++){
 				this.meshes[i].update(this.now);
@@ -473,9 +486,9 @@ $(document).ready( function() {
 											$qn.css("top", ($q.height() - $qa.height()- 100) +"px")
 										}
 										
-									}.bind(this), 15000);
+									}.bind(this), 10000);
 								}.bind(this), 5000 );
-							}.bind(this), 15000 );
+							}.bind(this), 10000 );
 						}.bind(this), 1500 );
 						break;
 				}
