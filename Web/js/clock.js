@@ -125,7 +125,7 @@ Clock.prototype.setup = function( x,y, rad, isGL ) {
 
 	window.clocks.push(this);
 	this.animating = true;
-	this.vel = new THREE.Vector2(1,0);
+	this.vel = new THREE.Vector2(( isIpad ? 3 : 1 ),0);
 	this.lastFroze = new Date();
 	this.lastAnim = new Date();
 	this.currentMouse = {x:-1, y:-1};
@@ -176,7 +176,7 @@ Clock.prototype.update = function( time ) {
 			if ( this.armOne.element.style["-webkit-transition"] != "" ){
 				this.armOne.element.style["-webkit-transition"] = "";
 				this.armTwo.element.style["-webkit-transition"] = "";
-				this.vel.x = 1;
+				this.vel.x = ( isIpad ? 3 : 1 );
 			}
 			this.rotateArmOneBy(this.vel.x);
 			this.rotateArmTwoBy(this.vel.x * 1/60.0);
