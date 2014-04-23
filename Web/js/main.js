@@ -18,7 +18,7 @@ $(document).ready( function() {
 	// cv.height = height;
 	app.begin({canvasId:"gridCanvas", renderType: "css3d", width: app.renderWidth, height: app.renderHeight });
 
-	window.addEventListener('onorientationchange', function () {
+	window.addEventListener('orientationchange', function () {
 		switch (window.orientation){
 			case -90:
 			case 90:
