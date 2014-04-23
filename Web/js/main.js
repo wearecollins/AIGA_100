@@ -114,6 +114,11 @@ $(document).ready( function() {
 			var cx = this.renderWidth / 2.0 - (((w + sp) * 9 )/2.0);
 			var cy = cx * (isIpad ? 1.5 : 2.0);// - (((w + sp)  * 9) /2.0);
 
+			// hax
+			if ( window.innerHeight == 922 ){
+				cy -= 50;
+			}
+
 			// build clocks + storage
 			for ( var x=0; x<10; x++){
 				for ( var y=0; y<10; y++){
