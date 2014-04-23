@@ -11,7 +11,7 @@ int messageTimeout      = 2000;
 bool bNeedToSend        = false;
 
 // swipe counter
-int swipeChangeTimer    = 30;
+int swipeChangeTimer    = 15;
 float maxDrawingAge     = 60 * 5;
 
 float texW = 2048;
@@ -47,7 +47,7 @@ void testApp::setup(){
     clocks.setup(10, 10, ofVec3f( w * 1.287, w * 1.1, w * 1.234 ), clockRadius-2 - 5, clockRadius-2 - 7, clockRadius );
     
     // setup clock FBO
-    type.allocate(texW, texH, GL_RGB, 2);
+    type.allocate(texW, texH, GL_RGB, 4);
     renderClocks();
     
     //ofEnableDepthTest();
@@ -103,42 +103,14 @@ void testApp::setup(){
     mapamok.drawMode = DRAW_FACES;
     mapamok.useLights = false;
     ofDisableLighting();
-    
-    /*
-    ofVboMesh & m = mapamok.getObjectMesh();
-    
-    auto it_max_x = max_element(m.getVertices().begin(), m.getVertices().end(), xMax);
-    auto it_max_y = max_element(m.getVertices().begin(), m.getVertices().end(), yMax);
-    auto it_min_x = min_element(m.getVertices().begin(), m.getVertices().end(), xMax);
-    auto it_min_y = min_element(m.getVertices().begin(), m.getVertices().end(), yMax);
-    
-    cout << *it_max_x << endl;
-    cout << *it_max_y << endl;
-    cout << *it_min_x << endl;
-    cout << *it_min_y << endl;
-    
-    float width = (*it_max_x).x - (*it_min_x).x;
-    float height = (*it_max_y).y - (*it_min_y).y;
-    
-    for ( int i=0; i<m.getNumVertices(); i++){
-        ofVec2f v = m.getTexCoord(i);
-        ofVec2f vert = m.getVertex(i);
-        if ( v.x >= 0 ){
-            ofVec2f t(vert);
-            t.x -= (*it_min_x).x;
-            t.y -= (*it_min_y).y;
-            t.x /= width;
-            t.y /= height;
-            m.setTexCoord(i, t);
-        }
-    }
-    */
 }
 
 //--------------------------------------------------------------
 void testApp::update(){
     clockManager.update();
 
+    if ( !clockManager.isInteractive()  ) gridDrawings.clear();
+    
     if ( gridDrawings.size() != 0 && clockManager.isInteractive() ){
         // first update indices
         for ( int i=0; i<gridDrawings.size(); i++){
