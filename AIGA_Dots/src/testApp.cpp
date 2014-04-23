@@ -74,8 +74,6 @@ void testApp::setup(){
     
     lastMode = currentMode;
     
-//    ofSetLogLevel(OF_LOG_VERBOSE);
-    
     spacebrew.addPublish("mode", Spacebrew::TYPE_RANGE);
     spacebrew.addPublish("name", Spacebrew::TYPE_RANGE);
     
@@ -97,7 +95,6 @@ void testApp::setup(){
     
     // setup mapamok
     string model = ((ofxUITextInput*) gui->getWidget("model"))->getTextString();
-    cout <<"LOADING "<<model<<endl;
     mapamok.loadSettings("mapamok.xml");
     mapamok.loadMesh(model, texW, texH);
     mapamok.drawMode = DRAW_FACES;
@@ -151,7 +148,7 @@ void testApp::update(){
         mapamok.update();
     }
     
-    ofSetWindowTitle(ofToString(ofGetFrameRate(), 3));
+    if ( ofGetWindowMode() != OF_FULLSCREEN ) ofSetWindowTitle(ofToString(ofGetFrameRate(), 3));
 }
 
 //--------------------------------------------------------------
@@ -172,8 +169,6 @@ void testApp::renderClocks(){
     type.begin();
     ofClear(255);
     ofPushMatrix();
-    //ofScale(-1,1);
-    //ofTranslate(-type.getWidth(), 0);
     clocks.draw();
     ofPopMatrix();
     type.end();
@@ -307,7 +302,7 @@ void testApp::onMessage( Spacebrew::Message & m ){
 
 //--------------------------------------------------------------
 void testApp::onClientConnect( Spacebrew::Config & c){
-    cout << "connect"<<endl;
+    ofLogVerbose() << "Client connected"<<endl;
     spacebrew.sendRange("name", clockManager.getCurrentName());
     spacebrew.sendRange("mode", clockManager.isInteractive() ? 0 : 1);
 }
