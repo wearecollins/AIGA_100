@@ -92,11 +92,11 @@ void ClockMode::update(){
                     if ( currentName >= numNames ){
                         currentName = 0;
                     }
-                    if ( spacebrew != NULL ) spacebrew->sendRange("name", currentName);
-                    if ( spacebrew != NULL ) spacebrew->sendRange("mode", 1);
+                    spacebrew->sendRange("name", currentName);
+                    spacebrew->sendRange("mode", 1);
                     
                     letterIndex = 0;
-                    ofLogVerbose()<<"name mode";
+                    ofLogError()<<"name mode";
                     
                     // transition to color
                     nextColor = ofColor(colors[currentName].r, colors[currentName].g, colors[currentName].b);
@@ -119,7 +119,7 @@ void ClockMode::update(){
                     mode = STATE_TRANSITION;
                     nextState = STATE_INTERACTIVE;
                     
-                    if ( spacebrew != NULL ) spacebrew->sendRange("mode", 0);
+                    spacebrew->sendRange("mode", 0);
                     letterIndex = 0;
                     letterLastChanged = ofGetElapsedTimeMillis();
                     ofLogVerbose()<<"interactive mode"<<endl;

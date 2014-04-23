@@ -10,9 +10,7 @@
 
 #include "ofMain.h"
 #include "Clock.h"
-#ifdef USE_SPACEBREW
 #include "ofxSpacebrew.h"
-#endif
 #include "ofxXmlSettings.h"
 
 enum AnimationMode {
@@ -40,15 +38,6 @@ struct Timer {
     bool bLoop = true;
     bool bTriggered = false;
 };
-
-#ifndef USE_SPACEBREW
-namespace Spacebrew {
-    class Connection {
-    public:
-        void sendRange( string s, int r ){};
-    };
-}
-#endif
 
 class ClockMode
 {
