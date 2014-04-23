@@ -117,7 +117,6 @@ $(document).ready( function() {
 			// hax
 			if ( window.innerHeight == 922 ){
 				cy -= 50;
-				$(".quote").css("top","-60px")
 			}
 
 			// build clocks + storage
@@ -208,6 +207,9 @@ $(document).ready( function() {
 			this.setupSpacebrew();
 			this.camera.lookAt( this.scene.position );
 			
+			if ( window.innerHeight == 922 ){
+				$(".quote").css("top","-60px");
+			}
 		}
 
 		//-------------------------------------------------------
