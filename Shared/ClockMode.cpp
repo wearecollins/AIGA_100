@@ -12,8 +12,8 @@
 ClockMode::ClockMode(){
     bChangeModes       = true;
     mode                = STATE_INTERACTIVE;
-    interactiveDuration = 60 * 1000;
-    nameDuration        = 30 * 1000;
+    interactiveDuration = 3 * 1000;
+    nameDuration        = 3 * 1000;
     lastChanged         = 0;
     currentName         = 0;
     letterIndex         = 0;
@@ -100,7 +100,7 @@ void ClockMode::update(){
                     
                     // transition to color
                     nextColor = ofColor(colors[currentName].r, colors[currentName].g, colors[currentName].b);
-                    nextArmColor = ofColor(colors[currentName].a);
+                    nextArmColor = ofColor(255);//colors[currentName].a);
                     //clocks->setColor( ofColor(colors[currentName].r, colors[currentName].g, colors[currentName].b) );
                     //clocks->setArmColor(ofColor(colors[currentName].a));
                     
@@ -167,7 +167,7 @@ void ClockMode::update(){
     //            letterIndex;
                 //cout << "set "<<ks<<":"<<((i+4) - letterIndex)<<endl;
                 float weight = letterIndex == i ? 1.0 : .3;
-                clocks->setClocks(clocks->letters[ks], ind, (ks == "w" || ks == "m")? 3 : 4, 3, weight);
+                clocks->setClocks(clocks->letters[ks], ind, (ks == "w" || ks == "m")? 2 : 4, 4, weight);
                 ind += (ks == "w" || ks == "m")? 6 : 4;
             }
         }
@@ -183,7 +183,7 @@ void ClockMode::update(){
                 char k = names[currentName][letterIndex];
                 string ks = ofToString(k);
                 //float weight = letterIndex == i ? 1.0 : .3;
-                clocks->setClocks(clocks->letters[ks], 3, (ks == "w" || ks == "m")? 2 : 3,  (ks == "w" || ks == "m")? 6 : 4, 1.0);
+                clocks->setClocks(clocks->letters[ks], (ks == "w" || ks == "m")? 2 : 3, 2, (ks == "w" || ks == "m")? 6 : 4, 1.0);
             }
         }
     } else if (mode == STATE_TRANSITION ){
@@ -219,7 +219,7 @@ void ClockMode::update(){
                     char k = names[currentName][letterIndex];
                     string ks = ofToString(k);
                     //float weight = letterIndex == i ? 1.0 : .3;
-                    clocks->setClocks(clocks->letters[ks], (ks == "w" || ks == "m")? 4 : 3, 3, (ks == "w" || ks == "m")? 6 : 4, 1.0);
+                    clocks->setClocks(clocks->letters[ks], (ks == "w" || ks == "m")? 2 : 3, 2, (ks == "w" || ks == "m")? 6 : 4, 1.0);
                 }
             }
         }
