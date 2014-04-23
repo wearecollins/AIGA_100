@@ -371,8 +371,14 @@ void Clock::draw(){
         offset = offset * .9;
     }
     
-    if ( !bInteracted ) liveFaceColor = liveFaceColor * .9 + faceColor * .1;
-    else liveFaceColor = liveFaceColor * .999 + faceColor * .001;
+    float val = .1;
+    if ( bInteracted ) val = .05;
+    float inVal = 1.0 - val;
+    
+    liveFaceColor.r = inVal * liveFaceColor.r + val * faceColor.r;
+	liveFaceColor.g = inVal * liveFaceColor.g + val * faceColor.g;
+	liveFaceColor.b = inVal * liveFaceColor.b + val * faceColor.b;
+    //	liveFaceColor = inVal * liveFaceColor + val * faceColor.a;
     
     liveArmColor = liveArmColor * .9 + armColor * .1;
     
@@ -659,7 +665,7 @@ void Clock::magnet( int mx, int my, ofColor color, int freezeTime ){
     if ( fabs(dist) < radius * 2 ){
         bHasColor = currentColors.size() == 0 ? false : (currentColors.back() == color);
         
-        if ( !bHasColor ){
+        if ( !bHasColor && currentColors.size() > 0 ){
 //            ofColor sum;
             ofColor avg;
             liveFaceColor = liveFaceColor * .5 + color * .5;
@@ -957,14 +963,16 @@ void Clocks::setClocks( Letter letter, int offsetX, int offsetY, int letterWidth
             if ( x >= 0 ){
                 int ind = (y - offsetY) + (x - offsetX) * clockLetterHeight;
                 int cind = y + x * 10.0;
-                ofColor color = letterColor;
-                if ( !clocks[cind].bLetter ) clocks[cind].liveLetterColor.set(clocks[cind].faceColor);
-                clocks[cind].letterColor.set(color);
-                clocks[cind].rotateClockTo( letter.angles[ind][0], letter.angles[ind][1]);
-                //clocks[cind].setColor( clocks[cind].faceColor, clocks[cind].letterColor, letter.colorAngles[ind][0], letter.colorAngles[ind][1] );
-                clocks[cind].rotateColorTo( letter.colorAngles[ind][0], letter.colorAngles[ind][1]);
-                clocks[cind].lastFroze = ofGetElapsedTimeMillis();
-                clocks[cind].bLetter = true;
+                if ( (letter.colorAngles[ind][0] != letter.colorAngles[ind][1]) && ( fabs( letter.colorAngles[ind][0] - letter.colorAngles[ind][1]) != 360) ){
+                    ofColor color = letterColor;
+                    if ( !clocks[cind].bLetter ) clocks[cind].liveLetterColor.set(clocks[cind].faceColor);
+                    clocks[cind].letterColor.set(color);
+                    clocks[cind].rotateClockTo( letter.angles[ind][0], letter.angles[ind][1]);
+                    //clocks[cind].setColor( clocks[cind].faceColor, clocks[cind].letterColor, letter.colorAngles[ind][0], letter.colorAngles[ind][1] );
+                    clocks[cind].rotateColorTo( letter.colorAngles[ind][0], letter.colorAngles[ind][1]);
+                    clocks[cind].lastFroze = ofGetElapsedTimeMillis();
+                    clocks[cind].bLetter = true;
+                }
             }
         }
     }
