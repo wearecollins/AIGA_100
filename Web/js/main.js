@@ -1,5 +1,22 @@
 SUD.require("js/clock.js");
 
+SUD.app.BaseApp.prototype._onTouchStart	= function( event )
+{
+	// prevent default, which ensures you don't get mouse events
+	event.preventDefault();
+
+	this.touches = {};
+
+	for ( var i=0; i<event.touches.length; i++){
+		var id 			  = event.touches[i].identifier;
+		this.touches[id]	= {};
+		this.touches[id].x 	= event.touches[i].pageX; 
+		this.touches[id].y 	= event.touches[i].pageY;
+		this.dispatchEvent("onTouchStart", this.touches[id] );
+		this.onTouchStart( id, this.touches[id].x, this.touches[id].y );
+	}
+}
+
 var app;
 var isIpad = false;
 
