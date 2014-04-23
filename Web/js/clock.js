@@ -131,6 +131,9 @@ Clock.prototype.setup = function( x,y, rad, isGL ) {
 	this.currentMouse = {x:-1, y:-1};
 	this.p2 = new THREE.Vector2(this.position.x, this.position.y);
 	this.m = new THREE.Vector2(0,0);
+
+	this.rotateArmOneBy(SUD.random(0,360));
+	this.rotateArmTwoBy(SUD.random(0,360));
 };
 
 Clock.prototype.getRBGStyle = function() {
