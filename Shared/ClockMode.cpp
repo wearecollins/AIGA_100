@@ -19,7 +19,7 @@ ClockMode::ClockMode(){
     letterIndex         = 0;
     letterRate          = 2000;
     letterLastChanged   = 0;
-    animationMode       = MODE_ARROW;
+    animationMode       = (AnimationMode) ofRandom(MODE_YEARS+1);
     aniDuration         = 3000;
 }
 
@@ -44,6 +44,9 @@ void ClockMode::setup(Spacebrew::Connection * sb, Clocks * c,  string path){
     if ( settings.load(path) ){
         interactiveDuration = settings.getValue("interactiveDuration", interactiveDuration);
         nameDuration = settings.getValue("nameDuration", nameDuration);
+        if ( settings.getValue("fullscreen", false) ) ofSetFullscreen(true);
+        arrowStartMinute = settings.getValue("arrowStartMinute", 15);
+        arrowStopMinute = settings.getValue("arrowStopMinute", 45);
         settings.pushTag("names");{
             numNames = settings.getNumTags("name");
             for (int i=0; i<numNames; i++){
@@ -125,7 +128,7 @@ void ClockMode::update(){
                     ofLogVerbose()<<"interactive mode"<<endl;
                     
                     // randomize animation mode
-                    animationMode = (AnimationMode) ofRandom(MODE_ARROW + 1);
+                    animationMode = (AnimationMode) ofRandom(MODE_YEARS + 1);
                     aniLastChanged = ofGetElapsedTimeMillis();
                     
                     resetAnimation( animationMode );
@@ -137,8 +140,12 @@ void ClockMode::update(){
                     //clocks->setArmColor(ofColor(0));
                     
                     // setup transition
-                    transitionMode =  (AnimationMode) floor(ofRandom(1, MODE_NOISE));
-                    resetAnimation( transitionMode );
+                    if ( ofGetHours() == 19 && ofGetMinutes() > arrowStartMinute && ofGetMinutes() < arrowStopMinute ){
+                        animationMode =  MODE_ARROW;
+                    } else {
+                        animationMode =  (AnimationMode) floor(ofRandom(MODE_YEARS+1));
+                    }
+                    resetAnimation( animationMode );
                 }
                 break;
                 
@@ -226,6 +233,7 @@ void ClockMode::update(){
         
     } else if (mode == STATE_INTERACTIVE ){
         if ( clocks->clocks[0].bAnimating ){
+            int index = 0;
             
             // start changing ambient animations
             switch (animationMode) {
@@ -249,7 +257,6 @@ void ClockMode::update(){
                         
                         resetAnimation( (AnimationMode) animationMode );
                     } else {
-                        int index = 0;
                         for ( auto & c : clocks->clocks ){
                             if ( ofGetElapsedTimeMillis() - delays[index].lastTriggered <= delays[index].delay ){
                                 //cout << delays[index].delay << endl;
@@ -271,6 +278,34 @@ void ClockMode::update(){
                     break;
                     
                 case MODE_ARROW:
+                    if ( ofGetElapsedTimeMillis() - aniLastChanged > aniDuration ){
+                        aniLastChanged = ofGetElapsedTimeMillis();
+                        resetAnimation( (AnimationMode) animationMode );
+                    }
+                    for ( auto & c : clocks->clocks ){
+                        if ( ofGetElapsedTimeMillis() - delays[index].lastTriggered <= delays[index].delay / 2.0 ){
+                            c.vel.x = 1.0;
+                        } else if ( ofGetElapsedTimeMillis() - delays[index].lastTriggered <= delays[index].delay ){
+                            c.vel.x = 0;
+                            
+                        } else {
+                            if ( !delays[index].bTriggered ){
+                                delays[index].bTriggered = true;
+                            } else {
+                            }
+                            int y = index % 10;
+                            //float angle = (float) ( y )  / 10.0 * 360.0f;
+                            c.vel.x = 0;
+                            
+                            if ( y < 5 ){
+                                c.rotateClockTo( 45, 45 + 180 );
+                            } else {
+                                c.rotateClockTo( 135, 135 + 180 );
+                            }
+                        }
+                        index++;
+                    }
+                    break;
                 case MODE_YEARS:
                     if ( ofGetElapsedTimeMillis() - aniLastChanged > aniDuration ){
                         aniLastChanged = ofGetElapsedTimeMillis();
@@ -411,12 +446,19 @@ void ClockMode::resetAnimation( AnimationMode mode ){
             
         case MODE_ARROW:
             for ( auto & c : clocks->clocks ){
-                int x = (float) index / 10.0f;
-                int y = index % 10;
-                float angle = (float) ( y )  / 10.0 * 360.0f;
-                c.rotateClockTo( -90, angle-90 );
+                //int x = (float) index / 10.0f;
+//                int y = index % 10;
+                //float angle = (float) ( y )  / 10.0 * 360.0f;
                 c.vel.x = 0;
-                //c.lastFroze = ofGetElapsedTimeMillis() + aniDuration / 2.0;
+                
+//                if ( y <= 5 ){
+//                    c.rotateClockTo( 135, 135 + 180 );
+//                } else {
+//                    c.rotateClockTo( 45, 45 + 180 );
+//                }
+                delays[index].lastTriggered = ofGetElapsedTimeMillis();
+                delays[index].delay = ofMap(c.x, 0, maxX, min, max, true);
+                delays[index].bTriggered = false;
                 index++;
             }
             break;

@@ -77,6 +77,8 @@ protected:
     vector<ofColor>     colors;
     vector<Timer>       delays;
     
+    int arrowStartMinute, arrowStopMinute;
+    
     // transition vars
     ofColor nextColor, nextArmColor;
     State nextState;

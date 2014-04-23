@@ -136,10 +136,6 @@ $(document).ready( function() {
 			this.meshParams.x = cx;
 			this.meshParams.y = cy;
 
-			// "big clock"
-				
-			this.createBigClock();
-
 			// ortho cam
 			this.scene.remove(this.camera);
 			this.camera = new THREE.OrthographicCamera( this._canvas.width / - 2, this._canvas.width / 2, this._canvas.height / 2, this._canvas.height / - 2, - 500, 1000 );
@@ -167,6 +163,9 @@ $(document).ready( function() {
 
 			window.scrollTo(0,1);
 			this.mode = 0;
+
+			// "big clock"
+			this.createBigClock();
 
 			// add "touch" div
 			var touchDiv = document.createElement("div");
@@ -216,7 +215,7 @@ $(document).ready( function() {
 		this.createBigClock = function(){
 			var bigCircle = document.createElement("div");
 			var rad = this.renderWidth * .8 / 2.0;
-			setCircleStyle(bigCircle, rad, true, isIpad ? 40 : 20, "#FD4F57");
+			setCircleStyle(bigCircle, rad, false, isIpad ? 40 : 20, "#FD4F57");
 			bigCircle.id = "bigclock_visual";
 			bigCircle.className = "bigClock";
 			document.getElementById("sud_container").appendChild(bigCircle);
@@ -226,23 +225,24 @@ $(document).ready( function() {
 			this.scene.add(this.bigCircle);
 
 			// little circle in center
-			// var rad = isIpad ? 15 : 7.5;
-			// setCircleStyle(bigCircle, rad, true, isIpad ? 40 : 20, "#FD4F57");
-			// bigCircle.id = "bigclock_visual";
-			// bigCircle.className = "bigClock";
-			// document.getElementById("sud_container").appendChild(bigCircle);
-			// this.bigCircle = new THREE.CSS3DObject(bigCircle);
-			// this.bigCircle.position.x = this.renderWidth/2.0;
-			// this.bigCircle.position.y = this.renderHeight/2.0;
+			var babyCircle = document.createElement("div");
+			var tinyRad = isIpad ? 15 : 7.5;
+			setCircleStyle(babyCircle, tinyRad, false, isIpad ? 40 : 20, "#FD4F57");
+			babyCircle.id = "babyclock_visual";
+			babyCircle.className = "bigClock";
+			babyCircle.style.backgroundColor = "#fff";
+			document.getElementById("sud_container").appendChild(babyCircle);
+			this.babyCircle = new THREE.CSS3DObject(babyCircle);
+			this.bigCircle.add(this.babyCircle);
 
 			var ad1 = document.createElement("div");
-			ad1.line = setLineStyle(ad1, isIpad ? 30 : 15, rad * .8, "#FD4F57");
+			ad1.line = setLineStyle(ad1, isIpad ? 30 : 15, rad * .8, "#FFF");
 			ad1.id = "clockArm1";
 			ad1.className = "bigClock";
 			document.getElementById("sud_container").appendChild(ad1);
 
 			var ad2 = document.createElement("div");
-			ad2.line = setLineStyle(ad2, isIpad ? 30 : 15, rad * .8, "#FD4F57");
+			ad2.line = setLineStyle(ad2, isIpad ? 30 : 15, rad * .8, "#FFF");
 			ad2.id = "clockArm2";
 			ad2.className = "bigClock";
 			document.getElementById("sud_container").appendChild(ad2);
@@ -519,9 +519,10 @@ $(document).ready( function() {
 			$("#quote_"+name).css("color", "rgb(" + this.colors[val].r +","+ this.colors[val].g +","+ this.colors[val].b + ")");
 			$("#clockYear").css("color", "rgb(" + this.colors[val].r +","+ this.colors[val].g +","+ this.colors[val].b + ")");
 			$("#clockYear").css("color", "rgb(" + this.colors[val].r +","+ this.colors[val].g +","+ this.colors[val].b + ")");
-			document.getElementById("clockArm1").line.style.backgroundColor = "rgb(" + this.colors[val].r +","+ this.colors[val].g +","+ this.colors[val].b + ")";
-			document.getElementById("clockArm2").line.style.backgroundColor = "rgb(" + this.colors[val].r +","+ this.colors[val].g +","+ this.colors[val].b + ")";
-			document.getElementById("bigclock_visual").style.border = "" + (isIpad ? 40 : 20) +"px solid rgb(" + this.colors[val].r +","+ this.colors[val].g +","+ this.colors[val].b + ")";
+			// document.getElementById("clockArm1").line.style.backgroundColor = "rgb(" + this.colors[val].r +","+ this.colors[val].g +","+ this.colors[val].b + ")";
+			// document.getElementById("clockArm2").line.style.backgroundColor = "rgb(" + this.colors[val].r +","+ this.colors[val].g +","+ this.colors[val].b + ")";
+			document.getElementById("bigclock_visual").style.backgroundColor = "rgb(" + this.colors[val].r +","+ this.colors[val].g +","+ this.colors[val].b + ")";
+			// document.getElementById("babyclock_visual").style.backgroundColor = "rgb(" + this.colors[val].r +","+ this.colors[val].g +","+ this.colors[val].b + ")";
 		}
 
 		this.showHide = function( show ) {

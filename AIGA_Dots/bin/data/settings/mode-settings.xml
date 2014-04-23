@@ -1,6 +1,8 @@
 <interactiveDuration>60000</interactiveDuration>
 <nameDuration>40000</nameDuration>
-<fullscreen>false</fullscreen>
+<fullscreen>0</fullscreen>
+<arrowStartMinute>15</arrowStartMinute>
+<arrowStopMinute>45</arrowStopMinute>
 <names>
 	<name>sean </name>
 	<name>noreen </name>
