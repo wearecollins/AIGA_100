@@ -19,15 +19,16 @@ $(document).ready( function() {
 	app.begin({canvasId:"gridCanvas", renderType: "css3d", width: app.renderWidth, height: app.renderHeight });
 
 	window.addEventListener('onorientationchange', function () {
-	    // if (window.orientation == -90) {
-	    //     document.getElementById('orient').className = 'orientright';
-	    // }
-	    // if (window.orientation == 90) {
-	    //     document.getElementById('orient').className = 'orientleft';
-	    // }
-	    // if (window.orientation == 0) {
-	    //     document.getElementById('orient').className = '';
-	    // }
+		switch (window.orientation){
+			case -90:
+			case 90:
+				$("#rotate").css("opacity", 1);
+				break;
+
+			case 0:
+				$("#rotate").css("opacity", 0);
+				break;
+		}
 	}, true);
 });
 
@@ -166,6 +167,7 @@ $(document).ready( function() {
 				$(".name").addClass("nameiPad");
 				$(".quote").addClass("quoteiPad");
 				$("#touch").addClass("touchiPad");
+				$("#rotate").addClass("touchiPad");
 				$("#release").addClass("touchiPad");
 				$(".quoteInner").addClass("quoteInneriPad");
 				$(".quoteName").addClass("quoteNameiPad");
@@ -346,21 +348,19 @@ $(document).ready( function() {
 				case 0:
 					if ( id == this.touchId ){
 						this.testGrid(x,y);
+						this.last = {x:x, y:y}
 					}
 					break;
 				case 2:
 					break;
 			}
-			this.last = {x:x, y:y}
-
-			
 		};
 
 		//-------------------------------------------------------
 		this.onTouchEnd = function( id, x,y ){
 			switch ( this.mode ){
 				case 0:
-					if ( id == this.touchId ){
+					if ( id == this.touchId || ){
 						this.touchId = -1;
 
 						// send grid obj + color
