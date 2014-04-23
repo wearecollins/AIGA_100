@@ -360,7 +360,7 @@ $(document).ready( function() {
 		this.onTouchEnd = function( id, x,y ){
 			switch ( this.mode ){
 				case 0:
-					if ( id == this.touchId || ){
+					if ( id == this.touchId ){
 						this.touchId = -1;
 
 						// send grid obj + color
