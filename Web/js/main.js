@@ -117,6 +117,7 @@ $(document).ready( function() {
 			// hax
 			if ( window.innerHeight == 922 ){
 				cy -= 50;
+				$(".quote").css("top","-50px")
 			}
 
 			// build clocks + storage
