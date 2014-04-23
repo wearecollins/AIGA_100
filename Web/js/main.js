@@ -155,7 +155,7 @@ $(document).ready( function() {
 			// todo: set w/h
 			//this.gridCtx 	= this.gridCanvas.getContext('2d');
 
-			var rgb = HSVtoRGB(SUD.random(0,1), .7, .9);
+			var rgb = HSVtoRGB(SUD.random(0,1), SUD.random(.7,.95), .9);
 
 			this.r = rgb.r;
 			this.g = rgb.g;
