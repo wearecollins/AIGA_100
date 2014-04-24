@@ -63,6 +63,8 @@ public:
     void checkHit( int mx, int my, bool bFlip = false );
     void nextRotate();
     
+    void limitRotation();
+    
     ofVec2f origin;
     ofVec2f lastMouse;
     float lastAngle;

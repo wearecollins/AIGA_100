@@ -387,6 +387,18 @@ void Clock::draw(){
 }
 
 //--------------------------------------------------------------
+void Clock::limitRotation(){
+    for ( auto & a : targetAngle ){
+        a = ofWrap(0, 0, 360);
+    }
+    
+    for ( auto & a : angles ){
+        a = ofWrap(0, 0, 360);
+    }
+    
+}
+
+//--------------------------------------------------------------
 void Clock::rotateClockTo ( float angleA, float angleB ){
     bool b = false;
     for ( auto & a : targetAngle ){

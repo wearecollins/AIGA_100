@@ -99,13 +99,21 @@ void ClockMode::update(){
                     spacebrew->sendRange("mode", 1);
                     
                     letterIndex = 0;
-                    ofLogError()<<"name mode";
+                    ofLogVerbose()<<"name mode";
                     
                     // transition to color
                     nextColor = ofColor(colors[currentName].r, colors[currentName].g, colors[currentName].b);
                     nextArmColor = ofColor(255);//colors[currentName].a);
                     //clocks->setColor( ofColor(colors[currentName].r, colors[currentName].g, colors[currentName].b) );
                     //clocks->setArmColor(ofColor(colors[currentName].a));
+                    
+                    for ( auto & d : delays ) {
+                        d.bTriggered = false;
+                    }
+                    
+//                    for ( auto & c : clocks->clocks ){
+//                        c.limitRotation();
+//                    }
                     
                     // setup transition
                     transitionMode =  (AnimationMode) floor(ofRandom(1, MODE_NOISE));
@@ -145,6 +153,11 @@ void ClockMode::update(){
                     } else {
                         animationMode =  (AnimationMode) floor(ofRandom(MODE_YEARS+1));
                     }
+                    
+                    for ( auto & d : delays ) {
+                        d.bTriggered = false;
+                    }
+                    
                     resetAnimation( animationMode );
                 }
                 break;
@@ -219,6 +232,13 @@ void ClockMode::update(){
         // CHANGE STATES
         if ( triggered == clocks->clocks.size() ){
             mode = nextState;
+            
+            
+            for ( auto & c : clocks->clocks ){
+                c.vel.x = 100;
+                c.faceColor.set(nextColor);
+                c.armColor.set(nextArmColor);
+            }
             
             if ( nextState == STATE_LETTERS ){
                 letterLastChanged = ofGetElapsedTimeMillis();
@@ -471,6 +491,7 @@ void ClockMode::resetAnimation( AnimationMode mode ){
                 c.rotateClockTo( -90, angle-90 );
                 c.vel.x = 0;
                 //c.lastFroze = ofGetElapsedTimeMillis() + aniDuration / 2.0;
+                delays[index].bTriggered = false;
                 index++;
             }
             break;
