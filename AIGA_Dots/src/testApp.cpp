@@ -33,6 +33,8 @@ struct {
     bool operator() (ofVec2f a,ofVec2f b) { return a.y>b.y; }
 } yMin;
 
+int drawn = 0;
+
 //--------------------------------------------------------------
 void testApp::setup(){
     ofSetFrameRate(60);
@@ -93,17 +95,23 @@ void testApp::setup(){
     // can i remove this?
     screen.allocate(ofGetWidth(), ofGetHeight());
     
-    // setup mapamok
-    string model = ((ofxUITextInput*) gui->getWidget("model"))->getTextString();
-    mapamok.loadSettings("mapamok.xml");
-    mapamok.loadMesh(model, texW, texH);
-    mapamok.drawMode = DRAW_FACES;
+    
     mapamok.useLights = false;
     ofDisableLighting();
 }
 
 //--------------------------------------------------------------
 void testApp::update(){
+    static bool bSetupMapamok = false;
+    if (!bSetupMapamok && drawn > 0){
+        bSetupMapamok = true;
+        // setup mapamok
+        string model = ((ofxUITextInput*) gui->getWidget("model"))->getTextString();
+        mapamok.loadSettings("mapamok.xml");
+        mapamok.loadMesh(model, texW, texH);
+        mapamok.drawMode = DRAW_FACES;
+    }
+    if ( drawn == 0 ) return;
     clockManager.update();
 
     if ( !clockManager.isInteractive()  ) gridDrawings.clear();
@@ -153,6 +161,11 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
+    if ( drawn == 0 ){
+        drawn++;
+        return;
+    }
+    
     if ( mapamok.setupMode == SETUP_NONE ){
         ofHideCursor();
     } else {

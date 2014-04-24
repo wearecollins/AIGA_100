@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>KeepAlive</key>
+	<dict>
+		<key>SuccessfulExit</key>
+		<false/>
+	</dict>
+	<key>Label</key>
+	<string>cc.openFrameworks.ofapp</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Users/install/Documents/of_v0.8.1_osx_release/apps/AIGA_100/AIGA_Dots/bin/AIGA_Dots.app/Contents/MacOS/AIGA_Dots</string>
+	</array>
+</dict>
+</plist>

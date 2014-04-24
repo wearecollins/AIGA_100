@@ -276,6 +276,15 @@ void Clock::draw(){
         angles[i * 2]       = angles[i * 2] * .9 + targetAngle[i * 2] * .1;
         angles[i * 2 + 1]   = angles[i * 2 + 1] * .9 + targetAngle[i * 2 + 1] * .1;
         
+        if ( angles[i * 2] > 360 ){
+            angles[i * 2]      -= 360;
+            targetAngle[i * 2] -= 360;
+        }
+        if ( angles[i * 2 + 1] > 360 ){
+            angles[i * 2 + 1]      -= 360;
+            targetAngle[i * 2 + 1] -= 360;
+        }
+        
         static float armMult = 1.1;
         
         ofPushMatrix();
@@ -321,7 +330,14 @@ void Clock::draw(){
         ofPopMatrix();
         
         ofPopMatrix();
+        
+        // tiny inner circle
+        
+        ofSetColor(armColor);
+        ofCircle(x, y, lineWidth/2.0);
+        ofSetColor(255);
     }
+    
     ofPopMatrix();
     
     // animate
@@ -401,6 +417,8 @@ void Clock::limitRotation(){
 //--------------------------------------------------------------
 void Clock::rotateClockTo ( float angleA, float angleB ){
     bool b = false;
+    angleA = ofWrap(angleA, 0, 360);
+    angleB = ofWrap(angleB, 0, 360);
     for ( auto & a : targetAngle ){
         if ( b ){
             float an = angleA;
@@ -417,6 +435,7 @@ void Clock::rotateClockTo ( float angleA, float angleB ){
         }
         b = !b;
     }
+    
 }
 
 //--------------------------------------------------------------
@@ -976,6 +995,15 @@ void Clocks::setClocks( Letter letter, int offsetX, int offsetY, int letterWidth
                 int ind = (y - offsetY) + (x - offsetX) * clockLetterHeight;
                 int cind = y + x * 10.0;
                 if ( (letter.colorAngles[ind][0] != letter.colorAngles[ind][1]) && ( fabs( letter.colorAngles[ind][0] - letter.colorAngles[ind][1]) != 360) ){
+                    
+                    for ( auto & a : clocks[cind].angles ){
+                        a = ofWrap(a, 0, 360);
+                    }
+                    
+                    for ( auto & a : clocks[cind].targetAngle ){
+                        a = ofWrap(a, 0, 360);
+                    }
+                    
                     ofColor color = letterColor;
                     if ( !clocks[cind].bLetter ) clocks[cind].liveLetterColor.set(clocks[cind].faceColor);
                     clocks[cind].letterColor.set(color);

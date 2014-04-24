@@ -496,7 +496,7 @@ $(document).ready( function() {
 										
 									}.bind(this), 10000);
 								}.bind(this), 5000 );
-							}.bind(this), 10000 );
+							}.bind(this), this.names[this.nameIndex].length * 1000 );
 						}.bind(this), 1500 );
 						break;
 				}
