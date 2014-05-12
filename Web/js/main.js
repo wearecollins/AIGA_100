@@ -1,4 +1,4 @@
-SUD.require("js/clock.js");
+SUD.require("js/clocks.js");
 
 SUD.app.BaseApp.prototype._onTouchStart	= function( event )
 {

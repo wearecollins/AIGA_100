@@ -1,4 +1,4 @@
-SUD.require("js/clock.js");
+SUD.require("js/clocks.js");
 
 var app;
 var isIpad = false;
@@ -28,6 +28,11 @@ $(document).ready( function() {
 		this.b = 0;
 
 		this.meshParams = {};
+
+		var gridDrawings 	= [];
+		var index 			= 0;
+		var swipeChangeTimer    = 15;
+		var maxDrawingAge     = 60 * 5;
 
 		this.nameIndex = 0;
 		this.names = ["sean","noreen","chuck","dana","bob","david","ken","leslie","kyle","michael","stephen","abbott","louise","sylvia","cheryl","alex","chip","michael_m","richard","michael_d","nancye","bill_m","gael","ann"];
@@ -67,7 +72,7 @@ $(document).ready( function() {
 			this.grid = [];
 			this.meshes = [];
 
-			this.renderer.setClearColor( 0xffffff );
+			this.renderer.setClearColor( 0x666666 );
 
 			this.currentDrawing = [];
 			this.touchId 		= -1;
@@ -81,6 +86,12 @@ $(document).ready( function() {
 
 			this.setupSpacebrew();
 			this.camera.lookAt( this.scene.position );
+
+			// build clocks...
+			this.clocks = new Clocks();
+			// 				gridX, gridY, spacing, startX, startY, radius, radiusMult
+			this.clocks.setup(10, 10, new THREE.Vector3(4,4,4), -20, -20, 1.5, 1);
+			this.scene.add( this.clocks );
 		}
 
 		//-------------------------------------------------------
@@ -89,26 +100,65 @@ $(document).ready( function() {
 			var app_name = "AIGA100_" + random_id.substring(random_id.length-4);
 
 			// create spacebrew client object
-			sb = new Spacebrew.Client();
+			sb = new Spacebrew.Client("spacebrew.robotconscience.com");
 			sb.send_interval = 0;
 			sb.name(app_name);
 
 			// configure the publication and subscription feeds
-			// grid
-			sb.addPublish( "grid", "grid", "[]" );
+			sb.addPublish( "mode", "range", 0 );
+			sb.addPublish( "name", "range", 0);
 			
 			// stuff we're subscribing to
-			sb.addSubscribe( "mode", "range" );
-			sb.addSubscribe( "name", "range");
+			sb.addSubscribe( "grid", "grid" );
 
 			// override Spacebrew events - this is how you catch events coming from Spacebrew
 			sb.onRangeMessage  = this.onRangeMessage.bind(this);
+			sb.onCustomMessage = this.onCustomMessage.bind(this);
 
 			sb.connect();
 		};
 
 		//-------------------------------------------------------
 		this.update = function (){
+			this.elapsedTime = Date.now() - this.startTime;
+			// this should be in the clockmode!
+			if ( gridDrawings.length != 0 ){//&& clockManager.isInteractive() ){
+		        // first update indices
+		        for ( var i=0; i<gridDrawings.length; i++){
+		            if ( this.getElapsedTimeMillis() - gridDrawings[i].lastChanged > swipeChangeTimer ){
+		                gridDrawings[i].index++;
+		                if (  gridDrawings[i].index >= gridDrawings[i].indices.length ){
+		                    gridDrawings[i].age = 1000;
+		                    continue;
+		                }
+		                gridDrawings[i].lastChanged = this.getElapsedTimeMillis();
+		            }
+		            
+		            var y = gridDrawings[i].indices[gridDrawings[i].index] % 10;
+		            var x = Math.floor(gridDrawings[i].indices[gridDrawings[i].index]/10);
+		            var ind = gridDrawings[i].indices[gridDrawings[i].index];//x + y * 10;
+		            
+		            var indO = gridDrawings[i].indices[gridDrawings[i].index];
+		            if ( gridDrawings[i].grid[indO] ){
+		                var mult = (maxDrawingAge-gridDrawings[i].age) / maxDrawingAge;
+		                //                            static float mult = texW / 10.0;
+		                var v = this.clocks.clocks[indO].position;
+		                this.clocks.magnet(v.x, v.y, gridDrawings[i].color );
+		            }
+		            gridDrawings[i].age++;
+		        }
+		        
+		        
+		        for ( var i=gridDrawings.length-1; i>=0; i--){
+		            if ( gridDrawings[i].age >= maxDrawingAge ){
+		                gridDrawings.slice(i, 1);
+		            }
+		        }
+		    }
+
+
+			this.clocks.update();
+			this.clocks.draw();
 		}
 
 		//-------------------------------------------------------
@@ -131,6 +181,32 @@ $(document).ready( function() {
 		//-------------------------------------------------------
 		this.onRangeMessage = function( name, value ){
 			
+		}
+
+		//-------------------------------------------------------
+		this.onCustomMessage = function( name, val, type ){
+	        
+	        // drawing is json array...
+	        var d = new GridDrawing();
+
+	        // set color
+	        if ( val["color"] ){
+	        	d.color = new THREE.Color();
+	            d.color.setRGB( val.color.r / 255.0, val.color.g / 255.0, val.color.b / 255.0 );
+	        }
+          
+            for (var i=0; i<val["grid"].length; i++){
+                var v = val["grid"][i];
+                var filled = v["filled"] == true | v["filled"] == "true";
+                d.grid.push(filled);
+            }
+	        
+            for (var i=0; i<val["indices"].length; i++){
+                var v = val["indices"][i];
+                d.indices.push( v );
+            }
+	        
+	        gridDrawings.push(d);
 		}
 	}
 	
