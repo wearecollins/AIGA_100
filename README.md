@@ -7,6 +7,11 @@ Sections
 * AIGA_100
   * openFrameworks application that was projected onto our sculpture
   * animates virtual clock faces, controls "modes"
+  * Requires:
+    * [ofxLibwebsockets](github.com/labatrockwell/ofxLibwebsockets)
+    * [ofxSpacebrew](https://github.com/spacebrew/ofxSpacebrew)
+    * [ofxUI](https://github.com/rezaali/ofxUI/)
+    * [ofxMapamok (my fork)](https://github.com/robotconscience/ofxMapamok)
   
 * Prototypes
   * Past prototypes, including lateral pre-clock explorations
