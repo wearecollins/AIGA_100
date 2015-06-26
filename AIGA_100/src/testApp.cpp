@@ -40,7 +40,7 @@ void testApp::setup(){
     ofSetFrameRate(60);
     ofBackground(0);
     
-    font.loadFont("circular/CircularStd-Bold.otf", dotWidth * 1.7 );
+    font.loadFont("fonts/Helvetica.otf", dotWidth * 1.7 );
     
     float sc = texW / 1024.0;
     float clockRadius = texW / 10.0 / 2.5;
