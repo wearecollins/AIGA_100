@@ -1,22 +1,7 @@
-@font-face {
-	font-family: Circular;
-	src:url("../fonts/CircularStd-Bold.otf");
-}
-
-@font-face {
-	font-family: CircularItalic;
-	src:url("../fonts/CircularStd-BoldItalic.otf");
-}
-
-@font-face {
-	font-family: Relative;
-	src:url("../fonts/Relative-10Pitch.ttf");
-}
-
 html, body {
 	background-color:#fff;
 	font-size: 50px;
-	font-family: "Circular";
+	font-family: "Helvetica";
 	letter-spacing: -2px;
 }
 
@@ -72,7 +57,7 @@ html, body {
 }
 
 #names {
-	font-family: "Circular";
+	font-family: "Helvetica";
 	font-size: 30px;
 	color:#FD4F57;
 	opacity: 0;
@@ -155,7 +140,7 @@ html, body {
 }
 
 .quotes {
-	font-family: "Circular";
+	font-family: "Helvetica";
 	font-size: 40px;
 	color:#FD4F57;
 	opacity: 0;
@@ -169,17 +154,17 @@ html, body {
 }
 
 .quotesiPad {
-	font-family: "Circular";
+	font-family: "Helvetica";
 	font-size: 60px;
 }
 
 .italic {
-	font-family: "CircularItalic";
+	font-family: "Helvetica";
 	font-style: normal;
 	font-size: 40px;
 }
 .italiciPad {
-	font-family: "CircularItalic";
+	font-family: "Helvetica";
 	font-style: normal;
 	font-size: 60px;
 }
